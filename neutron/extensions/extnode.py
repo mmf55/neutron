@@ -92,15 +92,9 @@ class ExtNode(extensions.ExtensionDescriptor):
                                           plugin,
                                           params,
                                           allow_bulk=False)
-        extension = extensions.RequestExtension(COLLECTION_NAME, controller)
+        extension = extensions.ResourceExtension(COLLECTION_NAME, controller)
         exts.append(extension)
         return exts
-
-        # resources = []
-        # resource = extensions.ResourceExtension(COLLECTION_NAME,
-        #                                         controller)
-        # resources.append(resource)
-        # return resources
 
     def get_extended_resources(self, version):
         if version == "2.0":
