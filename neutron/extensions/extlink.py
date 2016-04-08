@@ -87,15 +87,15 @@ class ExtLink(extensions.ExtensionDescriptor):
         return "2016-02-29T10:00:00-00:00"
 
     def get_resources(self):
-        exts = []
+        exts = list()
         plugin = manager.NeutronManager.get_plugin()
-        params = RESOURCE_ATTRIBUTE_MAP.get(COLLECTION_NAME, {})
+        params = RESOURCE_ATTRIBUTE_MAP.get(COLLECTION_NAME, dict())
         controller = base.create_resource(COLLECTION_NAME,
                                           RESOURCE_NAME,
                                           plugin,
                                           params,
                                           allow_bulk=False)
-        extension = extensions.RequestExtension(COLLECTION_NAME, controller)
+        extension = extensions.ResourceExtension(COLLECTION_NAME, controller)
         exts.append(extension)
         return exts
 
