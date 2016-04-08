@@ -61,7 +61,7 @@ class ExtLinkPluginInterface(extensions.PluginInterface):
         pass
 
 
-class ExtLink(extensions.ExtensionDescriptor):
+class Extlink(extensions.ExtensionDescriptor):
     def __init__(self):
         pass
 

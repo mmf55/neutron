@@ -64,7 +64,7 @@ class ExtInterfacePluginInterface(extensions.PluginInterface):
         pass
 
 
-class ExtInterface(extensions.ExtensionDescriptor):
+class Extinterface(extensions.ExtensionDescriptor):
     def __init__(self):
         pass
 

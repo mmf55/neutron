@@ -56,7 +56,7 @@ class ExtSegmentPluginInterface(extensions.PluginInterface):
         pass
 
 
-class ExtSegment(extensions.ExtensionDescriptor):
+class Extsegment(extensions.ExtensionDescriptor):
     def __init__(self):
         pass
 
