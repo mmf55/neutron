@@ -38,7 +38,7 @@ RESOURCE_ATTRIBUTE_MAP = {
 
 class ExtInterfacePluginInterface(extensions.PluginInterface):
     @abc.abstractmethod
-    def create_extinterface(self, context, ext_interface):
+    def create_extinterface(self, context, extinterface):
         """Create a new ExtInterface.
         This entity represents an external interface on the Campus Network NaaS plugin."""
         pass
@@ -59,7 +59,7 @@ class ExtInterfacePluginInterface(extensions.PluginInterface):
         pass
 
     @abc.abstractmethod
-    def update_extinterface(self, context, ext_interface):
+    def update_extinterface(self, context, extinterface):
         """Updates database with new information about the ExtInterface represented by the given ID."""
         pass
 

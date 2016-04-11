@@ -29,11 +29,11 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         pass
 
     # --------------------- Database operations related with the external nodes. --------------------------------------
-    def create_extnode(self, context, ext_node):
+    def create_extnode(self, context, extnode):
         LOG.debug("I got here!!!!")
-        LOG.info(ext_node)
+        LOG.info(extnode)
 
-    def update_extnode(self, context, ext_node):
+    def update_extnode(self, context, extnode):
         pass
 
     def list_extnode(self, context):

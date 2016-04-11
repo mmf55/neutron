@@ -39,7 +39,7 @@ RESOURCE_ATTRIBUTE_MAP = {
 
 class ExtLinkPluginInterface(extensions.PluginInterface):
     @abc.abstractmethod
-    def create_extlink(self, context, ext_link):
+    def create_extlink(self, context, extlink):
         """Create a new ExtSegment.
         This entity represents a physical network segment on the Campus Network NaaS plugin."""
         pass
@@ -60,7 +60,7 @@ class ExtLinkPluginInterface(extensions.PluginInterface):
         pass
 
     @abc.abstractmethod
-    def update_extlink(self, context, ext_link):
+    def update_extlink(self, context, extlink):
         """Updates database with new information about the ExtSegment represented by the given ID."""
         pass
 
