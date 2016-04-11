@@ -24,9 +24,9 @@ RESOURCE_ATTRIBUTE_MAP = {
                  'validate': {'type:string': None},
                  'required_by_policy': True,
                  'is_visible': True},
-        'tenant_id': {'allow_post': False, 'allow_put': False,
-                      'validate': {'type:uuid': None},
+        'tenant_id': {'allow_post': True, 'allow_put': False,
                       'required_by_policy': True,
+                      'validate': {'type:uuid': None},
                       'is_visible': True},
         'network_id': {'allow_post': True, 'allow_put': False,
                        'validate': {'type:string': None},
@@ -90,7 +90,7 @@ class Extinterface(extensions.ExtensionDescriptor):
         return "2016-02-29T10:00:00-00:00"
 
     def get_resources(self):
-        exts =list()
+        exts = list()
         plugin = manager.NeutronManager.get_plugin()
         params = RESOURCE_ATTRIBUTE_MAP.get(COLLECTION_NAME, dict())
         controller = base.create_resource(COLLECTION_NAME,
