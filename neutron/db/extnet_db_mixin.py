@@ -3,6 +3,11 @@ from neutron.extensions import extsegment
 from neutron.extensions import extinterface
 from neutron.extensions import extlink
 
+from neutron._i18n import _
+from neutron.common import exceptions
+from neutron.db import extnet_db as models
+
+from oslo_utils import uuidutils
 from oslo_log import log as logging
 
 LOG = logging.getLogger(__name__)
@@ -12,6 +17,21 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                         extsegment.ExtSegmentPluginInterface,
                         extinterface.ExtInterfacePluginInterface,
                         extlink.ExtLinkPluginInterface):
+    def _get_tenant_id_for_create(self, context, resource):
+        """Get tenant id for creation of resources."""
+        if context.is_admin and 'tenant_id' in resource:
+            tenant_id = resource['tenant_id']
+        elif ('tenant_id' in resource and
+                      resource['tenant_id'] != context.tenant_id):
+            reason = _('Cannot create resource for another tenant')
+            raise exceptions.AdminRequired(reason=reason)
+        else:
+            tenant_id = context.tenant_id
+        return tenant_id
+
+    def _make_extnode_dict(self, extnode):
+        pass
+
     # -------------------- Database operations related with the external interfaces. ----------------------------------
     def delete_extinterface(self, context, id):
         pass
@@ -32,6 +52,23 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
     def create_extnode(self, context, extnode):
         LOG.debug("I got here!!!!")
         LOG.info(extnode)
+        node = extnode['extnode']
+        with context.session.begin(subtransactions=True):
+            node_db = models.ExtNode(
+                id=node.get('id', uuidutils.generate_uuid()),
+                name=node.get('name'),
+                type=node.get('type'))
+            context.session.add(node_db)
+            if node['add_interfaces'] is not None:
+                interfaces = []
+                for interface in interfaces:
+                    int_db = models.ExtNodeInt(
+                        name=interface.get('name'),
+                        type=interface.get('type'),
+                        extnode=node_db.get('id'),
+                        extsegment=interface.get('segment_id'))
+                    context.session.add(int_db)
+        return _make_extnode_dict(node_db)
 
     def update_extnode(self, context, extnode):
         pass
