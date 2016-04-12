@@ -21,17 +21,9 @@ class ExtNode(model_base.BASEV2, models_v2.HasId):
     # type here can be e.g. router, switch, virtual switch.
     name = sa.Column(sa.String(36))
     type = sa.column(sa.String(36))
-
-
-class ExtNodeInt(model_base.BASEV2, models_v2.HasId):
-    __tablename__ = "extnodeint"
-
-    name = sa.Column(sa.String(36))
-    type = sa.Column(sa.String(36))
-    extnode = sa.Column(sa.String(36), sa.ForeignKey("extnode.id",
-                                                     ondelete="CASCADE"))
-    extsegment = sa.Column(sa.String(36), sa.ForeignKey("extsegment.id",
-                                                        ondelete="CASCADE"))
+    extsegments = orm.relationship(ExtSegment,
+                                   secondary=en_es_association,
+                                   backref="extnodes")
 
 
 class ExtSegment(model_base.BASEV2, models_v2.HasId):
@@ -42,6 +34,15 @@ class ExtSegment(model_base.BASEV2, models_v2.HasId):
     # Types supported can be e.g. VLAN, GRE, VXLAN.
     types_supported = sa.Column(sa.String(36))
     ids_pool = sa.Column(sa.String(36))
+    extnodes = orm.relationship(ExtNode,
+                                secondary=en_es_association,
+                                backref="extsegments")
+
+
+# Many to many relationship between ExtNodes and ExtSegments.
+en_es_association = sa.Table('cs_cl_association', model_base.BASEV2,
+                             sa.Column('extnode_id', sa.String(36), sa.ForeignKey('extnode.id')),
+                             sa.Column('extsegment_id', sa.String(36), sa.ForeignKey('extsegment.id')))
 
 
 class ExtLink(model_base.BASEV2, models_v2.HasId):
@@ -59,9 +60,9 @@ class ExtLink(model_base.BASEV2, models_v2.HasId):
 class ExtConnection(model_base.BASEV2, models_v2.HasId):
     __tablename__ = "extconnection"
 
-    extnodeint1 = sa.Column(sa.String(36), sa.ForeignKey("extnodeint.id",
+    extnode1 = sa.Column(sa.String(36), sa.ForeignKey("extnode.id",
                                                       ondelete="CASCADE"))
-    extnodeint2 = sa.Column(sa.String(36), sa.ForeignKey("extnodeint.id",
+    extnode2 = sa.Column(sa.String(36), sa.ForeignKey("extnode.id",
                                                       ondelete="CASCADE"))
     extlink = sa.Column(sa.String(36), sa.ForeignKey("extlink.id",
                                                      ondelete="CASCADE"))
