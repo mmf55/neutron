@@ -17,7 +17,6 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                         extsegment.ExtSegmentPluginInterface,
                         extinterface.ExtInterfacePluginInterface,
                         extlink.ExtLinkPluginInterface):
-
     def _get_tenant_id_for_create(self, context, resource):
         """Get tenant id for creation of resources."""
         if context.is_admin and 'tenant_id' in resource:
@@ -31,7 +30,21 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         return tenant_id
 
     def _make_extnode_dict(self, extnode, interfaces):
-        pass
+        int_list = []
+        for interface in interfaces:
+            inter = {
+                'id': interface.id,
+                'name': interface.name,
+                'type': interface.type
+            }
+            int_list.append(inter)
+        node_created = {
+            'id': extnode.id,
+            'name': extnode.name,
+            'type': extnode.type,
+            'interfaces': int_list
+        }
+        return node_created
 
     # -------------------- Database operations related with the external interfaces. ----------------------------------
     def delete_extinterface(self, context, id):
