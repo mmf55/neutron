@@ -49,12 +49,12 @@ class ExtInterfacePluginInterface(extensions.PluginInterface):
         pass
 
     @abc.abstractmethod
-    def show_extinterface(self, context, id):
+    def get_extinterface(self, context, id):
         """Return the info related to a ExtInterface represented by the given ID."""
         pass
 
     @abc.abstractmethod
-    def list_extinterface(self, context):
+    def get_extinterfaces(self, context, filters, fields):
         """Returns a list with all registered ExtInterface."""
         pass
 

@@ -53,17 +53,17 @@ class ExtNodePluginInterface(extensions.PluginInterface):
         pass
 
     @abc.abstractmethod
-    def show_extnode(self, context, id):
+    def get_extnode(self, context, id, fields):
         """Return the info related to a ExtNode represented by the given ID."""
         pass
 
     @abc.abstractmethod
-    def list_extnode(self, context):
+    def get_extnodes(self, context, filters, fields):
         """Returns a list with all registered ExtNodes."""
         pass
 
     @abc.abstractmethod
-    def update_extnode(self, context, extnode):
+    def update_extnode(self, context, id, extnode):
         """Updates database with new information about the ExtNode represented by the given ID."""
         pass
 

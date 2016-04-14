@@ -50,17 +50,17 @@ class ExtLinkPluginInterface(extensions.PluginInterface):
         pass
 
     @abc.abstractmethod
-    def show_extlink(self, context, id):
+    def get_extlink(self, context, id, fields):
         """Return the info related to a ExtSegment represented by the given ID."""
         pass
 
     @abc.abstractmethod
-    def list_extlink(self, context):
+    def get_extlinks(self, context, filters, fields):
         """Returns a list with all registered ExtSegment."""
         pass
 
     @abc.abstractmethod
-    def update_extlink(self, context, extlink):
+    def update_extlink(self, context, id, extlink):
         """Updates database with new information about the ExtSegment represented by the given ID."""
         pass
 

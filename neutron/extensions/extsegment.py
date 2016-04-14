@@ -2,7 +2,10 @@ import abc
 
 from neutron.api import extensions
 from neutron.api.v2 import base
+from neutron.api.v2 import attributes
 from neutron import manager
+
+from neutron.plugins.ml2.common import extnet_validators
 
 RESOURCE_NAME = "extsegment"
 COLLECTION_NAME = "%ss" % RESOURCE_NAME
@@ -16,13 +19,15 @@ RESOURCE_ATTRIBUTE_MAP = {
                },
         'name': {'allow_post': True, 'allow_put': False,
                  'validate': {'type:string': None},
-                 'is_visible': True, 'default': ''},
+                 'is_visible': True,
+                 'default': ''},
         'types_supported': {'allow_post': True, 'allow_put': False,
                             'required_by_policy': True,
-                            'validate': {'type:string': None},
-                            'is_visible': True, 'default': ''},
+                            'validate': {'type:extnet_overlay_types': None},
+                            'is_visible': True},
         'id_pool': {'allow_post': True, 'allow_put': False,
                     'required_by_policy': False,
+                    'validate': {'type:extnet_ids_pool': None},
                     'is_visible': True},
         'tenant_id': {'allow_post': True, 'allow_put': False,
                       'required_by_policy': True,
@@ -30,6 +35,11 @@ RESOURCE_ATTRIBUTE_MAP = {
                       'is_visible': True},
     }
 }
+
+validator_func_types = extnet_validators.validate_types_supported
+validator_func_ids_pool = extnet_validators.validate_ids_pool
+attributes.validators['type:extnet_overlay_types'] = validator_func_types
+attributes.validators['type:extnet_ids_pool'] = validator_func_ids_pool
 
 
 class ExtSegmentPluginInterface(extensions.PluginInterface):
@@ -45,17 +55,17 @@ class ExtSegmentPluginInterface(extensions.PluginInterface):
         pass
 
     @abc.abstractmethod
-    def show_extsegment(self, context, id):
+    def get_extsegment(self, context, id, fields):
         """Return the info related to a ExtSegment represented by the given ID."""
         pass
 
     @abc.abstractmethod
-    def list_extsegment(self, context):
+    def get_extsegments(self, context, filters, fields):
         """Returns a list with all registered ExtSegment."""
         pass
 
     @abc.abstractmethod
-    def update_extsegment(self, context, extsegment):
+    def update_extsegment(self, context, id, extsegment):
         """Updates database with new information about the ExtSegment represented by the given ID."""
         pass
 
