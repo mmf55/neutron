@@ -256,16 +256,21 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
 
     # --------------------- Database operations related with the external links. --------------------------------------
     def create_extlink(self, context, extlink):
+        self._admin_check(context, 'CREATE')
         pass
 
     def get_extlink(self, context, id, fields):
+        self._admin_check(context, 'GET')
         pass
 
     def update_extlink(self, context, id, extlink):
+        self._admin_check(context, 'UPDATE')
         pass
 
     def get_extlinks(self, context, filters, fields):
+        self._admin_check(context, 'GET')
         pass
 
     def delete_extlink(self, context, id):
+        self._admin_check(context, 'DELETE')
         pass

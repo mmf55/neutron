@@ -12,8 +12,7 @@ RESOURCE_ATTRIBUTE_MAP = {
     COLLECTION_NAME: {
         'id': {'allow_post': False, 'allow_put': False,
                'validate': {'type:uuid': None},
-               'is_visible': True
-               },
+               'is_visible': True},
         'type': {'allow_post': True, 'allow_put': False,
                  'required_by_policy': True,
                  'validate': {'type:string': None},
@@ -33,6 +32,12 @@ RESOURCE_ATTRIBUTE_MAP = {
                       'required_by_policy': True,
                       'validate': {'type:uuid': None},
                       'is_visible': True},
+        'add_connections': {'allow_post': True, 'allow_put': False,
+                            'required_by_policy': False,
+                            'is_visible': True},
+        'rem_connections': {'allow_post': True, 'allow_put': False,
+                            'required_by_policy': False,
+                            'is_visible': True},
     }
 }
 

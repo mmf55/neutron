@@ -1,5 +1,10 @@
 
+# Segmentation types supported
+SEG_TYPE_VLAN = 'vlan'
+SEG_TYPE_VXLAN = 'vxlan'
+SEG_TYPE_GRE = 'gre'
 
-TYPE_SUPPORTED_SEG_VLAN = 'vlan'
-TYPE_SUPPORTED_SEG_VXLAN = 'vxlan'
-TYPE_SUPPORTED_SEG_GRE = 'gre'
+# Connection types supported
+
+CON_TYPE_NORMAL = 'normal'
+CON_TYPE_TRUNK = 'trunk'

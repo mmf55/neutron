@@ -7,12 +7,11 @@ from sqlalchemy import orm
 class ExtInterface(model_base.BASEV2, models_v2.HasId, models_v2.HasTenant):
     __tablename__ = "extinterface"
 
-    # The type here can be e.g. SSID, port.
-    type = sa.column(sa.String(36))
     network_id = sa.Column(sa.String(36),
                            sa.ForeignKey('networks.id', ondelete='CASCADE'))
-    extnode = sa.Column(sa.String(36), sa.ForeignKey("extnode.id",
+    extnodeint_id = sa.Column(sa.String(36), sa.ForeignKey("extnodeint.id",
                                                      ondelete="CASCADE"))
+    extnodeint = orm.relationship("ExtNodeInt", back_populates="extinterface")
 
 
 class ExtNode(model_base.BASEV2, models_v2.HasId):
@@ -27,11 +26,13 @@ class ExtNodeInt(model_base.BASEV2, models_v2.HasId):
     __tablename__ = "extnodeint"
 
     name = sa.Column(sa.String(36))
+    # The type here can be e.g. SSID, port.
     type = sa.Column(sa.String(36))
     extnode = sa.Column(sa.String(36), sa.ForeignKey("extnode.id",
                                                      ondelete="CASCADE"))
     extsegment = sa.Column(sa.String(36), sa.ForeignKey("extsegment.id",
                                                         ondelete="CASCADE"))
+    extinterface = orm.relationship("ExtInterface", uselist=False, backref="extnodeint")
 
 
 class ExtSegment(model_base.BASEV2, models_v2.HasId):
@@ -58,6 +59,9 @@ class ExtLink(model_base.BASEV2, models_v2.HasId):
 
 class ExtConnection(model_base.BASEV2, models_v2.HasId):
     __tablename__ = "extconnection"
+
+    # Connection types can be e.g. normal or trunk.
+    type = sa.Column(sa.String(36))
 
     extnodeint1 = sa.Column(sa.String(36), sa.ForeignKey("extnodeint.id",
                                                       ondelete="CASCADE"))
