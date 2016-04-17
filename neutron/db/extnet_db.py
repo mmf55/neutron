@@ -28,9 +28,9 @@ class ExtNodeInt(model_base.BASEV2, models_v2.HasId):
     name = sa.Column(sa.String(36))
     # The type here can be e.g. SSID, port.
     type = sa.Column(sa.String(36))
-    extnode = sa.Column(sa.String(36), sa.ForeignKey("extnode.id",
+    extnode_id = sa.Column(sa.String(36), sa.ForeignKey("extnode.id",
                                                      ondelete="CASCADE"))
-    extsegment = sa.Column(sa.String(36), sa.ForeignKey("extsegment.id",
+    extsegment_id = sa.Column(sa.String(36), sa.ForeignKey("extsegment.id",
                                                         ondelete="CASCADE"))
     extinterface = orm.relationship("ExtInterface", uselist=False, backref="extnodeint")
 
@@ -53,7 +53,7 @@ class ExtLink(model_base.BASEV2, models_v2.HasId):
     network_id = sa.Column(sa.String(36),
                            sa.ForeignKey('networks.id', ondelete='CASCADE'))
     overlay_id = sa.Column(sa.String(36))
-    extsegment = sa.Column(sa.String(36), sa.ForeignKey("extsegment.id",
+    extsegment_id = sa.Column(sa.String(36), sa.ForeignKey("extsegment.id",
                                                         ondelete="CASCADE"))
 
 
@@ -63,9 +63,9 @@ class ExtConnection(model_base.BASEV2, models_v2.HasId):
     # Connection types can be e.g. normal or trunk.
     type = sa.Column(sa.String(36))
 
-    extnodeint1 = sa.Column(sa.String(36), sa.ForeignKey("extnodeint.id",
+    extnodeint1_id = sa.Column(sa.String(36), sa.ForeignKey("extnodeint.id",
                                                       ondelete="CASCADE"))
-    extnodeint2 = sa.Column(sa.String(36), sa.ForeignKey("extnodeint.id",
+    extnodeint2_id = sa.Column(sa.String(36), sa.ForeignKey("extnodeint.id",
                                                       ondelete="CASCADE"))
-    extlink = sa.Column(sa.String(36), sa.ForeignKey("extlink.id",
+    extlink_id = sa.Column(sa.String(36), sa.ForeignKey("extlink.id",
                                                      ondelete="CASCADE"))

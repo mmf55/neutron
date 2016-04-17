@@ -49,7 +49,7 @@ class ExtInterfacePluginInterface(extensions.PluginInterface):
         pass
 
     @abc.abstractmethod
-    def get_extinterface(self, context, id):
+    def get_extinterface(self, context, id, fields):
         """Return the info related to a ExtInterface represented by the given ID."""
         pass
 
@@ -59,7 +59,7 @@ class ExtInterfacePluginInterface(extensions.PluginInterface):
         pass
 
     @abc.abstractmethod
-    def update_extinterface(self, context, extinterface):
+    def update_extinterface(self, context, id, extinterface):
         """Updates database with new information about the ExtInterface represented by the given ID."""
         pass
 
