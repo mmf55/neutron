@@ -14,8 +14,8 @@ def validate_types_supported(data, valid_values=None):
 
 
 def validate_ids_pool(data, valid_values=None):
-    r1 = re.compile('[0-9]*:[0-9]*')
-    r2 = re.compile('[0-9]*')
-    if r1.match(data) is not None or r2.match(data) is not None:
+    r1 = re.compile('^[0-9]+:[0-9]+$')
+    r2 = re.compile('^[0-9]+$')
+    if r1.match(data) is None and r2.match(data) is None:
         return _('The format of the pool os IDs is not correct.')
     return
