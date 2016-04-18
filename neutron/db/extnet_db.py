@@ -39,7 +39,6 @@ class ExtSegment(model_base.BASEV2, models_v2.HasId):
     __tablename__ = "extsegment"
 
     name = sa.column(sa.String(36))
-
     # Types supported can be e.g. VLAN, GRE, VXLAN.
     types_supported = sa.Column(sa.String(36))
     ids_pool = sa.Column(sa.String(36))

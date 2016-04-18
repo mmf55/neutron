@@ -40,7 +40,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
             tenant_id = context.tenant_id
         return tenant_id
 
-    def _make_extnode_dict(self, extnode, interfaces=None):
+    def _make_extnode_dict(self, extnode, interfaces=None, fields=None):
         """Creates a dictionary to be sent to client API"""
         int_list = []
         node_created = {}
@@ -56,7 +56,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         node_created['id'] = extnode.id
         node_created['name'] = extnode.name
         node_created['type'] = extnode.type
-        return node_created
+        return self._fields(node_created, fields)
 
     def _get_existing_extnode(self, context, node_id):
         try:
@@ -79,14 +79,14 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
             .all()
         return extnode_connections is not None
 
-    def _make_extsegment_dict(self, extsegment):
+    def _make_extsegment_dict(self, extsegment, fields=None):
         extsegment_dict = {
             'id': extsegment.id,
             'name': extsegment.name,
             'types_supported': extsegment.types_supported,
             'ids_pool': extsegment.ids_pool
         }
-        return extsegment_dict
+        return self._fields(extsegment_dict, fields)
 
     def _get_existing_extsegment(self, context, segment_id):
         try:
@@ -99,7 +99,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         extsegments_links = context.session.query(models.ExtLink).filter_by(extsegment_id=extsegment.id).all()
         return extsegments_links is not None
 
-    def _make_extlink_dict(self, extlink, connections=None):
+    def _make_extlink_dict(self, extlink, connections=None, fields=None):
         """Creates a dictionary to be sent to client API"""
         connections_list = []
         link_created = {}
@@ -112,12 +112,12 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                     'extlink_id': connection.extlink_id
                 }
                 connections_list.append(conn)
-            link_created['interfaces'] = connections_list
+            link_created['connections'] = connections_list
         link_created['type'] = extlink.type
         link_created['network_id'] = extlink.network_id
         link_created['overlay_id'] = extlink.overlay_id
         link_created['extsegment_id'] = extlink.extsegment_id
-        return link_created
+        return self._fields(link_created, fields)
 
     def _get_existing_extlink(self, context, link_id):
         try:
@@ -126,13 +126,14 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
             raise extnet_exceptions.ExtNodeNotFound(id=link_id)
         return link
 
-    def _make_extinterface_dict(self, extinterface):
+    def _make_extinterface_dict(self, extinterface, fields=None):
         extinterface_dict = {
             'id': extinterface.id,
             'tenant_id': extinterface.tenant_id,
-            'extnodeint_id': extinterface.extnodeint_id
+            'extnodeint_id': extinterface.extnodeint_id,
+            'network_id': extinterface.network_id
         }
-        return extinterface_dict
+        return self._fields(extinterface_dict, fields)
 
     def _get_existing_extinterface(self, context, interface_id):
         try:
@@ -141,6 +142,13 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
             raise extnet_exceptions.ExtInterfaceNotFound(id=interface_id)
         return interface
 
+    def _fields(self, resource, fields):
+        """Get fields for the resource for get query."""
+        if fields:
+            return dict(((key, item) for key, item in resource.items()
+                         if key in fields))
+        return resource
+
     # -------------------- Database operations related with the external interfaces. ----------------------------------
     def create_extinterface(self, context, extinterface):
         interface = extinterface['extinterface']
@@ -148,7 +156,8 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
             interface_db = models.ExtInterface(
                 id=uuidutils.generate_uuid(),
                 tenant_id=interface['tenant_id'],
-                extnodeint_id=interface['extnodeint_id'])
+                extnodeint_id=interface['extnodeint_id'],
+                network_id=interface['network_id'])
             context.session.add(interface_db)
         return self._make_extinterface_dict(interface_db)
 
@@ -158,25 +167,25 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
             interface_in_db = self._get_existing_extinterface(context, id)
             interface_in_db.tenant_id = interface['tenant_id']
             interface_in_db.extnodeint_id = interface['extnodeint_id']
+            interface_in_db.network_id = interface['network_id']
             context.session.commit()
         return self._make_extinterface_dict(interface_in_db)
 
     def get_extinterfaces(self, context, filters, fields):
         extinterfaces = context.session.query(models.ExtInterface) \
             .filter_by(filters) \
-            .options(load_only(fields)) \
             .all()
         extinterfaces_list = []
         for extinterface in extinterfaces:
-            extinterface_dict = self._make_extinterface_dict(extinterface)
+            extinterface_dict = self._make_extinterface_dict(extinterface, fields=fields)
             extinterfaces_list.append(extinterface_dict)
-        return {'extinterfaces': extinterfaces_list}
+        return extinterfaces_list
 
     def get_extinterface(self, context, id, fields):
         extinterface = context.query(models.ExtInterface) \
             .filter_by(id=id) \
             .first()
-        return self._make_extinterface_dict(extinterface)
+        return self._make_extinterface_dict(extinterface, fields=fields)
 
     def delete_extinterface(self, context, id):
         with context.session.begin(subtransactions=True):
@@ -210,7 +219,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                     context.session.add(int_db)
                     list_int_db.append(int_db)
         """Create and return dictionary for the client."""
-        return self._make_extnode_dict(node_db, list_int_db)
+        return self._make_extnode_dict(node_db, interfaces=list_int_db)
 
     def update_extnode(self, context, id, extnode):
         LOG.info(extnode)
@@ -237,19 +246,18 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                     context.session.query(models.ExtNodeInt).filter_by(id=interface['id']).delete()
             list_int_db = context.session.query(models.ExtNodeInt).filter_by(extnode_id=id).all()
             context.session.commit()
-        return self._make_extnode_dict(node_in_db, list_int_db)
+        return self._make_extnode_dict(node_in_db, interfaces=list_int_db)
 
     def get_extnodes(self, context, filters=None, fields=None):
         self._admin_check(context, 'GET')
         extnodes = context.session.query(models.ExtNode)\
             .filter_by(filters)\
-            .options(load_only(fields))\
             .all()
         extnodes_list = []
         for extnode in extnodes:
-            extnode_dict = self._make_extnode_dict(extnode)
+            extnode_dict = self._make_extnode_dict(extnode, fields=fields)
             extnodes_list.append(extnode_dict)
-        return {'extnodes': extnodes_list}
+        return extnodes_list
 
     def get_extnode(self, context, id, fields=None):
         self._admin_check(context, 'GET')
@@ -259,7 +267,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         extnode_int = context.query(models.ExtNodeInt)\
             .filter_by(extnode_id=id)\
             .all()
-        return self._make_extnode_dict(extnode, extnode_int)
+        return self._make_extnode_dict(extnode, interfaces=extnode_int, fields=fields)
 
     def delete_extnode(self, context, id):
         self._admin_check(context, 'DELETE')
@@ -298,20 +306,19 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         self._admin_check(context, 'GET')
         extsegments = context.session.query(models.ExtSegment) \
             .filter_by(filters) \
-            .options(load_only(fields)) \
             .all()
         extsegments_list = []
         for extsegment in extsegments:
-            extsegment_dict = self._make_extnode_dict(extsegment)
+            extsegment_dict = self._make_extsegment_dict(extsegment, fields=fields)
             extsegments_list.append(extsegment_dict)
-        return {'extsegments': extsegments_list}
+        return extsegments_list
 
     def get_extsegment(self, context, id, fields):
         self._admin_check(context, 'GET')
         extsegment = context.query(models.ExtSegment) \
             .filter_by(id=id) \
             .first()
-        return self._make_extsegment_dict(extsegment)
+        return self._make_extsegment_dict(extsegment, fields=fields)
 
     def delete_extsegment(self, context, id):
         self._admin_check(context, 'DELETE')
@@ -345,7 +352,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                         extlink_id=link_db.id)
                     context.session.add(connection_db)
                     list_con_db.append(connection_db)
-        return self._make_extlink_dict(link_db, list_con_db)
+        return self._make_extlink_dict(link_db, connections=list_con_db)
 
     def get_extlink(self, context, id, fields):
         self._admin_check(context, 'GET')
@@ -355,7 +362,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         extlink_conn = context.session.query(models.ExtConnection)\
             .filter_by(extlink_id=id)\
             .all()
-        return self._make_extlink_dict(extlink, extlink_conn)
+        return self._make_extlink_dict(extlink, connections=extlink_conn, fields=fields)
 
     def update_extlink(self, context, id, extlink):
         self._admin_check(context, 'UPDATE')
@@ -380,7 +387,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                     context.session.query(models.ExtConnection).filter_by(id=connection['id']).delete()
             list_conn_db = context.session.query(models.ExtConnection).filter_by(extlink_id=id).all()
             context.session.commit()
-        return self._make_extlink_dict(link_in_db, list_conn_db)
+        return self._make_extlink_dict(link_in_db, connections=list_conn_db)
 
     def get_extlinks(self, context, filters, fields):
         self._admin_check(context, 'GET')
@@ -390,9 +397,9 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
             .all()
         extlinks_list = []
         for extlink in extlinks:
-            extlinks_dict = self._make_extlink_dict(extlink)
+            extlinks_dict = self._make_extlink_dict(extlink, fields=fields)
             extlinks_list.append(extlinks_dict)
-        return {'extnodes': extlinks_list}
+        return extlinks_list
 
     def delete_extlink(self, context, id):
         self._admin_check(context, 'DELETE')
