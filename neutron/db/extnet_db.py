@@ -32,7 +32,7 @@ class ExtNodeInt(model_base.BASEV2, models_v2.HasId):
                                                      ondelete="CASCADE"))
     extsegment_id = sa.Column(sa.String(36), sa.ForeignKey("extsegment.id",
                                                         ondelete="CASCADE"))
-    extinterface = orm.relationship("ExtInterface", uselist=False, backref="extnodeint")
+    extinterface = orm.relationship("ExtInterface", uselist=False, back_populates="extnodeint")
 
 
 class ExtSegment(model_base.BASEV2, models_v2.HasId):
