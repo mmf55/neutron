@@ -304,6 +304,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
 
     def get_extsegments(self, context, filters, fields):
         self._admin_check(context, 'GET')
+        LOG.info(filters)
         extsegments = context.session.query(models.ExtSegment) \
             .filter_by(filters) \
             .all()
