@@ -26,3 +26,5 @@ class ExtNetworkML2(plugin.Ml2Plugin,
 
     def create_extsegment(self, context, extsegment):
         super(ExtNetworkML2, self).create_extsegment(context, extsegment)
+
+
