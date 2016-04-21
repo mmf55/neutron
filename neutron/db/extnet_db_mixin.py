@@ -7,6 +7,7 @@ from neutron.plugins.ml2.common import extnet_exceptions
 from neutron._i18n import _
 from neutron.common import exceptions
 from neutron.db import extnet_db as models
+from neutron.db import extnet_db_query as db_query
 
 from oslo_utils import uuidutils
 from oslo_log import log as logging
@@ -19,7 +20,8 @@ LOG = logging.getLogger(__name__)
 class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                         extsegment.ExtSegmentPluginInterface,
                         extinterface.ExtInterfacePluginInterface,
-                        extlink.ExtLinkPluginInterface):
+                        extlink.ExtLinkPluginInterface,
+                        db_query.ExtNetworkCommonDbMixin):
 
     # ------------------------ Auxiliary functions for database operations. -------------------------------------------
     def _admin_check(self, context, action):
@@ -312,7 +314,10 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         for extsegment in extsegments:
             extsegment_dict = self._make_extsegment_dict(extsegment, fields=fields)
             extsegments_list.append(extsegment_dict)
-        return extsegments_list
+        return self._get_collection(context,
+                                    models.ExtSegment,
+                                    self._make_extsegment_dict,
+                                    filters=filters)
 
     def get_extsegment(self, context, id, fields):
         self._admin_check(context, 'GET')
