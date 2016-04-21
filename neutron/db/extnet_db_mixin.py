@@ -307,13 +307,13 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
     def get_extsegments(self, context, filters, fields):
         self._admin_check(context, 'GET')
         LOG.info(filters)
-        extsegments = context.session.query(models.ExtSegment) \
-            .filter_by(filters) \
-            .all()
-        extsegments_list = []
-        for extsegment in extsegments:
-            extsegment_dict = self._make_extsegment_dict(extsegment, fields=fields)
-            extsegments_list.append(extsegment_dict)
+        # extsegments = context.session.query(models.ExtSegment) \
+        #     .filter_by(filters) \
+        #     .all()
+        # extsegments_list = []
+        # for extsegment in extsegments:
+        #     extsegment_dict = self._make_extsegment_dict(extsegment, fields=fields)
+        #     extsegments_list.append(extsegment_dict)
         return self._get_collection(context,
                                     models.ExtSegment,
                                     self._make_extsegment_dict,
