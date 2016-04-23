@@ -83,8 +83,6 @@ from neutron.plugins.ml2 import rpc
 from neutron.quota import resource_registry
 from neutron.services.qos import qos_consts
 
-from neutron.db import extnet_db_mixin
-
 LOG = log.getLogger(__name__)
 
 MAX_BIND_TRIES = 10
@@ -126,8 +124,7 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
                 vlantransparent_db.Vlantransparent_db_mixin,
                 extradhcpopt_db.ExtraDhcpOptMixin,
                 netmtu_db.Netmtu_db_mixin,
-                address_scope_db.AddressScopeDbMixin,
-                extnet_db_mixin.ExtNetworkDBMixin):
+                address_scope_db.AddressScopeDbMixin):
 
     """Implement the Neutron L2 abstractions using modules.
 
