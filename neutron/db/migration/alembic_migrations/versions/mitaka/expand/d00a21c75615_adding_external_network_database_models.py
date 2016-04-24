@@ -35,6 +35,7 @@ def upgrade():
     op.create_table('extnodes',
     sa.Column('id', sa.String(length=36), nullable=False),
     sa.Column('name', sa.String(length=36), nullable=True),
+    sa.Column('type', sa.String(length=36), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     mysql_engine='InnoDB'
     )
@@ -70,6 +71,7 @@ def upgrade():
     op.create_index(op.f('ix_extinterfaces_tenant_id'), 'extinterfaces', ['tenant_id'], unique=False)
     op.create_table('extlinks',
     sa.Column('id', sa.String(length=36), nullable=False),
+    sa.Column('type', sa.String(length=36), nullable=True),
     sa.Column('network_id', sa.String(length=36), nullable=True),
     sa.Column('overlay_id', sa.String(length=36), nullable=True),
     sa.Column('extsegment_id', sa.String(length=36), nullable=True),

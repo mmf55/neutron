@@ -19,7 +19,7 @@ class ExtNode(model_base.BASEV2, models_v2.HasId):
 
     # type here can be e.g. router, switch, virtual switch.
     name = sa.Column(sa.String(36))
-    type = sa.column(sa.String(36))
+    type = sa.Column(sa.String(36))
 
 
 class ExtNodeInt(model_base.BASEV2, models_v2.HasId):
@@ -38,7 +38,7 @@ class ExtNodeInt(model_base.BASEV2, models_v2.HasId):
 class ExtSegment(model_base.BASEV2, models_v2.HasId):
     __tablename__ = "extsegments"
 
-    name = sa.column(sa.String(36))
+    name = sa.Column(sa.String(36))
     # Types supported can be e.g. VLAN, GRE, VXLAN.
     types_supported = sa.Column(sa.String(36))
     ids_pool = sa.Column(sa.String(36))
@@ -48,7 +48,7 @@ class ExtLink(model_base.BASEV2, models_v2.HasId):
     __tablename__ = "extlinks"
 
     # Tells the type of the links created e.g. VLAN, GRE, VXLAN
-    type = sa.column(sa.String(36))
+    type = sa.Column(sa.String(36))
     network_id = sa.Column(sa.String(36),
                            sa.ForeignKey('networks.id', ondelete='CASCADE'))
     overlay_id = sa.Column(sa.String(36))
