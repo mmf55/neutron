@@ -40,6 +40,7 @@ def upgrade():
     )
     op.create_table('extsegments',
     sa.Column('id', sa.String(length=36), nullable=False),
+    sa.Column('name', sa.String(length=36), nullable=True),
     sa.Column('types_supported', sa.String(length=36), nullable=True),
     sa.Column('ids_pool', sa.String(length=36), nullable=True),
     sa.PrimaryKeyConstraint('id'),

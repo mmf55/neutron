@@ -287,9 +287,9 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         with context.session.begin(subtransactions=True):
             segment_db = models.ExtSegment(
                 id=uuidutils.generate_uuid(),
-                name=extsegment.get('name'),
-                types_supported=extsegment.get('types_supported'),
-                ids_pool=extsegment.get('ids_pool'))
+                name=segment.get('name'),
+                types_supported=segment.get('types_supported'),
+                ids_pool=segment.get('ids_pool'))
             context.session.add(segment_db)
         return self._make_extsegment_dict(segment_db)
 
