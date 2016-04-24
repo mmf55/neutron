@@ -79,7 +79,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
             .filter(models.ExtConnection.extnodeint1 == extnode.id)\
             .filter(models.ExtConnection.extnodeint2 == extnode.id)\
             .all()
-        return extnode_connections is not None
+        return extnode_connections
 
     def _make_extsegment_dict(self, extsegment, fields=None):
         extsegment_dict = {
@@ -92,14 +92,14 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
 
     def _get_existing_extsegment(self, context, segment_id):
         try:
-            segment = context.session.query(models.ExtSegment).get(id=segment_id)
+            segment = context.session.query(models.ExtSegment).get(segment_id)
         except sa_orm_exc.NoResultFound:
             raise extnet_exceptions.ExtSegmentNotFound(id=segment_id)
         return segment
 
     def _extsegment_has_links(self, context, extsegment):
         extsegments_links = context.session.query(models.ExtLink).filter_by(extsegment_id=extsegment.id).all()
-        return extsegments_links is not None
+        return extsegments_links
 
     def _make_extlink_dict(self, extlink, connections=None, fields=None):
         """Creates a dictionary to be sent to client API"""
@@ -184,7 +184,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         return extinterfaces_list
 
     def get_extinterface(self, context, id, fields):
-        extinterface = context.query(models.ExtInterface) \
+        extinterface = context.session.query(models.ExtInterface) \
             .filter_by(id=id) \
             .first()
         return self._make_extinterface_dict(extinterface, fields=fields)
@@ -306,14 +306,6 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
 
     def get_extsegments(self, context, filters, fields):
         self._admin_check(context, 'GET')
-        LOG.info(filters)
-        # extsegments = context.session.query(models.ExtSegment) \
-        #     .filter_by(filters) \
-        #     .all()
-        # extsegments_list = []
-        # for extsegment in extsegments:
-        #     extsegment_dict = self._make_extsegment_dict(extsegment, fields=fields)
-        #     extsegments_list.append(extsegment_dict)
         return self._get_collection(context,
                                     models.ExtSegment,
                                     self._make_extsegment_dict,
@@ -321,7 +313,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
 
     def get_extsegment(self, context, id, fields):
         self._admin_check(context, 'GET')
-        extsegment = context.query(models.ExtSegment) \
+        extsegment = context.session.query(models.ExtSegment) \
             .filter_by(id=id) \
             .first()
         return self._make_extsegment_dict(extsegment, fields=fields)

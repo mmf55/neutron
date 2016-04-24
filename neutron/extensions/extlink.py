@@ -32,10 +32,10 @@ RESOURCE_ATTRIBUTE_MAP = {
                       'required_by_policy': True,
                       'validate': {'type:uuid': None},
                       'is_visible': True},
-        'add_connections': {'allow_post': True, 'allow_put': False,
+        'add_connections': {'allow_post': True, 'allow_put': True,
                             'required_by_policy': False,
                             'is_visible': True},
-        'rem_connections': {'allow_post': True, 'allow_put': False,
+        'rem_connections': {'allow_post': True, 'allow_put': True,
                             'required_by_policy': False,
                             'is_visible': True},
     }
