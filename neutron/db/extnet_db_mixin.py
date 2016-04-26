@@ -50,6 +50,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                 inter = {
                     'id': interface['id'],
                     'name': interface['name'],
+                    'extsegment_id': interface['extsegment_id']
                 }
                 int_list.append(inter)
             node_created['interfaces'] = int_list
