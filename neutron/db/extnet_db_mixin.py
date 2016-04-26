@@ -41,15 +41,15 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
             tenant_id = context.tenant_id
         return tenant_id
 
-    def _make_extnode_dict(self, extnode, fields=None, interfaces=None):
+    def _make_extnode_dict(self, extnode, fields=None):
         """Creates a dictionary to be sent to client API"""
         int_list = []
         node_created = {}
-        if interfaces is not None:
-            for interface in interfaces:
+        if extnode.extnodeints is not None:
+            for interface in extnode.extnodeints:
                 inter = {
-                    'id': interface.id,
-                    'name': interface.name,
+                    'id': interface['id'],
+                    'name': interface['name'],
                 }
                 int_list.append(inter)
             node_created['interfaces'] = int_list
@@ -267,10 +267,10 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
 
     def get_extnode(self, context, id, fields=None):
         self._admin_check(context, 'GET')
-        extnode = context.query(models.ExtNode)\
+        extnode = context.session.query(models.ExtNode)\
             .filter_by(id=id)\
             .first()
-        extnode_int = context.query(models.ExtNodeInt)\
+        extnode_int = context.session.query(models.ExtNodeInt)\
             .filter_by(extnode_id=id)\
             .all()
         return self._make_extnode_dict(extnode, fields=fields, interfaces=extnode_int)
