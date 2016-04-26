@@ -25,7 +25,7 @@ class ExtNode(model_base.BASEV2, models_v2.HasId):
     # type here can be e.g. router, switch, virtual switch.
     type = sa.Column(sa.String(36))
     extnodeints = orm.relationship("ExtNodeInt",
-                                   backref='extnodeints',
+                                   backref='extnodes',
                                    cascade='all,delete')
 
 
