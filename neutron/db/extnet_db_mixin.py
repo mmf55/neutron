@@ -231,7 +231,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                     context.session.add(int_db)
                     list_int_db.append(int_db)
         """Create and return dictionary for the client."""
-        return self._make_extnode_dict(node_db, interfaces=list_int_db)
+        return self._make_extnode_dict(node_db)
 
     def update_extnode(self, context, id, extnode):
         LOG.info(extnode)
@@ -256,7 +256,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                 for interface in interfaces:
                     context.session.query(models.ExtNodeInt).filter_by(id=interface['id']).delete()
             list_int_db = context.session.query(models.ExtNodeInt).filter_by(extnode_id=id).all()
-        return self._make_extnode_dict(node_in_db, interfaces=list_int_db)
+        return self._make_extnode_dict(node_in_db)
 
     def get_extnodes(self, context, filters=None, fields=None):
         self._admin_check(context, 'GET')
@@ -273,7 +273,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         extnode_int = context.session.query(models.ExtNodeInt)\
             .filter_by(extnode_id=id)\
             .all()
-        return self._make_extnode_dict(extnode, fields=fields, interfaces=extnode_int)
+        return self._make_extnode_dict(extnode, fields=fields)
 
     def delete_extnode(self, context, id):
         self._admin_check(context, 'DELETE')

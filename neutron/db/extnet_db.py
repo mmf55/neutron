@@ -58,6 +58,9 @@ class ExtLink(model_base.BASEV2, models_v2.HasId):
     overlay_id = sa.Column(sa.String(36))
     extsegment_id = sa.Column(sa.String(36), sa.ForeignKey("extsegments.id",
                                                            ondelete="CASCADE"))
+    extconnections = orm.relationship("ExtConnection",
+                                      backref='extlinks',
+                                      cascade='all,delete')
 
 
 class ExtConnection(model_base.BASEV2, models_v2.HasId):
