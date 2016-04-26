@@ -75,8 +75,8 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
 
     def _extnode_has_connections(self, context, extnode):
         extnode_connections = context.session.query(models.ExtNode, models.ExtConnection)\
-            .filter(models.ExtConnection.extnodeint1 == extnode.id)\
-            .filter(models.ExtConnection.extnodeint2 == extnode.id)\
+            .filter(models.ExtConnection.extnodeint1_id == extnode.id)\
+            .filter(models.ExtConnection.extnodeint2_id == extnode.id)\
             .all()
         return extnode_connections
 
