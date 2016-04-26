@@ -12,7 +12,6 @@ from neutron.db import extnet_db_query as db_query
 from oslo_utils import uuidutils
 from oslo_log import log as logging
 from sqlalchemy.orm import exc as sa_orm_exc
-from sqlalchemy.orm import load_only
 
 LOG = logging.getLogger(__name__)
 
@@ -51,7 +50,6 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                 inter = {
                     'id': interface.id,
                     'name': interface.name,
-                    'type': interface.type
                 }
                 int_list.append(inter)
             node_created['interfaces'] = int_list
@@ -131,8 +129,11 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
     def _make_extinterface_dict(self, extinterface, fields=None):
         extinterface_dict = {
             'id': extinterface.id,
+            'name': extinterface.name,
+            'type': extinterface.type,
+            'access_id': extinterface.access_id,
             'tenant_id': extinterface.tenant_id,
-            'extnodeint_id': extinterface.extnodeint_id,
+            'extnode_id': extinterface.extnodeint_id,
             'network_id': extinterface.network_id
         }
         return self._fields(extinterface_dict, fields)
@@ -151,14 +152,24 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                          if key in fields))
         return resource
 
+    def _get_existing_extnodeint(self, context, int_id):
+        try:
+            int = context.session.query(models.ExtNodeInt).get(int_id)
+        except sa_orm_exc.NoResultFound:
+            raise extnet_exceptions.ExtNodeNotFound(id=int_id)
+        return int
+
     # -------------------- Database operations related with the external interfaces. ----------------------------------
     def create_extinterface(self, context, extinterface):
         interface = extinterface['extinterface']
         with context.session.begin(subtransactions=True):
             interface_db = models.ExtInterface(
                 id=uuidutils.generate_uuid(),
+                name=interface.get('name'),
+                type=interface.get('type'),
+                access_id=interface.get('access_id'),
                 tenant_id=interface['tenant_id'],
-                extnodeint_id=interface['extnodeint_id'],
+                extnode_id=interface['extnode_id'],
                 network_id=interface['network_id'])
             context.session.add(interface_db)
         return self._make_extinterface_dict(interface_db)
@@ -168,7 +179,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         with context.session.begin(subtransactions=True):
             interface_in_db = self._get_existing_extinterface(context, id)
             interface_in_db.tenant_id = interface['tenant_id']
-            interface_in_db.extnodeint_id = interface['extnodeint_id']
+            interface_in_db.extnodeint_id = interface['extnode_id']
             interface_in_db.network_id = interface['network_id']
             context.session.commit()
         return self._make_extinterface_dict(interface_in_db)
@@ -215,8 +226,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                     int_db = models.ExtNodeInt(
                         id=uuidutils.generate_uuid(),
                         name=interface.get('name'),
-                        type=interface.get('type'),
-                        extnode=node_db.get('id'),
+                        extnode_id=node_db.get('id'),
                         extsegment_id=interface.get('segment_id'))
                     context.session.add(int_db)
                     list_int_db.append(int_db)
@@ -238,8 +248,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                     int_db = models.ExtNodeInt(
                         id=uuidutils.generate_uuid(),
                         name=interface.get('name'),
-                        type=interface.get('type'),
-                        extnode=id,
+                        extnode_id=id,
                         extsegment_id=interface.get('segment_id'))
                     context.session.add(int_db)
             if node['rem_interfaces'] is not None:

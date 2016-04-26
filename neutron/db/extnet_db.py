@@ -7,18 +7,22 @@ from sqlalchemy import orm
 class ExtInterface(model_base.BASEV2, models_v2.HasId, models_v2.HasTenant):
     __tablename__ = "extinterfaces"
 
+    name = sa.Column(sa.String(36))
+    # The type here can be e.g. SSID, VLAN, physical port.
+    type = sa.Column(sa.String(36))
+    # The access ID can be e.g. VNID, SSID.
+    access_id = sa.Column(sa.String(36))
     network_id = sa.Column(sa.String(36),
                            sa.ForeignKey('networks.id', ondelete='CASCADE'))
-    extnodeint_id = sa.Column(sa.String(36), sa.ForeignKey("extnodeints.id",
+    extnode_id = sa.Column(sa.String(36), sa.ForeignKey("extnodes.id",
                                                      ondelete="CASCADE"))
-    extnodeint = orm.relationship("ExtNodeInt", back_populates="extinterface")
 
 
 class ExtNode(model_base.BASEV2, models_v2.HasId):
     __tablename__ = "extnodes"
 
-    # type here can be e.g. router, switch, virtual switch.
     name = sa.Column(sa.String(36))
+    # type here can be e.g. router, switch, virtual switch.
     type = sa.Column(sa.String(36))
 
 
@@ -26,13 +30,10 @@ class ExtNodeInt(model_base.BASEV2, models_v2.HasId):
     __tablename__ = "extnodeints"
 
     name = sa.Column(sa.String(36))
-    # The type here can be e.g. SSID, port.
-    type = sa.Column(sa.String(36))
     extnode_id = sa.Column(sa.String(36), sa.ForeignKey("extnodes.id",
                                                      ondelete="CASCADE"))
     extsegment_id = sa.Column(sa.String(36), sa.ForeignKey("extsegments.id",
                                                         ondelete="CASCADE"))
-    extinterface = orm.relationship("ExtInterface", uselist=False, back_populates="extnodeint")
 
 
 class ExtSegment(model_base.BASEV2, models_v2.HasId):
