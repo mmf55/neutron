@@ -241,8 +241,8 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         node = extnode['extnode']
         with context.session.begin(subtransactions=True):
             node_in_db = self._get_existing_extnode(context, id)
-            node_in_db.name = extnode['name']
-            node_in_db.type = extnode['type']
+            # node_in_db.name = extnode['name']
+            # node_in_db.type = extnode['type']
             if node['add_interfaces'] is not None:
                 interfaces = node['add_interfaces']
                 for interface in interfaces:
