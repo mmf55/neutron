@@ -114,6 +114,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                 }
                 connections_list.append(conn)
             link_created['connections'] = connections_list
+        link_created['id'] = extlink.id
         link_created['type'] = extlink.type
         link_created['network_id'] = extlink.network_id
         link_created['overlay_id'] = extlink.overlay_id
