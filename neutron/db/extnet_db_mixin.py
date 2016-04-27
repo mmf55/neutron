@@ -354,7 +354,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                         extlink_id=link_db.id)
                     context.session.add(connection_db)
                     list_con_db.append(connection_db)
-        return self._make_extlink_dict(link_db, connections=list_con_db)
+        return self._make_extlink_dict(link_db)
 
     def get_extlink(self, context, id, fields):
         self._admin_check(context, 'GET')
@@ -364,7 +364,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         extlink_conn = context.session.query(models.ExtConnection)\
             .filter_by(extlink_id=id)\
             .all()
-        return self._make_extlink_dict(extlink, fields=fields, connections=extlink_conn)
+        return self._make_extlink_dict(extlink, fields=fields)
 
     def update_extlink(self, context, id, extlink):
         self._admin_check(context, 'UPDATE')
