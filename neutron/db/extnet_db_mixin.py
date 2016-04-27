@@ -388,7 +388,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                 for connection in connections:
                     context.session.query(models.ExtConnection).filter_by(id=connection['id']).delete()
             list_conn_db = context.session.query(models.ExtConnection).filter_by(extlink_id=id).all()
-        return self._make_extlink_dict(link_in_db, connections=list_conn_db)
+        return self._make_extlink_dict(link_in_db)
 
     def get_extlinks(self, context, filters, fields):
         self._admin_check(context, 'GET')
