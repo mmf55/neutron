@@ -107,10 +107,10 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         if extlink.extconnections is not None:
             for connection in extlink.extconnections:
                 conn = {
+                    'id': connection['id'],
                     'type': connection['type'],
                     'extnodeint1_id': connection['extnodeint1_id'],
-                    'extnodeint2_id': connection['extnodeint2_id'],
-                    'extlink_id': connection['extlink_id']
+                    'extnodeint2_id': connection['extnodeint2_id']
                 }
                 connections_list.append(conn)
             link_created['connections'] = connections_list
