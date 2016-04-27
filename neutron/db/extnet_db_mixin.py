@@ -89,11 +89,11 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         }
         return self._fields(extsegment_dict, fields)
 
-    def _get_existing_extsegment(self, context, segment_id):
+    def _get_existing_extsegment(self, context, extsegment_id):
         try:
-            segment = context.session.query(models.ExtSegment).get(segment_id)
+            segment = context.session.query(models.ExtSegment).get(extsegment_id)
         except sa_orm_exc.NoResultFound:
-            raise extnet_exceptions.ExtSegmentNotFound(id=segment_id)
+            raise extnet_exceptions.ExtSegmentNotFound(id=extsegment_id)
         return segment
 
     def _extsegment_has_links(self, context, extsegment):
@@ -228,7 +228,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                         id=uuidutils.generate_uuid(),
                         name=interface.get('name'),
                         extnode_id=node_db.get('id'),
-                        extsegment_id=interface.get('segment_id'))
+                        extsegment_id=interface.get('extsegment_id'))
                     context.session.add(int_db)
                     list_int_db.append(int_db)
         """Create and return dictionary for the client."""
@@ -250,7 +250,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                         id=uuidutils.generate_uuid(),
                         name=interface.get('name'),
                         extnode_id=id,
-                        extsegment_id=interface.get('segment_id'))
+                        extsegment_id=interface.get('extsegment_id'))
                     context.session.add(int_db)
             if node['rem_interfaces'] is not None:
                 interfaces = node['rem_interfaces']
