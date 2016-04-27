@@ -380,8 +380,8 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                 for connection in connections:
                     connection_db = models.ExtConnection(
                         type=connection['type'],
-                        extnodeint1_id=connection['extnodeint1_id'],
-                        extnodeint2_id=connection['extnodeint2_id'],
+                        extnodeint1_id=connection['extnodeint1'],
+                        extnodeint2_id=connection['extnodeint2'],
                         extlink_id=link_in_db.id)
                     context.session.add(connection_db)
             if link['rem_connections'] is not None:
