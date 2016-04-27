@@ -37,9 +37,11 @@ RESOURCE_ATTRIBUTE_MAP = {
                         'is_visible': True},
         'add_connections': {'allow_post': True, 'allow_put': True,
                             'required_by_policy': False,
+                            'default': None,
                             'is_visible': True},
         'rem_connections': {'allow_post': True, 'allow_put': True,
                             'required_by_policy': False,
+                            'default': None,
                             'is_visible': True},
     }
 }
