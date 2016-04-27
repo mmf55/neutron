@@ -100,17 +100,17 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         extsegments_links = context.session.query(models.ExtLink).filter_by(extsegment_id=extsegment.id).all()
         return extsegments_links
 
-    def _make_extlink_dict(self, extlink, fields=None, connections=None):
+    def _make_extlink_dict(self, extlink, fields=None):
         """Creates a dictionary to be sent to client API"""
         connections_list = []
         link_created = {}
-        if connections is not None:
-            for connection in connections:
+        if extlink.extconnections is not None:
+            for connection in extlink.extconnections:
                 conn = {
-                    'type': connection.type,
-                    'extnodeint1_id': connection.extnodeint1_id,
-                    'extnodeint2_id': connection.extnodeint2_id,
-                    'extlink_id': connection.extlink_id
+                    'type': connection['type'],
+                    'extnodeint1_id': connection['extnodeint1_id'],
+                    'extnodeint2_id': connection['extnodeint2_id'],
+                    'extlink_id': connection['extlink_id']
                 }
                 connections_list.append(conn)
             link_created['connections'] = connections_list
