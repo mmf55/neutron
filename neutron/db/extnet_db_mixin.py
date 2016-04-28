@@ -181,9 +181,8 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         with context.session.begin(subtransactions=True):
             interface_in_db = self._get_existing_extinterface(context, id)
             interface_in_db.tenant_id = interface['tenant_id']
-            interface_in_db.extnodeint_id = interface['extnode_id']
+            interface_in_db.extnode_id = interface['extnode_id']
             interface_in_db.network_id = interface['network_id']
-            context.session.commit()
         return self._make_extinterface_dict(interface_in_db)
 
     def get_extinterfaces(self, context, filters, fields):
