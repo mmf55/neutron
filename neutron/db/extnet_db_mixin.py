@@ -187,14 +187,10 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         return self._make_extinterface_dict(interface_in_db)
 
     def get_extinterfaces(self, context, filters, fields):
-        extinterfaces = context.session.query(models.ExtInterface) \
-            .filter_by(filters) \
-            .all()
-        extinterfaces_list = []
-        for extinterface in extinterfaces:
-            extinterface_dict = self._make_extinterface_dict(extinterface, fields=fields)
-            extinterfaces_list.append(extinterface_dict)
-        return extinterfaces_list
+        return self._get_collection(context,
+                                    models.ExtInterface,
+                                    self._make_extinterface_dict,
+                                    filters=filters)
 
     def get_extinterface(self, context, id, fields):
         extinterface = context.session.query(models.ExtInterface) \
