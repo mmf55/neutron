@@ -63,6 +63,7 @@ def upgrade():
     sa.Column('name', sa.String(length=36), nullable=True),
     sa.Column('type', sa.String(length=36), nullable=True),
     sa.Column('access_id', sa.String(length=36), nullable=True),
+    sa.Column('overlay_id', sa.String(length=36), nullable=True),
     sa.Column('network_id', sa.String(length=36), nullable=True),
     sa.Column('extnode_id', sa.String(length=36), nullable=True),
     sa.ForeignKeyConstraint(['extnode_id'], ['extnodes.id'], ondelete='CASCADE'),

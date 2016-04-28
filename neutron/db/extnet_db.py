@@ -12,6 +12,7 @@ class ExtInterface(model_base.BASEV2, models_v2.HasId, models_v2.HasTenant):
     type = sa.Column(sa.String(36))
     # The access ID can be e.g. VNID, SSID.
     access_id = sa.Column(sa.String(36))
+    overlay_id = sa.Column(sa.String(36))
     network_id = sa.Column(sa.String(36),
                            sa.ForeignKey('networks.id', ondelete='CASCADE'))
     extnode_id = sa.Column(sa.String(36), sa.ForeignKey("extnodes.id",
