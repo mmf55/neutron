@@ -135,7 +135,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
             'type': extinterface.type,
             'access_id': extinterface.access_id,
             'tenant_id': extinterface.tenant_id,
-            'extnode_id': extinterface.extnodeint_id,
+            'extnode_id': extinterface.extnode_id,
             'network_id': extinterface.network_id
         }
         return self._fields(extinterface_dict, fields)
