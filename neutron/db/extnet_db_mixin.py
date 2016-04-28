@@ -142,7 +142,7 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
 
     def _get_existing_extinterface(self, context, interface_id):
         try:
-            interface = context.session.query(models.ExtInterface).get(id=interface_id)
+            interface = context.session.query(models.ExtInterface).get(interface_id)
         except sa_orm_exc.NoResultFound:
             raise extnet_exceptions.ExtInterfaceNotFound(id=interface_id)
         return interface
