@@ -21,6 +21,7 @@ RESOURCE_ATTRIBUTE_MAP = {
                  'is_visible': True},
         'access_id': {'allow_post': True, 'allow_put': False,
                       'required_by_policy': True,
+                      'default': None,
                       'is_visible': True},
         'extnode_id': {'allow_post': True, 'allow_put': False,
                        'validate': {'type:string': None},
