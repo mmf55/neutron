@@ -2,19 +2,19 @@
 from neutron_lib import exceptions
 
 
-class ExtNodeNotFound(exceptions.NotFound):
-    message = _("External node %(id)s could not be found.")
+class ExtNodeIntNotFound(exceptions.NotFound):
+    message = _("External node interface %(id)s could not be found.")
 
 
-class ExtNodeHasConnectionsInUse(exceptions.InUse):
+class ExtNodeIntHasConnectionsInUse(exceptions.InUse):
     message = _("External node %(id)s has connections in use.")
 
 
-class ExtSegmentNotFound(exceptions.NotFound):
+class ExtConnectionNotFound(exceptions.NotFound):
     message = _("External segment %(id)s could not be found.")
 
 
-class ExtSegmentHasLinksInUse(exceptions.InUse):
+class ExtConnectionHasLinksInUse(exceptions.InUse):
     message = _("External segment %(id)s has links in use.")
 
 

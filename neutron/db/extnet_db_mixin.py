@@ -1,14 +1,13 @@
-from neutron.extensions import extnode
-from neutron.extensions import extsegment
-from neutron.extensions import extinterface
+from neutron.extensions import extconnection
+from neutron.extensions import extnodeint
 from neutron.extensions import extlink
 from neutron.plugins.ml2.common import extnet_exceptions
 
 from neutron._i18n import _
-from neutron.common import exceptions
 from neutron.db import extnet_db as models
 from neutron.db import extnet_db_query as db_query
 
+from neutron_lib import exceptions
 from oslo_utils import uuidutils
 from oslo_log import log as logging
 from sqlalchemy.orm import exc as sa_orm_exc
@@ -16,9 +15,8 @@ from sqlalchemy.orm import exc as sa_orm_exc
 LOG = logging.getLogger(__name__)
 
 
-class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
-                        extsegment.ExtSegmentPluginInterface,
-                        extinterface.ExtInterfacePluginInterface,
+class ExtNetworkDBMixin(extconnection.ExtConnectionPluginInterface,
+                        extnodeint.ExtNodeIntPluginInterface,
                         extlink.ExtLinkPluginInterface,
                         db_query.ExtNetworkCommonDbMixin):
 
@@ -41,84 +39,61 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
             tenant_id = context.tenant_id
         return tenant_id
 
-    def _make_extnode_dict(self, extnode, fields=None):
+    def _make_extnodeint_dict(self, extnodeint, fields=None):
         """Creates a dictionary to be sent to client API"""
-        int_list = []
-        node_created = {}
-        if extnode.extnodeints is not None:
-            for interface in extnode.extnodeints:
-                inter = {
-                    'id': interface['id'],
-                    'name': interface['name'],
-                    'extsegment_id': interface['extsegment_id']
-                }
-                int_list.append(inter)
-            node_created['interfaces'] = int_list
-        node_created['id'] = extnode.id
-        node_created['name'] = extnode.name
-        node_created['type'] = extnode.type
-        return self._fields(node_created, fields)
+        extnodeint_dict = {
+            'id': extnodeint.id,
+            'name': extnodeint.name,
+            'type': extnodeint.type,
+            'extnodename': extnodeint.extnodename
+        }
+        return self._fields(extnodeint_dict, fields)
 
-    def _get_existing_extnode(self, context, node_id):
+    def _get_existing_extnodeint(self, context, node_id):
         try:
-            node = context.session.query(models.ExtNode).get(node_id)
+            node = context.session.query(models.ExtNodeInt).get(node_id)
         except sa_orm_exc.NoResultFound:
-            raise extnet_exceptions.ExtNodeNotFound(id=node_id)
+            raise extnet_exceptions.ExtNodeIntNotFound(id=node_id)
         return node
 
-    def _get_interfaces_from_node(self, context, node_id):
-        try:
-            interfaces = context.session.query(models.ExtNodeInt).filter_by(extnode_id=node_id).all()
-        except sa_orm_exc.NoResultFound:
-            raise extnet_exceptions.ExtNodeNotFound(id=node_id)
-        return interfaces
-
-    def _extnode_has_connections(self, context, extnode):
+    def _extnodeint_has_connections(self, context, extnodeint):
         extnode_connections = context.session.query(models.ExtNode, models.ExtConnection)\
-            .filter(models.ExtConnection.extnodeint1_id == extnode.id)\
-            .filter(models.ExtConnection.extnodeint2_id == extnode.id)\
+            .filter(models.ExtConnection.extnodeint1_id == extnodeint.id)\
+            .filter(models.ExtConnection.extnodeint2_id == extnodeint.id)\
             .all()
         return extnode_connections
 
-    def _make_extsegment_dict(self, extsegment, fields=None):
-        extsegment_dict = {
-            'id': extsegment.id,
-            'name': extsegment.name,
-            'types_supported': extsegment.types_supported,
-            'ids_pool': extsegment.ids_pool
+    def _make_extconnection_dict(self, extconnection, fields=None):
+        extconnection_dict = {
+            'id': extconnection.id,
+            'types_supported': extconnection.types_supported,
+            'ids_pool': extconnection.ids_pool,
+            'extnodeint1_id': extconnection.extnodeint1_id,
+            'extnodeint2_id': extconnection.extnodeint2_id
         }
-        return self._fields(extsegment_dict, fields)
+        return self._fields(extconnection_dict, fields)
 
-    def _get_existing_extsegment(self, context, extsegment_id):
+    def _get_existing_extconnection(self, context, extconnection_id):
         try:
-            segment = context.session.query(models.ExtSegment).get(extsegment_id)
+            connection = context.session.query(models.ExtConnection).get(extconnection_id)
         except sa_orm_exc.NoResultFound:
-            raise extnet_exceptions.ExtSegmentNotFound(id=extsegment_id)
-        return segment
+            raise extnet_exceptions.ExtConnectionNotFound(id=extconnection_id)
+        return connection
 
-    def _extsegment_has_links(self, context, extsegment):
-        extsegments_links = context.session.query(models.ExtLink).filter_by(extsegment_id=extsegment.id).all()
+    def _extconnection_has_links(self, context, extconnection):
+        extsegments_links = context.session.query(models.ExtLink).filter_by(extconnection_id=extconnection.id).all()
         return extsegments_links
 
     def _make_extlink_dict(self, extlink, fields=None):
         """Creates a dictionary to be sent to client API"""
         connections_list = []
-        link_created = {}
-        if extlink.extconnections is not None:
-            for connection in extlink.extconnections:
-                conn = {
-                    'id': connection['id'],
-                    'type': connection['type'],
-                    'extnodeint1_id': connection['extnodeint1_id'],
-                    'extnodeint2_id': connection['extnodeint2_id']
-                }
-                connections_list.append(conn)
-            link_created['connections'] = connections_list
-        link_created['id'] = extlink.id
-        link_created['type'] = extlink.type
-        link_created['network_id'] = extlink.network_id
-        link_created['overlay_id'] = extlink.overlay_id
-        link_created['extsegment_id'] = extlink.extsegment_id
+        link_created = {
+            'id': extlink.id,
+            'type': extlink.type,
+            'overlay_id': extlink.overlay_id,
+            'extport_id': extlink.extport_id,
+            'extconnection_id': extlink.extconnection_id
+        }
         return self._fields(link_created, fields)
 
     def _get_existing_extlink(self, context, link_id):
@@ -128,26 +103,6 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
             raise extnet_exceptions.ExtNodeNotFound(id=link_id)
         return link
 
-    def _make_extinterface_dict(self, extinterface, fields=None):
-        extinterface_dict = {
-            'id': extinterface.id,
-            'name': extinterface.name,
-            'type': extinterface.type,
-            'access_id': extinterface.access_id,
-            'overlay_id': extinterface.overlay_id,
-            'tenant_id': extinterface.tenant_id,
-            'extnode_id': extinterface.extnode_id,
-            'network_id': extinterface.network_id
-        }
-        return self._fields(extinterface_dict, fields)
-
-    def _get_existing_extinterface(self, context, interface_id):
-        try:
-            interface = context.session.query(models.ExtInterface).get(interface_id)
-        except sa_orm_exc.NoResultFound:
-            raise extnet_exceptions.ExtInterfaceNotFound(id=interface_id)
-        return interface
-
     def _fields(self, resource, fields):
         """Get fields for the resource for get query."""
         if fields:
@@ -155,203 +110,115 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
                          if key in fields))
         return resource
 
-    def _get_existing_extnodeint(self, context, int_id):
-        try:
-            int = context.session.query(models.ExtNodeInt).get(int_id)
-        except sa_orm_exc.NoResultFound:
-            raise extnet_exceptions.ExtNodeNotFound(id=int_id)
-        return int
-
-    # -------------------- Database operations related with the external interfaces. ----------------------------------
-    def create_extinterface(self, context, extinterface):
-        interface = extinterface['extinterface']
-        with context.session.begin(subtransactions=True):
-            interface_db = models.ExtInterface(
-                id=uuidutils.generate_uuid(),
-                name=interface.get('name'),
-                type=interface.get('type'),
-                access_id=interface.get('access_id'),
-                overlay_id=interface.get('overlay_id'),
-                tenant_id=interface['tenant_id'],
-                extnode_id=interface['extnode_id'],
-                network_id=interface['network_id'])
-            context.session.add(interface_db)
-        return self._make_extinterface_dict(interface_db)
-
-    def update_extinterface(self, context, id, extinterface):
-        interface = extinterface['extinterface']
-        with context.session.begin(subtransactions=True):
-            interface_in_db = self._get_existing_extinterface(context, id)
-            interface_in_db.tenant_id = interface['tenant_id']
-            interface_in_db.extnode_id = interface['extnode_id']
-            interface_in_db.network_id = interface['network_id']
-        return self._make_extinterface_dict(interface_in_db)
-
-    def get_extinterfaces(self, context, filters, fields):
-        return self._get_collection(context,
-                                    models.ExtInterface,
-                                    self._make_extinterface_dict,
-                                    filters=filters)
-
-    def get_extinterface(self, context, id, fields):
-        extinterface = context.session.query(models.ExtInterface) \
-            .filter_by(id=id) \
-            .first()
-        return self._make_extinterface_dict(extinterface, fields=fields)
-
-    def delete_extinterface(self, context, id):
-        with context.session.begin(subtransactions=True):
-            extinterface = self._get_existing_extinterface(context, id)
-            context.session.delete(extinterface)
-        LOG.debug("External node '%s' was deleted.", id)
-
     # --------------------- Database operations related with the external nodes. --------------------------------------
-    def create_extnode(self, context, extnode):
-        LOG.debug("I got here!!!!")
-        LOG.info(extnode)
+    def create_extnodeint(self, context, extnodeint):
         """Check if the request was made by the admin"""
         self._admin_check(context, 'CREATE')
-        node = extnode['extnode']
-        list_int_db = []
+        node = extnodeint['extnodeint']
         with context.session.begin(subtransactions=True):
-            node_db = models.ExtNode(
+            node_db = models.ExtNodeInt(
                 id=uuidutils.generate_uuid(),
                 name=node.get('name'),
-                type=node.get('type'))
+                type=node.get('type'),
+                extnodename=node.get('extnodename'))
             context.session.add(node_db)
-            if node['add_interfaces'] is not None:
-                interfaces = node['add_interfaces']
-                for interface in interfaces:
-                    int_db = models.ExtNodeInt(
-                        id=uuidutils.generate_uuid(),
-                        name=interface.get('name'),
-                        extnode_id=node_db.get('id'),
-                        extsegment_id=interface.get('extsegment_id'))
-                    context.session.add(int_db)
-                    list_int_db.append(int_db)
         """Create and return dictionary for the client."""
-        return self._make_extnode_dict(node_db)
+        return self._make_extnodeint_dict(node_db)
 
-    def update_extnode(self, context, id, extnode):
-        LOG.info(extnode)
+    def update_extnodeint(self, context, id, extnodeint):
         """Check if the request was made by the admin"""
         self._admin_check(context, 'UPDATE')
-        node = extnode['extnode']
+        node_int = extnodeint['extnodeint']
         with context.session.begin(subtransactions=True):
-            node_in_db = self._get_existing_extnode(context, id)
-            # node_in_db.name = extnode['name']
-            # node_in_db.type = extnode['type']
-            if node['add_interfaces'] is not None:
-                interfaces = node['add_interfaces']
-                for interface in interfaces:
-                    int_db = models.ExtNodeInt(
-                        id=uuidutils.generate_uuid(),
-                        name=interface.get('name'),
-                        extnode_id=id,
-                        extsegment_id=interface.get('extsegment_id'))
-                    context.session.add(int_db)
-            if node['rem_interfaces'] is not None:
-                interfaces = node['rem_interfaces']
-                for interface in interfaces:
-                    context.session.query(models.ExtNodeInt).filter_by(id=interface['id']).delete()
-            list_int_db = context.session.query(models.ExtNodeInt).filter_by(extnode_id=id).all()
-        return self._make_extnode_dict(node_in_db)
+            node_in_db = self._get_existing_extnodeint(context, id)
+            node_in_db.name = node_int['name']
+            node_in_db.type = node_int['type']
+            node_in_db.extnodename = node_int['extnodename']
+        return self._make_extnodeint_dict(node_in_db)
 
-    def get_extnodes(self, context, filters=None, fields=None):
+    def get_extnodeints(self, context, filters=None, fields=None):
         self._admin_check(context, 'GET')
         return self._get_collection(context,
-                                    models.ExtNode,
-                                    self._make_extnode_dict,
+                                    models.ExtNodeInt,
+                                    self._make_extnodeint_dict,
                                     filters=filters)
 
-    def get_extnode(self, context, id, fields=None):
+    def get_extnodeint(self, context, id, fields=None):
         self._admin_check(context, 'GET')
-        extnode = context.session.query(models.ExtNode)\
+        extnode_int = context.session.query(models.ExtNodeInt)\
             .filter_by(id=id)\
             .first()
-        extnode_int = context.session.query(models.ExtNodeInt)\
-            .filter_by(extnode_id=id)\
-            .all()
-        return self._make_extnode_dict(extnode, fields=fields)
+        return self._make_extnodeint_dict(extnode_int, fields=fields)
 
-    def delete_extnode(self, context, id):
+    def delete_extnodeint(self, context, id):
         self._admin_check(context, 'DELETE')
         with context.session.begin(subtransactions=True):
-            extnode = self._get_existing_extnode(context, id)
-            if self._extnode_has_connections(context, extnode):
-                raise extnet_exceptions.ExtNodeHasConnectionsInUse(id=id)
-            context.session.delete(extnode)
-        LOG.debug("External node '%s' was deleted.", id)
+            extnode_int = self._get_existing_extnodeint(context, id)
+            if self._extnodeint_has_connections(context, extnode_int):
+                raise extnet_exceptions.ExtNodeIntHasConnectionsInUse(id=id)
+            context.session.delete(extnode_int)
+        LOG.debug("External node interface '%s' was deleted.", id)
 
     # --------------------- Database operations related with the external segments. -----------------------------------
-    def create_extsegment(self, context, extsegment):
+    def create_extconnection(self, context, extconnection):
         self._admin_check(context, 'CREATE')
-        segment = extsegment['extsegment']
+        connection = extconnection['extconnection']
         with context.session.begin(subtransactions=True):
-            segment_db = models.ExtSegment(
+            connection_db = models.ExtConnection(
                 id=uuidutils.generate_uuid(),
-                name=segment.get('name'),
-                types_supported=segment.get('types_supported'),
-                ids_pool=segment.get('ids_pool'))
-            context.session.add(segment_db)
-        return self._make_extsegment_dict(segment_db)
+                types_supported=connection.get('types_supported'),
+                ids_pool=connection.get('ids_pool'),
+                extnodeint1_id=connection.get('extnodeint1_id'),
+                extnodeint2_id=connection.get('extnodeint2_id'))
+            context.session.add(connection_db)
+        return self._make_extconnection_dict(connection_db)
 
     def update_extsegment(self, context, id, extsegment):
         self._admin_check(context, 'UPDATE')
-        segment = extsegment['extsegment']
+        connection = extconnection['extconnection']
         with context.session.begin(subtransactions=True):
-            segment_in_db = self._get_existing_extsegment(context, id)
-            segment_in_db.name = segment['name']
-            segment_in_db.types_supported = segment['types_supported']
-            segment_in_db.ids_pool = segment['ids_pool']
-        return self._make_extsegment_dict(segment_in_db)
+            connection_in_db = self._get_existing_extconnection(context, id)
+            connection_in_db.types_supported = connection['types_supported']
+            connection_in_db.ids_pool = connection['ids_pool']
+            connection_in_db.extnodeint1_id = connection['extnodeint1_id']
+            connection_in_db.extnodeint2_id = connection['extnodeint2_id']
+        return self._make_extconnection_dict(connection_in_db)
 
-    def get_extsegments(self, context, filters, fields):
+    def get_extconnections(self, context, filters, fields):
         self._admin_check(context, 'GET')
         return self._get_collection(context,
-                                    models.ExtSegment,
-                                    self._make_extsegment_dict,
+                                    models.ExtConnection,
+                                    self._make_extconnection_dict,
                                     filters=filters)
 
-    def get_extsegment(self, context, id, fields):
+    def get_extconnection(self, context, id, fields):
         self._admin_check(context, 'GET')
-        extsegment = context.session.query(models.ExtSegment) \
+        extconnection = context.session.query(models.ExtConnection) \
             .filter_by(id=id) \
             .first()
-        return self._make_extsegment_dict(extsegment, fields=fields)
+        return self._make_extconnection_dict(extconnection, fields=fields)
 
-    def delete_extsegment(self, context, id):
+    def delete_extconnection(self, context, id):
         self._admin_check(context, 'DELETE')
         with context.session.begin(subtransactions=True):
-            extsegment = self._get_existing_extsegment(context, id)
-            if self._extsegment_has_links(context, extsegment):
-                raise extnet_exceptions.ExtSegmentHasLinksInUse(id=id)
-            context.session.delete(extsegment)
-        LOG.debug("External node '%s' was deleted.", id)
+            extconnection_db = self._get_existing_extconnection(context, id)
+            if self._extconnection_has_links(context, extconnection_db):
+                raise extnet_exceptions.ExtConnectionHasLinksInUse(id=id)
+            context.session.delete(extconnection_db)
+        LOG.debug("External connection '%s' was deleted.", id)
 
     # --------------------- Database operations related with the external links. --------------------------------------
     def create_extlink(self, context, extlink):
         self._admin_check(context, 'CREATE')
         link = extlink['extlink']
-        list_con_db = []
         with context.session.begin(subtransactions=True):
             link_db = models.ExtLink(
                 id=uuidutils.generate_uuid(),
                 type=link['type'],
-                network_id=link['network_id'],
                 overlay_id=link['overlay_id'],
-                extsegment_id=link['extsegment_id'])
+                extport_id=link['extport_id'],
+                extconnection_id=link['extconnection_id'])
             context.session.add(link_db)
-            if link['add_connections'] is not None:
-                connections = link['add_connections']
-                for connection in connections:
-                    connection_db = models.ExtConnection(
-                        type=connection['type'],
-                        extnodeint1_id=connection['extnodeint1'],
-                        extnodeint2_id=connection['extnodeint2'],
-                        extlink_id=link_db.id)
-                    context.session.add(connection_db)
-                    list_con_db.append(connection_db)
         return self._make_extlink_dict(link_db)
 
     def get_extlink(self, context, id, fields):
@@ -359,9 +226,6 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         extlink = context.session.query(models.ExtLink)\
             .filter_by(id=id)\
             .first()
-        extlink_conn = context.session.query(models.ExtConnection)\
-            .filter_by(extlink_id=id)\
-            .all()
         return self._make_extlink_dict(extlink, fields=fields)
 
     def update_extlink(self, context, id, extlink):
@@ -369,23 +233,10 @@ class ExtNetworkDBMixin(extnode.ExtNodePluginInterface,
         link = extlink['extlink']
         with context.session.begin(subtransactions=True):
             link_in_db = self._get_existing_extlink(context, id)
-            # link_in_db.type = link['type']
-            # link_in_db.network_id = link['network_id']
-            # link_in_db.overlay_id = link['overlay_id']
-            if link['add_connections'] is not None:
-                connections = link['add_connections']
-                for connection in connections:
-                    connection_db = models.ExtConnection(
-                        type=connection['type'],
-                        extnodeint1_id=connection['extnodeint1'],
-                        extnodeint2_id=connection['extnodeint2'],
-                        extlink_id=link_in_db.id)
-                    context.session.add(connection_db)
-            if link['rem_connections'] is not None:
-                connections = link['rem_connections']
-                for connection in connections:
-                    context.session.query(models.ExtConnection).filter_by(id=connection['id']).delete()
-            list_conn_db = context.session.query(models.ExtConnection).filter_by(extlink_id=id).all()
+            link_in_db.type = link['type']
+            link_in_db.overlay_id = link['overlay_id']
+            link_in_db.extport_id = link['extport_id']
+            link_in_db.extconnection_id = link['extconnection_id']
         return self._make_extlink_dict(link_in_db)
 
     def get_extlinks(self, context, filters, fields):

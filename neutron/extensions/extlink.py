@@ -24,25 +24,14 @@ RESOURCE_ATTRIBUTE_MAP = {
         'overlay_id': {'allow_post': True, 'allow_put': False,
                        'validate': {'type:string': None},
                        'is_visible': True},
-        'extsegment_id': {'allow_post': True, 'allow_put': False,
-                          'required_by_policy': True,
-                          'validate': {'type:uuid': None},
-                          'is_visible': True},
-        'tenant_id': {'allow_post': True, 'allow_put': False,
-                      'required_by_policy': True,
-                      'validate': {'type:uuid': None},
-                      'is_visible': True},
-        'connections': {'allow_post': False, 'allow_put': False,
-                        'required_by_policy': False,
-                        'is_visible': True},
-        'add_connections': {'allow_post': True, 'allow_put': True,
-                            'required_by_policy': False,
-                            'default': None,
-                            'is_visible': True},
-        'rem_connections': {'allow_post': True, 'allow_put': True,
-                            'required_by_policy': False,
-                            'default': None,
-                            'is_visible': True},
+        'extport_id': {'allow_post': True, 'allow_put': False,
+                       'required_by_policy': True,
+                       'validate': {'type:uuid': None},
+                       'is_visible': True},
+        'extconnection_id': {'allow_post': False, 'allow_put': False,
+                             'required_by_policy': False,
+                             'validate': {'type:uuid': None},
+                             'is_visible': True},
     }
 }
 
@@ -50,28 +39,28 @@ RESOURCE_ATTRIBUTE_MAP = {
 class ExtLinkPluginInterface(extensions.PluginInterface):
     @abc.abstractmethod
     def create_extlink(self, context, extlink):
-        """Create a new ExtSegment.
-        This entity represents a physical network segment on the Campus Network NaaS plugin."""
+        """Create a new External link.
+        This entity represents an opverlay network on the external network."""
         pass
 
     @abc.abstractmethod
     def delete_extlink(self, context, id):
-        """Delete a ExtSegment using the given ID."""
+        """Delete a ExtLink using the given ID."""
         pass
 
     @abc.abstractmethod
     def get_extlink(self, context, id, fields):
-        """Return the info related to a ExtSegment represented by the given ID."""
+        """Return the info related to a ExtLink represented by the given ID."""
         pass
 
     @abc.abstractmethod
     def get_extlinks(self, context, filters, fields):
-        """Returns a list with all registered ExtSegment."""
+        """Returns a list with all registered ExtLink."""
         pass
 
     @abc.abstractmethod
     def update_extlink(self, context, id, extlink):
-        """Updates database with new information about the ExtSegment represented by the given ID."""
+        """Updates database with new information about the ExtLink represented by the given ID."""
         pass
 
 

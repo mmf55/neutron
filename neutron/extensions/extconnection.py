@@ -7,20 +7,23 @@ from neutron import manager
 
 from neutron.plugins.ml2.common import extnet_validators
 
-RESOURCE_NAME = "extsegment"
-COLLECTION_NAME = "%ss" % RESOURCE_NAME
+# You have to specify the attributes neutron-server should expect when
+# someone invokes this plugin. Let's say you want
+# 'name', 'priority', 'credential' for your extension /foxinsocks
+# then following dictionary must be declared.
+# I am following the naming convention used by other extensions.
 
-# Attribute Map for extsegment resource
+RESOURCE_NAME = "extconnection"
+COLLECTION_NAME = "%ss" % RESOURCE_NAME
+# Collection name is the path identifier of the extension in the URI!
+
+# Attribute Map for extnode resource
 RESOURCE_ATTRIBUTE_MAP = {
     COLLECTION_NAME: {
         'id': {'allow_post': False, 'allow_put': False,
                'validate': {'type:uuid': None},
                'is_visible': True
                },
-        'name': {'allow_post': True, 'allow_put': True,
-                 'validate': {'type:string': None},
-                 'is_visible': True,
-                 'default': ''},
         'types_supported': {'allow_post': True, 'allow_put': True,
                             'required_by_policy': True,
                             'validate': {'type:extnet_overlay_types': None},
@@ -29,10 +32,14 @@ RESOURCE_ATTRIBUTE_MAP = {
                      'required_by_policy': False,
                      'validate': {'type:extnet_ids_pool': None},
                      'is_visible': True},
-        'tenant_id': {'allow_post': True, 'allow_put': False,
-                      'required_by_policy': True,
-                      'validate': {'type:uuid': None},
-                      'is_visible': True},
+        'extnodeint1': {'allow_post': True, 'allow_put': True,
+                        'required_by_policy': False,
+                        'default': None,
+                        'is_visible': True},
+        'extnodeint2': {'allow_post': True, 'allow_put': True,
+                        'required_by_policy': False,
+                        'default': None,
+                        'is_visible': True},
     }
 }
 
@@ -42,53 +49,52 @@ attributes.validators['type:extnet_overlay_types'] = validator_func_types
 attributes.validators['type:extnet_ids_pool'] = validator_func_ids_pool
 
 
-class ExtSegmentPluginInterface(extensions.PluginInterface):
+class ExtConnectionPluginInterface(extensions.PluginInterface):
     @abc.abstractmethod
-    def create_extsegment(self, context, extsegment):
-        """Create a new ExtSegment.
-        This entity represents a physical network segment on the Campus Network NaaS plugin."""
+    def create_extconnection(self, context, extconnection):
+        """Create a new ExtNode. This entity represents a physical network device on the Campus Network NaaS plugin."""
         pass
 
     @abc.abstractmethod
-    def delete_extsegment(self, context, id):
-        """Delete a ExtSegment using the given ID."""
+    def delete_extconnection(self, context, id):
+        """Delete a ExtNode using the given ID."""
         pass
 
     @abc.abstractmethod
-    def get_extsegment(self, context, id, fields):
-        """Return the info related to a ExtSegment represented by the given ID."""
+    def get_extconnection(self, context, id, fields):
+        """Return the info related to a ExtNode represented by the given ID."""
         pass
 
     @abc.abstractmethod
-    def get_extsegments(self, context, filters, fields):
-        """Returns a list with all registered ExtSegment."""
+    def get_extconnection(self, context, filters, fields):
+        """Returns a list with all registered ExtNodes."""
         pass
 
     @abc.abstractmethod
-    def update_extsegment(self, context, id, extsegment):
-        """Updates database with new information about the ExtSegment represented by the given ID."""
+    def update_extconnection(self, context, id, extconnection):
+        """Updates database with new information about the ExtNode represented by the given ID."""
         pass
 
 
-class Extsegment(extensions.ExtensionDescriptor):
+class Extconnection(extensions.ExtensionDescriptor):
     def __init__(self):
         pass
 
     def get_plugin_interface(self):
-        return ExtSegmentPluginInterface
+        return Extconnection
 
     def get_name(self):
         # You can coin a name for this extension
-        return "External segment Extension"
+        return "External Connection Extension"
 
     def get_alias(self):
         # This alias will be used by your core_plugin class to load
         # the extension
-        return "extsegment"
+        return "extconnection"
 
     def get_description(self):
         # A small description about this extension
-        return "This is the segment representation of the NaaS network implementation."
+        return "This is the physical connection representation of the NaaS network implementation."
 
     def get_updated(self):
         # Specify when was this extension last updated,
