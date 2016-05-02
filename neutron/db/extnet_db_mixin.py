@@ -186,11 +186,6 @@ class ExtNetworkDBMixin(extconnection.ExtConnectionPluginInterface,
 
     def get_extconnections(self, context, filters, fields):
         self._admin_check(context, 'GET')
-        LOG.debug(self._get_collection(context,
-                                       models.ExtConnection,
-                                       self._make_extconnection_dict,
-                                       filters=filters)
-                  )
         return self._get_collection(context,
                                     models.ExtConnection,
                                     self._make_extconnection_dict,
