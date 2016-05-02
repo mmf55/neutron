@@ -81,7 +81,7 @@ class Extconnection(extensions.ExtensionDescriptor):
         pass
 
     def get_plugin_interface(self):
-        return Extconnection
+        return ExtConnectionPluginInterface
 
     def get_name(self):
         # You can coin a name for this extension
