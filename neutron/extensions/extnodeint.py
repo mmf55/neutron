@@ -22,6 +22,10 @@ RESOURCE_ATTRIBUTE_MAP = {
         'extnodename': {'allow_post': True, 'allow_put': False,
                         'validate': {'type:string': None},
                         'is_visible': True, 'default': 'no_name'},
+        'tenant_id': {'allow_post': True, 'allow_put': False,
+                      'required_by_policy': True,
+                      'validate': {'type:uuid': None},
+                      'is_visible': True}
     }
 }
 
