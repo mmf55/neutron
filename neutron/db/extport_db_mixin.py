@@ -41,8 +41,8 @@ class ExtPortDBMixin(object):
         with context.session.begin(subtransactions=True):
             extport_db = extnet_db.ExtPort(
                 port_id=data['id'],
-                access_id=data[extport_dict_ext.EXTPORT]['access_id'],
-                extnodeint_id=data[extport_dict_ext.EXTPORT]['extnodeint_id']
+                access_id=data[extport_dict_ext.EXTPORT][0]['access_id'],
+                extnodeint_id=data[extport_dict_ext.EXTPORT][0]['extnodeint_id']
             )
             context.session.add(extport_db)
         result[extport_dict_ext.EXTPORT] = data[extport_dict_ext.EXTPORT]
@@ -51,7 +51,7 @@ class ExtPortDBMixin(object):
     def _process_update_port(self, context, data, result):
         extport_db = self._get_existing_extport(context, data['id'])
         with context.session.begin(subtransactions=True):
-            extport_db.access_id = data[extport_dict_ext.EXTPORT]['access_id']
-            extport_db.extnodeint_id = data[extport_dict_ext.EXTPORT]['extnodeint_id']
+            extport_db.access_id = data[extport_dict_ext.EXTPORT][0]['access_id']
+            extport_db.extnodeint_id = data[extport_dict_ext.EXTPORT][0]['extnodeint_id']
         result[extport_dict_ext.EXTPORT] = data[extport_dict_ext.EXTPORT]
         return self._make_extport_dict(extport_db)
