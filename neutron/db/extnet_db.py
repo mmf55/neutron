@@ -15,7 +15,7 @@ class ExtPort(model_base.BASEV2):
     extnodeint_id = sa.Column(sa.String(36), sa.ForeignKey("extnodeints.id",
                                                            ondelete="CASCADE"))
     extnodeint = orm.relationship(
-        ExtNodeInt,
+        "ExtNodeInt",
         backref=orm.backref('extport', uselist=False))
     port = orm.relationship(
         models_v2.Port,
