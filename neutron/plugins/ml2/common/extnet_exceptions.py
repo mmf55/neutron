@@ -22,5 +22,5 @@ class ExtLinkNotFound(exceptions.NotFound):
     message = _("External link %(id)s could not be found.")
 
 
-class ExtInterfaceNotFound(exceptions.NotFound):
-    message = _("External interface %(id)s could not be found.")
+class ExtPortNotFound(exceptions.NotFound):
+    message = _("External port %(id)s could not be found.")

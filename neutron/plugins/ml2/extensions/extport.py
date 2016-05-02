@@ -23,7 +23,7 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
 
     def process_update_port(self, plugin_context, data, result):
         if extport.EXTPORT in data:
-            self._process_create_port(plugin_context, data, result)
+            self._process_update_port(plugin_context, data, result)
 
     def extend_port_dict(self, session, base_model, result):
         result[extport.EXTPORT] = base_model[extport.EXTPORT]
