@@ -68,7 +68,7 @@ class Extnodeint(extensions.ExtensionDescriptor):
     def get_alias(self):
         # This alias will be used by your core_plugin class to load
         # the extension
-        return "extinterface"
+        return "extnodeint"
 
     def get_description(self):
         # A small description about this extension
