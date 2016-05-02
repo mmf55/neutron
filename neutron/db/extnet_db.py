@@ -49,7 +49,7 @@ class ExtLink(model_base.BASEV2, models_v2.HasId):
     type = sa.Column(sa.String(36))
     overlay_id = sa.Column(sa.String(36))
     extport_id = sa.Column(sa.String(36),
-                           sa.ForeignKey('ports.id', ondelete="CASCADE"))
+                           sa.ForeignKey('extports.port_id', ondelete="CASCADE"))
     extconnection_id = sa.Column(sa.String(36),
                                  sa.ForeignKey('extconnections.id', ondelete="CASCADE"))
     extport = orm.relationship("ExtPort",
