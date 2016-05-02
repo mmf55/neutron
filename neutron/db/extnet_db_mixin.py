@@ -173,7 +173,7 @@ class ExtNetworkDBMixin(extconnection.ExtConnectionPluginInterface,
             context.session.add(connection_db)
         return self._make_extconnection_dict(connection_db)
 
-    def update_extsegment(self, context, id, extsegment):
+    def update_extconnection(self, context, id, extsegment):
         self._admin_check(context, 'UPDATE')
         connection = extconnection['extconnection']
         with context.session.begin(subtransactions=True):
