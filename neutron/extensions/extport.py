@@ -8,7 +8,7 @@ EXTENDED_ATTRIBUTES_2_0 = {
                       'default': attributes.ATTR_NOT_SPECIFIED,
                       'enforce_policy': True,
                       'is_visible': True},
-        'extnodeint_id': {'allow_post': True, 'allow_put': True,
+        'extnodeint_id': {'allow_post': True, 'allow_put': False,
                           'default': attributes.ATTR_NOT_SPECIFIED,
                           'enforce_policy': True,
                           'is_visible': True},
