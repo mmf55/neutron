@@ -57,7 +57,7 @@ class ExtNetworkDBMixin(extconnection.ExtConnectionPluginInterface,
         return node
 
     def _extnodeint_has_connections(self, context, extnodeint):
-        extnode_connections = context.session.query(models.ExtNode, models.ExtConnection)\
+        extnode_connections = context.session.query(models.ExtConnection)\
             .filter(models.ExtConnection.extnodeint1_id == extnodeint.id)\
             .filter(models.ExtConnection.extnodeint2_id == extnodeint.id)\
             .all()
@@ -102,6 +102,13 @@ class ExtNetworkDBMixin(extconnection.ExtConnectionPluginInterface,
         except sa_orm_exc.NoResultFound:
             raise extnet_exceptions.ExtNodeNotFound(id=link_id)
         return link
+
+    def _check_if_conn_exists(self, context, extnodeint1_id, extnodeint2_id):
+        connection = context.session.query(models.ExtConnection) \
+            .filter(models.ExtConnection.extnodeint1_id == extnodeint1_id and
+                    models.ExtConnection.extnodeint2_id == extnodeint2_id) \
+            .first()
+        return connection
 
     def _fields(self, resource, fields):
         """Get fields for the resource for get query."""
@@ -163,6 +170,8 @@ class ExtNetworkDBMixin(extconnection.ExtConnectionPluginInterface,
     def create_extconnection(self, context, extconnection):
         self._admin_check(context, 'CREATE')
         connection = extconnection['extconnection']
+        if self._check_if_conn_exists(context, connection['extnodeint1_id'], connection['extnodeint2_id']):
+            raise extnet_exceptions.ExtConnectionsExists
         with context.session.begin(subtransactions=True):
             connection_db = models.ExtConnection(
                 id=uuidutils.generate_uuid(),

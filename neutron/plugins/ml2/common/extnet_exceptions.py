@@ -24,3 +24,7 @@ class ExtLinkNotFound(exceptions.NotFound):
 
 class ExtPortNotFound(exceptions.NotFound):
     message = _("External port %(id)s could not be found.")
+
+
+class ExtConnectionsExists(exceptions.NotFound):
+    message = _("External connection %(id)s already exists.")
