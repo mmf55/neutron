@@ -5,7 +5,7 @@ EXTPORT = 'external_port'
 EXTENDED_ATTRIBUTES_2_0 = {
     'ports': {
         EXTPORT: {'allow_post': True, 'allow_put': True,
-                  'default': None,
+                  'default': [],
                   'enforce_policy': True,
                   'is_visible': True},
     }
