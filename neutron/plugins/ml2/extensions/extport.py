@@ -22,11 +22,11 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
         return self._supported_extension_alias
 
     def process_create_port(self, plugin_context, data, result):
-        if extport.EXTPORT in data:
+        if data[extport.EXTPORT] is not None:
             self._process_create_port(plugin_context, data, result)
 
     def process_update_port(self, plugin_context, data, result):
-        if extport.EXTPORT in data:
+        if data[extport.EXTPORT] is not None:
             self._process_update_port(plugin_context, data, result)
 
     def extend_port_dict(self, session, base_model, result):
