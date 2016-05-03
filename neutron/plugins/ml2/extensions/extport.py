@@ -1,4 +1,3 @@
-
 from oslo_log import log as logging
 
 from neutron._i18n import _LI
@@ -11,7 +10,6 @@ LOG = logging.getLogger(__name__)
 
 class ExtPortExtensionDriver(api.ExtensionDriver,
                              extport_db.ExtPortDBMixin):
-
     _supported_extension_alias = 'extport'
 
     def initialize(self):
@@ -32,13 +30,7 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
     def extend_port_dict(self, session, base_model, result):
         LOG.debug(base_model)
         LOG.debug(result)
-        result[extport.EXTPORT] = base_model[extport.EXTPORT]
-
-        # if base_model.get('extport') is None:
-        #     result[extport.EXTPORT] = (
-        #         extport.EXTENDED_ATTRIBUTES_2_0['ports']
-        #         [extport.EXTPORT]['default'])
-        # else:
-        #     result[extport.EXTPORT] = (
-        #         base_model['extport'][extport.EXTPORT])
+        if not result[extport.EXTPORT]:
+            result[extport.EXTPORT] = (extport.EXTENDED_ATTRIBUTES_2_0['ports']
+                                       [extport.EXTPORT]['default'])
 
