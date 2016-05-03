@@ -42,9 +42,10 @@ class ExtPortDBMixin(object):
 
     def _process_create_port(self, context, data, result):
         LOG.debug(data)
+        LOG.debug(result)
         with context.session.begin(subtransactions=True):
             extport_db = extnet_db.ExtPort(
-                port_id=data['id'],
+                port_id=result['id'],
                 access_id=data[extport_dict_ext.EXTPORT]['access_id'],
                 extnodeint_id=data[extport_dict_ext.EXTPORT]['extnodeint_id']
             )
