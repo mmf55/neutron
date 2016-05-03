@@ -1,6 +1,7 @@
 
 from oslo_log import log as logging
 
+from neutron._i18n import _LI
 from neutron.db import extport_db_mixin as extport_db
 from neutron.extensions import extport
 from neutron.plugins.ml2 import driver_api as api
@@ -12,6 +13,9 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
                              extport_db.ExtPortDBMixin):
 
     _supported_extension_alias = 'extport'
+
+    def initialize(self):
+        LOG.info(_LI("ExtPortExtensionDriver initialization complete"))
 
     @property
     def extension_alias(self):
