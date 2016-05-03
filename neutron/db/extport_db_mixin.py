@@ -5,6 +5,9 @@ from neutron.plugins.ml2.common import extnet_exceptions
 from neutron.db import extnet_db as models
 
 from sqlalchemy.orm import exc as sa_orm_exc
+from oslo_log import log as logging
+
+LOG = logging.getLogger(__name__)
 
 
 class ExtPortDBMixin(object):
@@ -38,6 +41,7 @@ class ExtPortDBMixin(object):
     # --------------------------------------- Functions that do database operations. -----------------------------------
 
     def _process_create_port(self, context, data, result):
+        LOG.debug(data)
         with context.session.begin(subtransactions=True):
             extport_db = extnet_db.ExtPort(
                 port_id=data['id'],
