@@ -13,7 +13,7 @@ RESOURCE_ATTRIBUTE_MAP = {
         'id': {'allow_post': False, 'allow_put': False,
                'validate': {'type:uuid': None},
                'is_visible': True},
-        'name': {'allow_post': True, 'allow_put': False,
+        'name': {'allow_post': True, 'allow_put': True,
                  'validate': {'type:string': None},
                  'is_visible': True, 'default': 'no_name'},
         'type': {'allow_post': True, 'allow_put': False,

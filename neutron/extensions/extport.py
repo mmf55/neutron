@@ -3,15 +3,11 @@ from neutron.api.v2 import attributes
 
 EXTPORT = 'external_port'
 EXTENDED_ATTRIBUTES_2_0 = {
-    EXTPORT: {
-        'access_id': {'allow_post': True, 'allow_put': True,
-                      'default': attributes.ATTR_NOT_SPECIFIED,
-                      'enforce_policy': True,
-                      'is_visible': True},
-        'extnodeint_id': {'allow_post': True, 'allow_put': False,
-                          'default': attributes.ATTR_NOT_SPECIFIED,
-                          'enforce_policy': True,
-                          'is_visible': True},
+    'ports': {
+        EXTPORT: {'allow_post': True, 'allow_put': True,
+                  'default': attributes.ATTR_NOT_SPECIFIED,
+                  'enforce_policy': True,
+                  'is_visible': True},
     }
 }
 

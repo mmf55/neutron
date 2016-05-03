@@ -17,14 +17,10 @@ RESOURCE_ATTRIBUTE_MAP = {
                  'required_by_policy': True,
                  'validate': {'type:string': None},
                  'is_visible': True, 'default': ''},
-        'network_id': {'allow_post': True, 'allow_put': False,
-                       'validate': {'type:string': None},
-                       'required_by_policy': True,
-                       'is_visible': True},
-        'overlay_id': {'allow_post': True, 'allow_put': False,
+        'overlay_id': {'allow_post': True, 'allow_put': True,
                        'validate': {'type:string': None},
                        'is_visible': True},
-        'extport_id': {'allow_post': True, 'allow_put': False,
+        'extport_id': {'allow_post': True, 'allow_put': True,
                        'required_by_policy': True,
                        'validate': {'type:uuid': None},
                        'is_visible': True},
@@ -32,6 +28,10 @@ RESOURCE_ATTRIBUTE_MAP = {
                              'required_by_policy': False,
                              'validate': {'type:uuid': None},
                              'is_visible': True},
+        'tenant_id': {'allow_post': True, 'allow_put': False,
+                      'required_by_policy': True,
+                      'validate': {'type:uuid': None},
+                      'is_visible': True}
     }
 }
 
