@@ -32,3 +32,11 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
     def extend_port_dict(self, session, base_model, result):
         result[extport.EXTPORT] = base_model[extport.EXTPORT]
 
+        if base_model.get('extport') is None:
+            result[extport.EXTPORT] = (
+                extport.EXTENDED_ATTRIBUTES_2_0['ports']
+                [extport.EXTPORT]['default'])
+        else:
+            result[extport.EXTPORT] = (
+                base_model['extport'][extport.EXTPORT])
+
