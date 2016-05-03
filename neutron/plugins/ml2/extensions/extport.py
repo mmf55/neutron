@@ -30,7 +30,7 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
             self._process_update_port(plugin_context, data, result)
 
     def extend_port_dict(self, session, base_model, result):
-        result[extport.EXTPORT] = base_model[extport.EXTPORT]
+        # result[extport.EXTPORT] = base_model[extport.EXTPORT]
 
         if base_model.get('extport') is None:
             result[extport.EXTPORT] = (
