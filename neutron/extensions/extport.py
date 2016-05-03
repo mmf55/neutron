@@ -17,7 +17,7 @@ class Extport(extensions.ExtensionDescriptor):
 
     @classmethod
     def get_name(cls):
-        return "External Port"
+        return "External Port Extension"
 
     @classmethod
     def get_alias(cls):
@@ -29,7 +29,7 @@ class Extport(extensions.ExtensionDescriptor):
 
     @classmethod
     def get_updated(cls):
-        return "2012-07-23T10:00:00-00:00"
+        return "2014-05-03T10:00:00-00:00"
 
     def get_extended_resources(self, version):
         if version == "2.0":
