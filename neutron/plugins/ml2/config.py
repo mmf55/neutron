@@ -34,12 +34,12 @@ ml2_opts = [
                 help=_("An ordered list of networking mechanism driver "
                        "entrypoints to be loaded from the "
                        "neutron.ml2.mechanism_drivers namespace.")),
-    cfg.ListOpt('extension_drivers',
+    cfg.ListOpt('device_drivers',
                 default=[],
                 help=_("An ordered list of extension driver "
                        "entrypoints to be loaded from the "
-                       "neutron.ml2.extension_drivers namespace. "
-                       "For example: extension_drivers = port_security,qos")),
+                       "neutron.ml2.device_drivers namespace. "
+                       "For example: device_drivers = port_security,qos")),
     cfg.IntOpt('path_mtu', default=constants.DEFAULT_NETWORK_MTU,
                help=_('Maximum size of an IP packet (MTU) that can traverse '
                       'the underlying physical network infrastructure without '

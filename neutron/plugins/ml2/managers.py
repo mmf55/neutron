@@ -787,7 +787,7 @@ class ExtensionManager(stevedore.named.NamedExtensionManager):
 
         LOG.info(_LI("Configured extension driver names: %s"),
                  cfg.CONF.ml2.extension_drivers)
-        super(ExtensionManager, self).__init__('neutron.ml2.extension_drivers',
+        super(ExtensionManager, self).__init__('neutron.ml2.device_drivers',
                                                cfg.CONF.ml2.extension_drivers,
                                                invoke_on_load=True,
                                                name_order=True)

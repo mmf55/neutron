@@ -42,7 +42,7 @@ class DNSIntegrationTestCase(test_plugin.Ml2PluginV2TestCase):
     _extension_drivers = ['dns']
 
     def setUp(self):
-        config.cfg.CONF.set_override('extension_drivers',
+        config.cfg.CONF.set_override('device_drivers',
                                      self._extension_drivers,
                                      group='ml2')
         config.cfg.CONF.set_override('external_dns_driver', 'designate')

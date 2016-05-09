@@ -26,7 +26,7 @@ class ExtensionDriverTestCase(test_plugin.Ml2PluginV2TestCase):
     _extension_drivers = ['test']
 
     def setUp(self):
-        config.cfg.CONF.set_override('extension_drivers',
+        config.cfg.CONF.set_override('device_drivers',
                                      self._extension_drivers,
                                      group='ml2')
         super(ExtensionDriverTestCase, self).setUp()
@@ -179,7 +179,7 @@ class DBExtensionDriverTestCase(test_plugin.Ml2PluginV2TestCase):
     _extension_drivers = ['testdb']
 
     def setUp(self):
-        config.cfg.CONF.set_override('extension_drivers',
+        config.cfg.CONF.set_override('device_drivers',
                                      self._extension_drivers,
                                      group='ml2')
         super(DBExtensionDriverTestCase, self).setUp()

@@ -7,10 +7,10 @@ LOG = log.getLogger(__name__)
 
 campus_opts = [
 
-    cfg.ListOpt('extension_drivers',
+    cfg.ListOpt('device_drivers',
                 default=[],
                 help=_("Ordered list of extension driver entrypoints "
-                       "to be loaded from the neutron.ml2.drivers.extnet.extension_drivers namespace."))
+                       "to be loaded from the neutron.ml2.drivers.extnet.device_drivers namespace."))
 
 ]
 
