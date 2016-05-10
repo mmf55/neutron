@@ -8,5 +8,3 @@ default_opts = [
     cfg.DictOpt('devices', default=None,
                 help='Dictionary of the devices that this controller configures.')
 ]
-
-cfg.CONF.

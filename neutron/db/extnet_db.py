@@ -14,6 +14,11 @@ class ExtPort(model_base.BASEV2):
     access_id = sa.Column(sa.String(36))
     extnodeint_id = sa.Column(sa.String(36), sa.ForeignKey("extnodeints.id",
                                                            ondelete="CASCADE"))
+    extsegment_id = sa.Column(sa.String(36),
+                           sa.ForeignKey('extsegments.id', ondelete="CASCADE"))
+    extsegment = orm.relationship("ExtSegment",
+                               back_populates='extports',
+                               cascade='all,delete')
     extnodeint = orm.relationship(
         "ExtNodeInt",
         backref=orm.backref('extport', uselist=False))
@@ -48,13 +53,32 @@ class ExtLink(model_base.BASEV2, models_v2.HasId):
     # Tells the type of the links created e.g. VLAN, GRE, VXLAN
     type = sa.Column(sa.String(36))
     overlay_id = sa.Column(sa.String(36))
-    extport_id = sa.Column(sa.String(36),
-                           sa.ForeignKey('extports.port_id', ondelete="CASCADE"))
     extconnection_id = sa.Column(sa.String(36),
                                  sa.ForeignKey('extconnections.id', ondelete="CASCADE"))
-    extport = orm.relationship("ExtPort",
-                               backref='extlinks',
-                               cascade='all,delete')
     extconnection = orm.relationship("ExtConnection",
                                      backref='extlinks',
                                      cascade='all,delete')
+    extsegment_id = sa.Column(sa.String(36),
+                              sa.ForeignKey('extsegments.id', ondelete="CASCADE"))
+    extsegment = orm.relationship("ExtSegment",
+                                  back_populates='extlinks',
+                                  cascade='all,delete')
+
+
+class ExtSegment(model_base.BASEV2, models_v2.HasId):
+    __tablename__ = "extsegments"
+
+    extlinks = orm.relationship("ExtLink",
+                                back_populates='extsegments',
+                                cascade='all,delete')
+    extports = orm.relationship("ExtPort",
+                                back_populates='extsegments',
+                                cascade='all,delete')
+    allocated = sa.Column(sa.Boolean, nullable=False)
+
+    # extport_id = sa.Column(sa.String(36),
+    #                        sa.ForeignKey('extports.port_id', ondelete="CASCADE"))
+    # extport = orm.relationship("ExtPort",
+    #                            backref='extsegments',
+    #                            cascade='all,delete')
+

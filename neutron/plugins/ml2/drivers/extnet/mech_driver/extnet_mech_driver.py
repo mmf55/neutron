@@ -19,5 +19,23 @@ cfg.CONF.register_opts(campus_opts, "ml2_mech_extnet")
 
 class ExtnetMechanismDriver(api.MechanismDriver):
 
+    def create_port_postcommit(self, context):
+        super(ExtnetMechanismDriver, self).create_port_postcommit(context)
+
+    def delete_port_precommit(self, context):
+        super(ExtnetMechanismDriver, self).delete_port_precommit(context)
+
+    def update_port_precommit(self, context):
+        super(ExtnetMechanismDriver, self).update_port_precommit(context)
+
+    def update_port_postcommit(self, context):
+        super(ExtnetMechanismDriver, self).update_port_postcommit(context)
+
+    def delete_port_postcommit(self, context):
+        super(ExtnetMechanismDriver, self).delete_port_postcommit(context)
+
+    def create_port_precommit(self, context):
+        super(ExtnetMechanismDriver, self).create_port_precommit(context)
+
     def initialize(self):
         pass
