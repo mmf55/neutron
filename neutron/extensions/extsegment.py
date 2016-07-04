@@ -13,7 +13,7 @@ from neutron.plugins.ml2.common import extnet_validators
 # then following dictionary must be declared.
 # I am following the naming convention used by other extensions.
 
-RESOURCE_NAME = "extconnection"
+RESOURCE_NAME = "extsegment"
 COLLECTION_NAME = "%ss" % RESOURCE_NAME
 # Collection name is the path identifier of the extension in the URI!
 
@@ -24,22 +24,22 @@ RESOURCE_ATTRIBUTE_MAP = {
                'validate': {'type:uuid': None},
                'is_visible': True
                },
+        'name': {'allow_post': True, 'allow_put': True,
+                 'required_by_policy': True,
+                 'validate': {'type:string': None},
+                 'is_visible': True},
         'types_supported': {'allow_post': True, 'allow_put': True,
                             'required_by_policy': True,
                             'validate': {'type:extnet_overlay_types': None},
                             'is_visible': True},
-        'ids_pool': {'allow_post': True, 'allow_put': True,
-                     'required_by_policy': False,
-                     'validate': {'type:extnet_ids_pool': None},
-                     'is_visible': True},
-        'extnodeint1_id': {'allow_post': True, 'allow_put': False,
-                           'required_by_policy': False,
-                           'default': None,
-                           'is_visible': True},
-        'extnodeint2_id': {'allow_post': True, 'allow_put': False,
-                           'required_by_policy': False,
-                           'default': None,
-                           'is_visible': True},
+        'vlan_ids_available': {'allow_post': True, 'allow_put': True,
+                               'required_by_policy': False,
+                               'validate': {'type:extnet_ids_pool': None},
+                               'is_visible': True},
+        'tun_ids_available': {'allow_post': True, 'allow_put': True,
+                              'required_by_policy': False,
+                              'validate': {'type:extnet_ids_pool': None},
+                              'is_visible': True},
         'tenant_id': {'allow_post': True, 'allow_put': False,
                       'required_by_policy': True,
                       'validate': {'type:uuid': None},
@@ -53,34 +53,34 @@ attributes.validators['type:extnet_overlay_types'] = validator_func_types
 attributes.validators['type:extnet_ids_pool'] = validator_func_ids_pool
 
 
-class ExtConnectionPluginInterface(extensions.PluginInterface):
+class ExtSegmentPluginInterface(extensions.PluginInterface):
     @abc.abstractmethod
-    def create_extconnection(self, context, extconnection):
+    def create_extsegment(self, context, extsegment):
         """Create a new ExtNode. This entity represents a physical network device on the Campus Network NaaS plugin."""
         pass
 
     @abc.abstractmethod
-    def delete_extconnection(self, context, id):
+    def delete_extsegment(self, context, id):
         """Delete a ExtNode using the given ID."""
         pass
 
     @abc.abstractmethod
-    def get_extconnection(self, context, id, fields):
+    def get_extsegment(self, context, id, fields):
         """Return the info related to a ExtNode represented by the given ID."""
         pass
 
     @abc.abstractmethod
-    def get_extconnection(self, context, filters, fields):
+    def get_extsegment(self, context, filters, fields):
         """Returns a list with all registered ExtNodes."""
         pass
 
     @abc.abstractmethod
-    def update_extconnection(self, context, id, extconnection):
+    def update_extsegment(self, context, id, extsegment):
         """Updates database with new information about the ExtNode represented by the given ID."""
         pass
 
 
-class Extconnection(extensions.ExtensionDescriptor):
+class Extsegment(extensions.ExtensionDescriptor):
     def __init__(self):
         pass
 
@@ -89,16 +89,17 @@ class Extconnection(extensions.ExtensionDescriptor):
 
     def get_name(self):
         # You can coin a name for this extension
-        return "External Connection Extension"
+        return "External Segment Extension"
 
     def get_alias(self):
         # This alias will be used by your core_plugin class to load
         # the extension
-        return "extconnection"
+        return "extsegment"
 
     def get_description(self):
         # A small description about this extension
-        return "This is the physical connection representation of the NaaS network implementation."
+        return "This is the network segment representation of the NaaS network implementation. This may not represent " \
+               "a physical segment"
 
     def get_updated(self):
         # Specify when was this extension last updated,

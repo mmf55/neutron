@@ -365,6 +365,29 @@ class OVSBridge(BaseOVS):
 
         return self.add_port(port_name, *attrs)
 
+    def add_external_tunnel_port(self, port_name, remote_ip, local_ip,
+                            tunnel_type=p_const.TYPE_GRE,
+                            lvid=None,
+                            tid=0):
+
+        attrs = [('type', tunnel_type)]
+        # TODO(twilson) This is an OrderedDict solely to make a test happy
+        options = collections.OrderedDict()
+
+        options['remote_ip'] = remote_ip
+        options['local_ip'] = local_ip
+        options['key'] = tid
+
+        attrs.append(('options', options))
+
+        ofport = self.add_port(port_name, *attrs)
+
+        if lvid:
+            with self.ovsdb.transaction() as txn:
+                txn.add(self.ovsdb.db_set('Port', port_name,
+                                          [('tag', tid)]))
+        return ofport
+
     def add_patch_port(self, local_name, remote_name):
         attrs = [('type', 'patch'),
                  ('options', {'peer': remote_name})]

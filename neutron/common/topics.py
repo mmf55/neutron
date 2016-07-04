@@ -36,8 +36,13 @@ METERING_PLUGIN = 'q-metering-plugin'
 L3_AGENT = 'l3_agent'
 DHCP_AGENT = 'dhcp_agent'
 METERING_AGENT = 'metering_agent'
+EXTNET_AGENT = 'extnet_agent'
 
 RESOURCE_TOPIC_PATTERN = "neutron-vo-%(resource_type)s-%(version)s"
+
+# Extnet topics
+EXTNET_LINK = 'extnet-link'
+EXTNET_PORT = 'extnet-port'
 
 
 def get_topic_name(prefix, table, operation, host=None):

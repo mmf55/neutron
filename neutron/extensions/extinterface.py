@@ -4,7 +4,7 @@ from neutron.api import extensions
 from neutron.api.v2 import base
 from neutron import manager
 
-RESOURCE_NAME = "extnodeint"
+RESOURCE_NAME = "extinterface"
 COLLECTION_NAME = "%ss" % RESOURCE_NAME
 
 # Attribute Map for extinterface resource
@@ -19,9 +19,13 @@ RESOURCE_ATTRIBUTE_MAP = {
         'type': {'allow_post': True, 'allow_put': False,
                  'required_by_policy': True,
                  'is_visible': True},
-        'extnodename': {'allow_post': True, 'allow_put': False,
-                        'validate': {'type:string': None},
-                        'is_visible': True, 'default': 'no_name'},
+        'ip_address': {'allow_post': True, 'allow_put': True,
+                       'validate': {'type:ip_address': None},
+                       'is_visible': True, 'default': 'no_name'},
+        'node_name': {'allow_post': True, 'allow_put': False,
+                      'required_by_policy': True,
+                      'validate': {'type:string': None},
+                      'is_visible': True},
         'tenant_id': {'allow_post': True, 'allow_put': False,
                       'required_by_policy': True,
                       'validate': {'type:uuid': None},
@@ -30,40 +34,40 @@ RESOURCE_ATTRIBUTE_MAP = {
 }
 
 
-class ExtNodeIntPluginInterface(extensions.PluginInterface):
+class ExtInterfacePluginInterface(extensions.PluginInterface):
     @abc.abstractmethod
-    def create_extnodeint(self, context, extnodeint):
+    def create_extinterface(self, context, extinterface):
         """Create a new ExtInterface.
         This entity represents an external interface on the Campus Network NaaS plugin."""
         pass
 
     @abc.abstractmethod
-    def delete_extnodeint(self, context, id):
+    def delete_extinterface(self, context, id):
         """Delete a ExtInterface using the given ID."""
         pass
 
     @abc.abstractmethod
-    def get_extnodeint(self, context, id, fields):
+    def get_extinterface(self, context, id, fields):
         """Return the info related to a ExtInterface represented by the given ID."""
         pass
 
     @abc.abstractmethod
-    def get_extnodeint(self, context, filters, fields):
+    def get_extinterface(self, context, filters, fields):
         """Returns a list with all registered ExtInterface."""
         pass
 
     @abc.abstractmethod
-    def update_extnodeint(self, context, id, extnodeint):
+    def update_extinterface(self, context, id, extinterface):
         """Updates database with new information about the ExtInterface represented by the given ID."""
         pass
 
 
-class Extnodeint(extensions.ExtensionDescriptor):
+class ExtInterface(extensions.ExtensionDescriptor):
     def __init__(self):
         pass
 
     def get_plugin_interface(self):
-        return ExtNodeIntPluginInterface
+        return ExtInterfacePluginInterface
 
     def get_name(self):
         # You can coin a name for this extension
@@ -72,7 +76,7 @@ class Extnodeint(extensions.ExtensionDescriptor):
     def get_alias(self):
         # This alias will be used by your core_plugin class to load
         # the extension
-        return "extnodeint"
+        return "extinterface"
 
     def get_description(self):
         # A small description about this extension
