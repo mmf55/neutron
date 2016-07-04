@@ -53,6 +53,7 @@ from neutron.plugins.ml2.drivers.openvswitch.agent \
     import ovs_agent_extension_api as ovs_ext_api
 from neutron.plugins.ml2.drivers.openvswitch.agent \
     import ovs_dvr_neutron_agent
+from neutron.plugins.ml2.extnet import extnet_misc
 
 
 LOG = logging.getLogger(__name__)
@@ -99,7 +100,8 @@ def has_zero_prefixlen_address(ip_addresses):
 
 class OVSNeutronAgent(sg_rpc.SecurityGroupAgentRpcCallbackMixin,
                       l2population_rpc.L2populationRpcCallBackTunnelMixin,
-                      dvr_rpc.DVRAgentRpcCallbackMixin):
+                      dvr_rpc.DVRAgentRpcCallbackMixin,
+                      extnet_misc.ExtNetOVSAgentMixin):
     '''Implements OVS-based tunneling, VLANs and flat networks.
 
     Two local bridges are created: an integration bridge (defaults to

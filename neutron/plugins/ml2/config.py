@@ -34,7 +34,7 @@ ml2_opts = [
                 help=_("An ordered list of networking mechanism driver "
                        "entrypoints to be loaded from the "
                        "neutron.ml2.mechanism_drivers namespace.")),
-    cfg.ListOpt('device_drivers',
+    cfg.ListOpt('extension_drivers',
                 default=[],
                 help=_("An ordered list of extension driver "
                        "entrypoints to be loaded from the "
