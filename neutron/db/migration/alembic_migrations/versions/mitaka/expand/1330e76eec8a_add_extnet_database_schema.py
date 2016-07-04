@@ -47,8 +47,6 @@ def upgrade():
     sa.Column('types_supported', sa.String(length=36), nullable=True),
     sa.Column('vlan_ids_available', sa.String(length=36), nullable=True),
     sa.Column('tun_ids_available', sa.String(length=36), nullable=True),
-    sa.ForeignKeyConstraint(['extinterface1_id'], ['extinterfaces.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['extinterface2_id'], ['extinterfaces.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     mysql_engine='InnoDB'
     )
@@ -73,6 +71,8 @@ def upgrade():
     sa.Column('extconnection_id', sa.String(length=36), nullable=True),
     sa.ForeignKeyConstraint(['extconnection_id'], ['extconnections.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['network_id'], ['networks.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['extinterface1_id'], ['extinterfaces.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['extinterface2_id'], ['extinterfaces.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     mysql_engine='InnoDB'
     )
