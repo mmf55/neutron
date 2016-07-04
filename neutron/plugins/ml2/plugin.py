@@ -156,7 +156,7 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
                                     "network_availability_zone",
                                     "default-subnetpools",
                                     'extinterface',
-                                    'extconnection',
+                                    'extsegment',
                                     'extlink',
                                     ]
 

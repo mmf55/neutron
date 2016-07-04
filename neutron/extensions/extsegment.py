@@ -85,7 +85,7 @@ class Extsegment(extensions.ExtensionDescriptor):
         pass
 
     def get_plugin_interface(self):
-        return ExtConnectionPluginInterface
+        return ExtSegmentPluginInterface
 
     def get_name(self):
         # You can coin a name for this extension
