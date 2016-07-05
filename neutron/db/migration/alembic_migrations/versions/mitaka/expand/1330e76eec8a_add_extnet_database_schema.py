@@ -37,6 +37,7 @@ def upgrade():
     sa.Column('name', sa.String(length=36), nullable=True),
     sa.Column('type', sa.String(length=36), nullable=True),
     sa.Column('node_name', sa.String(length=36), nullable=True),
+    sa.Column('ip_address', sa.String(length=36), nullable=True),
     sa.Column('node_driver', sa.String(length=36), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     mysql_engine='InnoDB'
