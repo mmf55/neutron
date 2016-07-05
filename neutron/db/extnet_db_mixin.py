@@ -155,7 +155,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         interface = context.session.query(models.ExtInterface)\
             .filter_by(id=id)\
             .first()
-        return self._make_extnodeint_dict(interface, fields=fields)
+        return self._make_extinterface_dict(interface, fields=fields)
 
     def delete_extinterface(self, context, id):
         self._admin_check(context, 'DELETE')
