@@ -13,6 +13,7 @@ def main(manager='neutron.agent.extnet.agent.ExtNetAgent'):
 
     cfg.CONF.register_opts(external_process.OPTS)
     cfg.CONF.register_opts(extnet_config.OPTS)
+    config.register_agent_state_opts_helper(cfg.CONF)
     config.setup_logging()
     server = neutron_service.Service.create(
         binary='neutron-extnet-agent',
