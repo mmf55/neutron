@@ -31,7 +31,7 @@ RESOURCE_ATTRIBUTE_MAP = {
                         'required_by_policy': True,
                         'validate': {'type:string': None},
                         'is_visible': True},
-        'extsegment_id': {'allow_post': False, 'allow_put': False,
+        'extsegment_id': {'allow_post': True, 'allow_put': False,
                           'required_by_policy': True,
                           'validate': {'type:uuid': None},
                           'is_visible': True},
