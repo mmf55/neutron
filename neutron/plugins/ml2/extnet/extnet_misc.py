@@ -15,6 +15,8 @@ from extnet_networkcontroller.network_controller import dev_ctrl_mgr
 from extnet_networkcontroller.device_controller import dev_ctrl
 from extnet_networkcontroller.common import const
 
+from sqlalchemy import or_
+
 
 class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                             net_ctrl.ExtNetController):
@@ -38,16 +40,10 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         segment = self.get_extsegment(context, interface1.get('extsegment_id'))
 
-        segmentation_id = self._get_segmentation_id(context,
-                                                    segment.get('id'),
-                                                    link.get('type'),
-                                                    link.get('segmentation_id'))
-
-        # Check if the segmentation id is available on the connection where the link is about to be deployed.
-        if link.get('segmentation_id') is not None and segmentation_id != link.get('segmentation_id'):
-            raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable(segmentation_id=link.get('segmentation_id'),
-                                                                      connection_id=link.get('extconnection_id'))
-        link['segmentation_id'] = segmentation_id
+        link['segmentation_id'] = self._get_segmentation_id(context,
+                                                            segment.get('id'),
+                                                            link.get('type'),
+                                                            link.get('network_id'))
 
         # Call create link to make the changes on the network.
         if self.deploy_link(link, interface1, interface2, vnetwork=link.get('network_id')) != const.OK:
@@ -67,10 +63,20 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
     # ------------------------------------ Auxiliary functions ---------------------------------------
 
-    def _get_segmentation_id(self, context, segment_id, conn_type, get_id=None):
+    def _get_segmentation_id(self, context, segment_id, conn_type, network_id):
         segment = context.session.query(models.ExtSegment).filter_by(id=segment_id).first()
 
         if conn_type == const.VLAN:
+            interfaces = context.session.query(models.ExtInterface).filter_by(extsegment_id=segment_id).all()
+            for interface in interfaces:
+                link = context.session.query(models.ExtLink) \
+                    .filter_by(or_(models.ExtLink.extinterface1_id == interface.id,
+                                   models.ExtLink.extinterface2_id == interface.id)) \
+                    .filter_by(models.ExtLink.type == const.VLAN) \
+                    .filter_by(models.ExtLink.network_id == network_id) \
+                    .first()
+                if link:
+                    return link.segmentation_id
             ids_avail = segment.vlan_ids_available
         else:
             ids_avail = segment.tun_ids_available
@@ -88,11 +94,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         num_list.sort()
 
-        if get_id is not None and get_id in num_list:
-            num_list.remove(get_id)
-            seg_id = get_id
-        else:
-            seg_id = num_list.pop(0)
+        seg_id = num_list.pop(0)
 
         l2 = [':'.join([str(t[0][1]), str(t[-1][1])]) if t[0][1] - t[-1][1] != 0 else str(t[0][1]) for t in
               (tuple(g[1]) for g in itertools.groupby(enumerate(num_list), lambda (i, x): i - x))]
@@ -148,7 +150,6 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
 
 
 class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
-
     def deploy_link(self, interface, network_type, segmentation_id, **kwargs):
         network_id = kwargs.get('vnetwork')
 
