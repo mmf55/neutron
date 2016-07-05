@@ -190,6 +190,7 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
         self._start_rpc_notifiers()
         self.add_agent_status_check(self.agent_health_check)
         self._verify_service_plugins_requirements()
+        self.initialize_extnetcontroller()
         LOG.info(_LI("Modular L2 Plugin initialization complete"))
 
     def _setup_rpc(self):
