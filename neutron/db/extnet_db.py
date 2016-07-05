@@ -49,7 +49,7 @@ class ExtSegment(model_base.BASEV2, models_v2.HasId):
     vlan_ids_available = sa.Column(sa.String(36))
     tun_ids_available = sa.Column(sa.String(36))
 
-    extinterfaces = orm.relationship("ExtLink",
+    extinterfaces = orm.relationship("ExtInterface",
                                      back_populates='extsegment')
 
 
