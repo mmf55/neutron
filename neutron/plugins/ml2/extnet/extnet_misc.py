@@ -110,7 +110,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
     def __init__(self, config):
         super(ExtNetDeviceCtrlManager, self).__init__(config)
-        self.config = config
 
     def deploy_link_on_node(self, interface, network_type, segmentation_id, **kwargs):
         context = kwargs.get('context')
@@ -122,7 +121,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
         target = oslo_messaging.Target(topic=topic, version='1.0')
         client = n_rpc.get_client(target)
         cctxt = client.prepare(topic=topic_create_extlink,
-                               fanout=True)
+                               fanout=False)
         return cctxt.call(context,
                           'deploy_link',
                           network_type=network_type,
@@ -140,7 +139,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
         target = oslo_messaging.Target(topic=topic, version='1.0')
         client = n_rpc.get_client(target)
         cctxt = client.prepare(topic=topic_create_extport,
-                               fanout=True)
+                               fanout=False)
 
         return cctxt.call(context,
                           'deploy_port',
