@@ -11,9 +11,8 @@ from neutron.agent import rpc as agent_rpc
 
 class ExtNetDeviceControllerMixin(object):
     def initialize(self, config):
-        self.config = config
-        config_dict = dict(device_drivers=config.device_drivers,
-                           device_configs_path=config.device_configs_path)
+        self.config_dict = dict(device_drivers=config.device_drivers,
+                                device_configs_path=config.device_configs_path)
         super(ExtNetDeviceControllerMixin, self).__init__()
 
     def deploy_port(self, interface, segmentation_id, **kwargs):
@@ -35,14 +34,14 @@ class ExtNetDeviceControllerMixin(object):
         return topics.EXTNET_AGENT
 
     def load_driver(self, device_name, device_driver):
-        if device_driver not in self.config.get('device_drivers'):
+        if device_driver not in self.config_dict.get('device_drivers'):
             return
 
         return driver.DriverManager(
             namespace='neutron.agent.extnet.device_drivers',
             name=device_driver,
             invoke_on_load=True,
-            invoke_args=(device_name, self.config.get('device_configs_path'))
+            invoke_args=(device_name, self.config_dict.get('device_configs_path'))
         ).driver
 
 
