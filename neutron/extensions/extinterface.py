@@ -21,7 +21,7 @@ RESOURCE_ATTRIBUTE_MAP = {
                  'is_visible': True},
         'ip_address': {'allow_post': True, 'allow_put': True,
                        'required_by_policy': False,
-                       'validate': {'type:ip_address': None, 'required': False},
+                       'validate': {'type:ip_address_or_none': None},
                        'is_visible': True},
         'node_name': {'allow_post': True, 'allow_put': False,
                       'required_by_policy': True,
