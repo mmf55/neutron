@@ -8,8 +8,11 @@ from neutron import manager
 from neutron import context
 from neutron.agent import rpc as agent_rpc
 
+from extnet_networkcontroller.device_controller import dc_api
 
-class ExtNetDeviceControllerMixin(dev_ctrl.ExtNetDeviceController):
+
+class ExtNetDeviceControllerMixin(dev_ctrl.ExtNetDeviceController,
+                                  dc_api.ExtNetDeviceController):
     def initialize(self, config):
         config_dict = dict(device_drivers=config.device_drivers,
                            device_configs_path=config.device_configs_path)
