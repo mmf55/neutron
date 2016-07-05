@@ -9,11 +9,12 @@ from neutron import context
 from neutron.agent import rpc as agent_rpc
 
 
-class ExtNetDeviceControllerMixin(dev_ctrl.ExtNetDeviceController):
+class ExtNetDeviceControllerMixin(object):
     def initialize(self, config):
+        self.config = config
         config_dict = dict(device_drivers=config.device_drivers,
                            device_configs_path=config.device_configs_path)
-        super(ExtNetDeviceControllerMixin, self).__init__(config_dict)
+        super(ExtNetDeviceControllerMixin, self).__init__()
 
     def deploy_port(self, interface, segmentation_id, **kwargs):
         return self.load_driver(interface.get('node_name'),
@@ -45,12 +46,8 @@ class ExtNetDeviceControllerMixin(dev_ctrl.ExtNetDeviceController):
         ).driver
 
 
-class Test1(ExtNetDeviceControllerMixin,
-            manager.Manager):
-    pass
-
-
-class ExtNetAgent(Test1):
+class ExtNetAgent(ExtNetDeviceControllerMixin,
+                  manager.Manager):
     def __init__(self, conf=None):
         if conf:
             self.conf = conf
