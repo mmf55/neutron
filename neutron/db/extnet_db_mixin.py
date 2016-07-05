@@ -127,7 +127,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
             )
             context.session.add(interface_db)
         """Create and return dictionary for the client."""
-        return self._make_extnodeint_dict(interface_db)
+        return self._make_extinterface_dict(interface_db)
 
     def update_extinterface(self, context, id, extinterface):
         """Check if the request was made by the admin"""
