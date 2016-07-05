@@ -45,8 +45,8 @@ class ExtNetDeviceController(dev_ctrl.ExtNetDeviceController):
         ).driver
 
 
-class ExtNetAgent(manager.Manager,
-                  ExtNetDeviceController):
+class ExtNetAgent(ExtNetDeviceController,
+                  manager.Manager):
     def __init__(self, conf=None):
         if conf:
             self.conf = conf
