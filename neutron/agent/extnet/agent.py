@@ -48,13 +48,13 @@ class ExtNetDeviceControllerMixin(object):
 
 class ExtNetAgent(ExtNetDeviceControllerMixin,
                   manager.Manager):
-    def __init__(self, conf=None):
+    def __init__(self, host, conf=None):
         if conf:
             self.conf = conf
         else:
             self.conf = cfg.CONF
 
-        super(ExtNetAgent, self).__init__()
+        super(ExtNetAgent, self).__init__(host)
 
         self.initialize(conf)
 
