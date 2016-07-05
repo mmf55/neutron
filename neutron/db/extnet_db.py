@@ -30,6 +30,13 @@ class ExtInterface(model_base.BASEV2, models_v2.HasId):
     node_name = sa.Column(sa.String(36))
     node_driver = sa.Column(sa.String(36))
 
+    extsegment_id = sa.Column(sa.String(36),
+                              sa.ForeignKey('extsegments.id', ondelete="CASCADE"))
+
+    extsegment = orm.relationship("ExtSegment",
+                                  back_populates='extinterfaces',
+                                  cascade='all,delete')
+
     extports = orm.relationship("ExtPort",
                                 back_populates='extinterface')
 
@@ -42,8 +49,8 @@ class ExtSegment(model_base.BASEV2, models_v2.HasId):
     vlan_ids_available = sa.Column(sa.String(36))
     tun_ids_available = sa.Column(sa.String(36))
 
-    extlinks = orm.relationship("ExtLink",
-                                back_populates='extsegment')
+    extinterfaces = orm.relationship("ExtLink",
+                                     back_populates='extsegment')
 
 
 class ExtLink(model_base.BASEV2, models_v2.HasId):
@@ -61,9 +68,3 @@ class ExtLink(model_base.BASEV2, models_v2.HasId):
 
     network_id = sa.Column(sa.String(36), sa.ForeignKey("networks.id"),
                            nullable=False)
-    extsegment_id = sa.Column(sa.String(36),
-                                 sa.ForeignKey('extsegments.id', ondelete="CASCADE"))
-
-    extsegment = orm.relationship("ExtSegment",
-                                  back_populates='extlinks',
-                                  cascade='all,delete')

@@ -50,7 +50,8 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
             'type': extinterface.type,
             'ip_address': extinterface.ip_address,
             'node_name': extinterface.node_name,
-            'node_driver': extinterface.node_driver
+            'node_driver': extinterface.node_driver,
+            'extsegment_id': extinterface.extsegment_id
         }
         return self._fields(extinterface_dict, fields)
 
@@ -90,7 +91,6 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
             'segmentation_id': extlink.segmentation_id,
             'extinterface1_id': extlink.extinterface1_id,
             'extinterface2_id': extlink.extinterface2_id,
-            'extsegment_id': extlink.extsegment_id,
             'network_id': extlink.network_id,
         }
         return self._fields(link_created, fields)
@@ -122,7 +122,8 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
                 type=interface.get('type'),
                 ip_address=interface.get('ip_address'),
                 node_name=interface.get('node_name'),
-                node_driver=interface.get('node_driver')
+                node_driver=interface.get('node_driver'),
+                extsegment_id=interface.get('extsegment_id')
             )
             context.session.add(interface_db)
         """Create and return dictionary for the client."""
@@ -139,6 +140,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
             interface_in_db.ip_address = interface['ip_address']
             interface_in_db.node_name = interface['node_name']
             interface_in_db.node_driver = interface['node_driver']
+            interface_in_db.extsegment_id = interface['extsegment_id']
         return self._make_extinterface_dict(interface_in_db)
 
     def get_extinterfaces(self, context, filters=None, fields=None):
@@ -224,7 +226,6 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
                 id=uuidutils.generate_uuid(),
                 type=link['type'],
                 segmentation_id=link['segmentation_id'],
-                extsegment_id=link['extsegment_id'],
                 extinterface1_id=link['extinterface1_id'],
                 extinterface2_id=link['extinterface2_id'],
                 network_id=link['network_id'],
@@ -248,7 +249,6 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
             link_in_db.segmentation_id = link['segmentation_id']
             link_in_db.extinterface1_id = link['extinterface1_id']
             link_in_db.extinterface2_id = link['extinterface2_id']
-            link_in_db.extsegment_id = link['extsegment_id']
             link_in_db.network_id = link['network_id']
         return self._make_extlink_dict(link_in_db)
 

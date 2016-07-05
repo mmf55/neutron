@@ -39,6 +39,8 @@ def upgrade():
     sa.Column('node_name', sa.String(length=36), nullable=True),
     sa.Column('ip_address', sa.String(length=36), nullable=True),
     sa.Column('node_driver', sa.String(length=36), nullable=True),
+    sa.Column('extsegment_id', sa.String(length=36), nullable=True),
+    sa.ForeignKeyConstraint(['extsegment_id'], ['extsegments.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     mysql_engine='InnoDB'
     )
@@ -69,8 +71,6 @@ def upgrade():
     sa.Column('extinterface1_id', sa.String(length=36), nullable=True),
     sa.Column('extinterface2_id', sa.String(length=36), nullable=True),
     sa.Column('network_id', sa.String(length=36), nullable=True),
-    sa.Column('extsegment_id', sa.String(length=36), nullable=True),
-    sa.ForeignKeyConstraint(['extsegment_id'], ['extsegments.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['network_id'], ['networks.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['extinterface1_id'], ['extinterfaces.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['extinterface2_id'], ['extinterfaces.id'], ondelete='CASCADE'),

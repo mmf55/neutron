@@ -1,5 +1,6 @@
 
 from neutron_lib import exceptions
+from neutron._i18n import _
 
 
 class ExtNetObjectNotFound(exceptions.NotFound):
@@ -36,3 +37,7 @@ class ExtLinkErrorApplyingConfigs(exceptions.BadRequest):
 
 class ExtLinkSegmentationIdNotAvailable(exceptions.InvalidConfigurationOption):
     message = _("The segmentation id %(segmentation_id) is not available on connection %(connection_id).")
+
+
+class ExtInterfacesNotInSameSegment(exceptions.BadRequest):
+    message = _("The interfaces are not in the same segment.")

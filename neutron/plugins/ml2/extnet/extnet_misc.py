@@ -31,10 +31,15 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         # Get the necessary info
         link = extlink['extlink']
         interface1 = self.get_extinterface(context, link.get('extinterface1_id'))
-        interface2 = self.get_extinterface(context, link.get('extinterface1_id'))
+        interface2 = self.get_extinterface(context, link.get('extinterface2_id'))
+
+        if interface1.get('extsegment_id') != interface2.get('extsegment_id'):
+            raise extnet_exceptions.ExtInterfacesNotInSameSegment()
+
+        segment = self.get_extsegment(context, interface1.get('extsegment_id'))
 
         segmentation_id = self._get_segmentation_id(context,
-                                                    link.get('extsegment_id'),
+                                                    segment.get('id'),
                                                     link.get('type'),
                                                     link.get('segmentation_id'))
 
