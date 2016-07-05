@@ -173,6 +173,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         with context.session.begin(subtransactions=True):
             segment_db = models.ExtSegment(
                 id=uuidutils.generate_uuid(),
+                name=segment.get('name'),
                 types_supported=segment.get('types_supported'),
                 vlan_ids_available=segment.get('vlan_ids_available'),
                 tun_ids_available=segment.get('tun_ids_available'))
@@ -184,6 +185,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         segment = extsegment['extsegment']
         with context.session.begin(subtransactions=True):
             segment_in_db = self._get_existing_extsegment(context, id)
+            segment_in_db.name = segment['name']
             segment_in_db.types_supported = segment['types_supported']
             segment_in_db.vlan_ids_available = segment['vlan_ids_available']
             segment_in_db.tun_ids_available = segment['tun_ids_available']
