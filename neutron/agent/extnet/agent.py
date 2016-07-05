@@ -55,7 +55,7 @@ class ExtNetAgent(ExtNetDeviceControllerMixin,
 
         super(ExtNetAgent, self).__init__(host)
 
-        self.initialize(conf)
+        self.initialize(self.conf)
 
         self._setup_rpc()
 
