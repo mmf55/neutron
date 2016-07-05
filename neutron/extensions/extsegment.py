@@ -17,7 +17,7 @@ RESOURCE_NAME = "extsegment"
 COLLECTION_NAME = "%ss" % RESOURCE_NAME
 # Collection name is the path identifier of the extension in the URI!
 
-# Attribute Map for extnode resource
+# Attribute Map for resource
 RESOURCE_ATTRIBUTE_MAP = {
     COLLECTION_NAME: {
         'id': {'allow_post': False, 'allow_put': False,

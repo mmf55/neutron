@@ -14,6 +14,8 @@ def validate_types_supported(data, valid_values=None):
 
 
 def validate_ids_pool(data, valid_values=None):
+    if data is None:
+        return
     r1 = re.compile('^[0-9]+:[0-9]+(,[0-9]+:[0-9]+)*$')
     if r1.match(data) is None:
         return _('The format of the pool IDs is not correct.')
