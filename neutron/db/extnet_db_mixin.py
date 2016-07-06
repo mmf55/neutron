@@ -88,6 +88,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         link_created = {
             'id': extlink.id,
             'type': extlink.type,
+            'name': extlink.name,
             'segmentation_id': extlink.segmentation_id,
             'extinterface1_id': extlink.extinterface1_id,
             'extinterface2_id': extlink.extinterface2_id,
@@ -226,6 +227,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         with context.session.begin(subtransactions=True):
             link_db = models.ExtLink(
                 id=uuidutils.generate_uuid(),
+                name=link['name'],
                 type=link['type'],
                 segmentation_id=link['segmentation_id'],
                 extinterface1_id=link['extinterface1_id'],
@@ -247,6 +249,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         link = extlink['extlink']
         with context.session.begin(subtransactions=True):
             link_in_db = self._get_existing_extlink(context, id)
+            link_in_db.name = link['name']
             link_in_db.type = link['type']
             link_in_db.segmentation_id = link['segmentation_id']
             link_in_db.extinterface1_id = link['extinterface1_id']
