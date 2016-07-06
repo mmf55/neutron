@@ -158,8 +158,9 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
 
 
 class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
-    def deploy_link(self, interface, network_type, segmentation_id, **kwargs):
+    def deploy_link(self, ctxt, interface, network_type, segmentation_id, **kwargs):
         LOG.debug("Deploy_link called!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        return
         network_id = kwargs.get('vnetwork')
 
         if network_id not in self.local_vlan_map:
