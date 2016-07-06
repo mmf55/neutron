@@ -1,5 +1,6 @@
 import itertools
 import oslo_messaging
+from oslo_log import log as logging
 
 from neutron.callbacks import registry, resources, events
 from neutron.common import topics
@@ -16,6 +17,8 @@ from extnet_networkcontroller.device_controller import dev_ctrl
 from extnet_networkcontroller.common import const
 
 from sqlalchemy import or_
+
+LOG = logging.getLogger(__name__)
 
 
 class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
@@ -156,6 +159,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
 
 class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
     def deploy_link(self, interface, network_type, segmentation_id, **kwargs):
+        LOG.debug("Deploy_link called!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         network_id = kwargs.get('vnetwork')
 
         if network_id not in self.local_vlan_map:
