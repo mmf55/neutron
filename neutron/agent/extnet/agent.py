@@ -73,4 +73,4 @@ class ExtNetAgent(ExtNetDeviceControllerMixin,
         self.connection = agent_rpc.create_consumers([self],
                                                      topics.EXTNET_AGENT,
                                                      consumers,
-                                                     start_listening=False)
+                                                     start_listening=True)
