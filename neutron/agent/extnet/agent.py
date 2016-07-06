@@ -25,7 +25,7 @@ class ExtNetDeviceControllerMixin(object):
                                                                           interface.get('name'),
                                                                           vnetwork=kwargs.get('vnetwork'))
 
-    def deploy_link(self, interface, network_type, segmentation_id, **kwargs):
+    def deploy_link(self, ctxt, interface, network_type, segmentation_id, **kwargs):
         LOG.debug("Deploy link called!")
         return self.load_driver(interface.get('node_name'),
                                 interface.get('node_driver')).deploy_link(network_type,
