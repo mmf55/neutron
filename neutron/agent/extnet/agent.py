@@ -1,4 +1,5 @@
 from oslo_config import cfg
+from oslo_log import log as logging
 from stevedore import driver
 
 from extnet_networkcontroller.device_controller import dev_ctrl
@@ -7,6 +8,8 @@ from neutron.common import topics
 from neutron import manager
 from neutron import context
 from neutron.agent import rpc as agent_rpc
+
+LOG = logging.getLogger(__name__)
 
 
 class ExtNetDeviceControllerMixin(object):
@@ -23,6 +26,7 @@ class ExtNetDeviceControllerMixin(object):
                                                                           vnetwork=kwargs.get('vnetwork'))
 
     def deploy_link(self, interface, network_type, segmentation_id, **kwargs):
+        LOG.debug("Deploy link called!")
         return self.load_driver(interface.get('node_name'),
                                 interface.get('node_driver')).deploy_link(network_type,
                                                                           interface.get('name'),
