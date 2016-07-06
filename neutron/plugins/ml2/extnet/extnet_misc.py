@@ -132,8 +132,8 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
                                timeout=5)
         return cctxt.call(context,
                           'deploy_link',
-                          network_type=network_type,
                           segmentation_id=segmentation_id,
+                          network_type=network_type,
                           interface=interface,
                           vnetwork=kwargs.get('vnetwork'))
 
@@ -158,7 +158,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
 
 
 class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
-    def deploy_link(self, ctxt, interface, network_type, segmentation_id, **kwargs):
+    def deploy_link(self, ctxt, interface, segmentation_id, network_type, **kwargs):
         LOG.debug("Deploy_link called!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         return
         network_id = kwargs.get('vnetwork')

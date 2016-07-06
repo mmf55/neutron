@@ -18,14 +18,14 @@ class ExtNetDeviceControllerMixin(object):
                                 device_configs_path=config.device_configs_path)
         super(ExtNetDeviceControllerMixin, self).__init__()
 
-    def deploy_port(self, interface, segmentation_id, **kwargs):
+    def deploy_port(self, ctxt, interface, segmentation_id, **kwargs):
         return self.load_driver(interface.get('node_name'),
                                 interface.get('node_driver')).deploy_port(interface.get('type'),
                                                                           segmentation_id,
                                                                           interface.get('name'),
                                                                           vnetwork=kwargs.get('vnetwork'))
 
-    def deploy_link(self, ctxt, interface, network_type, segmentation_id, **kwargs):
+    def deploy_link(self, ctxt, interface, segmentation_id, network_type, **kwargs):
         LOG.debug("Deploy link called!")
         return self.load_driver(interface.get('node_name'),
                                 interface.get('node_driver')).deploy_link(network_type,
