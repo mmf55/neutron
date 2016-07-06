@@ -125,9 +125,9 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
         target = oslo_messaging.Target(topic=topic, version='1.0')
         client = n_rpc.get_client(target)
         cctxt = client.prepare(topic=topic_create_extlink,
-                               fanout=False,
+                               fanout=True,
                                timeout=5)
-        return cctxt.call(context,
+        return cctxt.cast(context,
                           'deploy_link',
                           network_type=network_type,
                           segmentation_id=segmentation_id,
@@ -144,10 +144,10 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
         target = oslo_messaging.Target(topic=topic, version='1.0')
         client = n_rpc.get_client(target)
         cctxt = client.prepare(topic=topic_create_extport,
-                               fanout=False,
+                               fanout=True,
                                timeout=5)
 
-        return cctxt.call(context,
+        return cctxt.cast(context,
                           'deploy_port',
                           segmentation_id=segmentation_id,
                           interface=interface,
