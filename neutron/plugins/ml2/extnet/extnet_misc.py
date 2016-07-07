@@ -1,5 +1,6 @@
 import itertools
 import oslo_messaging
+from oslo_config import cfg
 from oslo_log import log as logging
 
 from neutron.callbacks import registry, resources, events
@@ -28,7 +29,10 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         # Subscribe for the creation of new ports.
         registry.subscribe(self.create_port_callback, resources.PORT, events.AFTER_CREATE)
 
-        device_ctrl_mgr = ExtNetDeviceCtrlManager({topics.AGENT: ['OVS'], topics.EXTNET_AGENT: ['ESW1', 'ESW2']})
+        config_dict = {dev_ctrl: dev_name_list.split(',')
+                       for device_ctrl, dev_name_list in cfg.CONF.EXTNET_CONTROLLER.device_controllers.items()}
+
+        device_ctrl_mgr = ExtNetDeviceCtrlManager(config_dict)
         super(ExtNetControllerMixin, self).__init__(device_ctrl_mgr)
 
     def create_extlink(self, context, extlink):
@@ -42,6 +46,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             raise extnet_exceptions.ExtInterfacesNotInSameSegment()
 
         segment = self.get_extsegment(context, interface1.get('extsegment_id'))
+
+        if link.get('type') not in segment.get('types_supported').split(','):
+            raise extnet_exceptions.ExtLinkTypeNotSupportedOnSegment()
 
         link['segmentation_id'] = self._get_segmentation_id(context,
                                                             segment.get('id'),
@@ -159,8 +166,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
 
 class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
     def deploy_link(self, ctxt, interface, segmentation_id, network_type, **kwargs):
-        LOG.debug("Deploy_link called!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        return
+        LOG.debug("Deploy_link on %s" % interface.get('name'))
         network_id = kwargs.get('vnetwork')
 
         if network_id not in self.local_vlan_map:

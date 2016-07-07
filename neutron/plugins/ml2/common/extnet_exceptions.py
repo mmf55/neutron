@@ -41,3 +41,7 @@ class ExtLinkSegmentationIdNotAvailable(exceptions.InvalidConfigurationOption):
 
 class ExtInterfacesNotInSameSegment(exceptions.BadRequest):
     message = _("The interfaces are not in the same segment.")
+
+
+class ExtLinkTypeNotSupportedOnSegment(exceptions.InvalidInput):
+    message = _("The link type requested is not supported on this segment.")

@@ -1,3 +1,5 @@
+import imp
+
 from oslo_config import cfg
 from oslo_log import log as logging
 from stevedore import driver
@@ -26,7 +28,7 @@ class ExtNetDeviceControllerMixin(object):
                                                                           vnetwork=kwargs.get('vnetwork'))
 
     def deploy_link(self, ctxt, interface, segmentation_id, network_type, **kwargs):
-        LOG.debug("Deploy link called!")
+        LOG.debug("Deploy_link on %s" % interface.get('name'))
         return self.load_driver(interface.get('node_name'),
                                 interface.get('node_driver')).deploy_link(network_type,
                                                                           interface.get('name'),
@@ -38,15 +40,13 @@ class ExtNetDeviceControllerMixin(object):
         return topics.EXTNET_AGENT
 
     def load_driver(self, device_name, device_driver):
-        if device_driver not in self.config_dict.get('device_drivers'):
+        for driver_str in self.config_dict.get('device_drivers'):
+            name, module_path = driver_str.split(':')
+            if device_driver.lower() == name.lower():
+                mod = imp.load_source(name.lower(), module_path)
+                Class = getattr(mod, name)
+                return Class(device_name, self.config_dict.get('device_configs_path'))
             return
-
-        return driver.DriverManager(
-            namespace='neutron.agent.extnet.device_drivers',
-            name=device_driver,
-            invoke_on_load=True,
-            invoke_args=(device_name, self.config_dict.get('device_configs_path'))
-        ).driver
 
 
 class ExtNetAgent(ExtNetDeviceControllerMixin,

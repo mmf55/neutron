@@ -5,7 +5,7 @@ from neutron._i18n import _
 
 OPTS = [
     cfg.ListOpt('device_drivers',
-                default='cisco3700',
+                default='Cisco3700:/home/mfernandes/drivers_and_configs/cisco3700.py',
                 help=_("Device drivers available on this device controller.")
                 ),
     cfg.StrOpt('device_configs_path',
