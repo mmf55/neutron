@@ -14,6 +14,7 @@ from neutron.agent import rpc as agent_rpc
 LOG = logging.getLogger(__name__)
 
 
+# This class holds the main logic of the external devices device controller.
 class ExtNetDeviceControllerMixin(object):
     def initialize(self, config):
         self.config_dict = dict(device_drivers=config.device_drivers,
@@ -49,6 +50,7 @@ class ExtNetDeviceControllerMixin(object):
             return
 
 
+# This class do the necessary setup for the external devices device controller to be launched as a neutron agent.
 class ExtNetAgent(ExtNetDeviceControllerMixin,
                   manager.Manager):
     def __init__(self, host, conf=None):

@@ -45,3 +45,7 @@ class ExtInterfacesNotInSameSegment(exceptions.BadRequest):
 
 class ExtLinkTypeNotSupportedOnSegment(exceptions.InvalidInput):
     message = _("The link type requested is not supported on this segment.")
+
+
+class ExtLinkTypeNotSupportedByInterfaces(exceptions.BadRequest):
+    message = _("The link type requested is not supported by one or both the interfaces.")

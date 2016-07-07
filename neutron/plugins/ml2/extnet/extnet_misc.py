@@ -22,6 +22,7 @@ from sqlalchemy import or_
 LOG = logging.getLogger(__name__)
 
 
+# This class holds the main logic for extending the virtual networks to the campus network.
 class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                             net_ctrl.ExtNetController):
     def initialize_extnetcontroller(self):
@@ -49,6 +50,12 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         if link.get('type') not in segment.get('types_supported').split(','):
             raise extnet_exceptions.ExtLinkTypeNotSupportedOnSegment()
+
+        if (link.get('type') == const.GRE and not (interface1.get('type') == 'l3' and
+                                                   interface2.get('type') == 'l3')) or \
+           (link.get('type') == const.VLAN and not (interface1.get('type') == 'l2' and
+                                                    interface2.get('type') == 'l2')):
+            raise extnet_exceptions.ExtLinkTypeNotSupportedByInterfaces()
 
         link['segmentation_id'] = self._get_segmentation_id(context,
                                                             segment.get('id'),
@@ -121,6 +128,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         return seg_id
 
 
+# Controls the deploy requests by directing themselves to the correspondent device controller
 class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
     def __init__(self, config):
         super(ExtNetDeviceCtrlManager, self).__init__(config)
@@ -164,6 +172,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
                           vnetwork=kwargs.get('vnetwork'))
 
 
+# This turns the OVS agent to a device controller itself.
 class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
     def deploy_link(self, ctxt, interface, segmentation_id, network_type, **kwargs):
         LOG.debug("Deploy_link on %s" % interface.get('name'))
@@ -178,7 +187,7 @@ class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
             if not self.enable_tunneling:
                 self._local_vlan_for_vlan(lvid, const.VLAN, segmentation_id)
             else:
-                return "ERROR - Tunneling not enabled."
+                return "ERROR - Tunneling enabled."
 
         elif network_type == const.GRE:
             remote_ip = kwargs.get('remote_ip')
