@@ -33,6 +33,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         config_dict = {dev_ctrl: dev_name_list.split(',')
                        for device_ctrl, dev_name_list in cfg.CONF.EXTNET_CONTROLLER.device_controllers.items()}
 
+        LOG.debug("#############################################3333")
+        LOG.debug(config_dict)
         device_ctrl_mgr = ExtNetDeviceCtrlManager(config_dict)
         super(ExtNetControllerMixin, self).__init__(device_ctrl_mgr)
 
@@ -137,7 +139,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
         context = kwargs.get('context')
         node = interface['node_name']
         topic = self.get_device_controller(node)
-        LOG.debug(topic)
+
         topic_create_extlink = topics.get_topic_name(topic,
                                                      topics.EXTNET_LINK,
                                                      topics.CREATE)
