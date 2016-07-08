@@ -5,7 +5,7 @@ netctrl_group = cfg.OptGroup(name='EXTNET_CONTROLLER',
 
 netctrl_opts = [
     cfg.DictOpt('device_controllers',
-                default="q-agent-notifier: OVS, extnet_agent: ESW1,ESW2",
+                default="q-agent-notifier: OVS,extnet_agent: ESW1;ESW2",
                 required=False,
                 help='Device controller name.'),
     cfg.StrOpt('network_mapper_namespace',
