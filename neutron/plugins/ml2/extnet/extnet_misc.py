@@ -151,7 +151,8 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
                           segmentation_id=segmentation_id,
                           network_type=network_type,
                           interface=interface,
-                          vnetwork=kwargs.get('vnetwork'))
+                          vnetwork=kwargs.get('vnetwork'),
+                          reomte_ip=kwargs.get('remote_ip'))
 
     def deploy_port_on_node(self, interface, segmentation_id, **kwargs):
         context = kwargs.get('context')
