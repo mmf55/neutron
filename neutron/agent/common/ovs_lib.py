@@ -385,7 +385,7 @@ class OVSBridge(BaseOVS):
         if lvid:
             with self.ovsdb.transaction() as txn:
                 txn.add(self.ovsdb.db_set('Port', port_name,
-                                          [('tag', lvid)]))
+                                          ('tag', lvid)))
         return ofport
 
     def add_patch_port(self, local_name, remote_name):
