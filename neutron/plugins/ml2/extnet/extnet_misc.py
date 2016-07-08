@@ -30,11 +30,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         # Subscribe for the creation of new ports.
         registry.subscribe(self.create_port_callback, resources.PORT, events.AFTER_CREATE)
 
-        config_dict = {dev_ctrl: dev_name_list.split(',')
+        config_dict = {device_ctrl: dev_name_list.split(';')
                        for device_ctrl, dev_name_list in cfg.CONF.EXTNET_CONTROLLER.device_controllers.items()}
 
-        LOG.debug("#############################################3333")
-        LOG.debug(config_dict)
         device_ctrl_mgr = ExtNetDeviceCtrlManager(config_dict)
         super(ExtNetControllerMixin, self).__init__(device_ctrl_mgr)
 
