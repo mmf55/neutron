@@ -87,10 +87,10 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
         self.spawn.expect(COMMAND_PROMPT)
         return self.spawn.before
 
-    def delete_link(self, link):
+    def undeploy_link(self, link):
         pass
 
-    def create_port(self, interface_type, interface_name, link_segmentation_id, **kwargs):
+    def deploy_port(self, interface_type, interface_name, link_segmentation_id, **kwargs):
         self._init_telnet_session()
         self._enter_config_mode()
 
@@ -127,6 +127,9 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
         return msg
 
+    def undeploy_port(self, port):
+        pass
+
     def driver_name(self):
         return "Cisco 3700"
 
@@ -139,7 +142,7 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
     def driver_protocol(self):
         return 'telnet'
 
-    def create_link(self,
+    def deploy_link(self,
                     link_type,
                     interface_name,
                     tun_destination,
