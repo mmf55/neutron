@@ -136,8 +136,8 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
     def deploy_link_on_node(self, interface, network_type, segmentation_id, **kwargs):
         context = kwargs.get('context')
         node = interface['node_name']
-        LOG.debug(node)
         topic = self.get_device_controller(node)
+        LOG.debug(topic)
         topic_create_extlink = topics.get_topic_name(topic,
                                                      topics.EXTNET_LINK,
                                                      topics.CREATE)
