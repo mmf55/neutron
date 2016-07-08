@@ -145,7 +145,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
         client = n_rpc.get_client(target)
         cctxt = client.prepare(topic=topic_create_extlink,
                                fanout=False,
-                               timeout=5)
+                               timeout=30)
         return cctxt.call(context,
                           'deploy_link',
                           segmentation_id=segmentation_id,
@@ -164,7 +164,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
         client = n_rpc.get_client(target)
         cctxt = client.prepare(topic=topic_create_extport,
                                fanout=False,
-                               timeout=5)
+                               timeout=30)
 
         return cctxt.call(context,
                           'deploy_port',
