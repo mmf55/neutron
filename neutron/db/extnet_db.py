@@ -18,6 +18,7 @@ class ExtPort(model_base.BASEV2):
                                                              ondelete="CASCADE"))
     extinterface = orm.relationship("ExtInterface",
                                     back_populates='extports')
+    port = orm.relationship(models_v2.Port)
 
 
 class ExtInterface(model_base.BASEV2, models_v2.HasId):

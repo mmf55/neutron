@@ -32,7 +32,7 @@ class ExtLinkExists(exceptions.NotFound):
 
 
 class ExtLinkErrorApplyingConfigs(exceptions.BadRequest):
-    message = _("Error applying configuration on the devices.")
+    message = _("Error applying link configurations on the devices.")
 
 
 class ExtLinkSegmentationIdNotAvailable(exceptions.InvalidConfigurationOption):
@@ -49,3 +49,11 @@ class ExtLinkTypeNotSupportedOnSegment(exceptions.InvalidInput):
 
 class ExtLinkTypeNotSupportedByInterfaces(exceptions.BadRequest):
     message = _("The link type requested is not supported by one or both the interfaces.")
+
+
+class ExtPortErrorApplyingConfigs(exceptions.BadRequest):
+    message = _("Error applying port configurations on the devices.")
+
+
+class ExtInterfaceHasPortsInUse(exceptions.InUse):
+    message = _("External interface has ports in use.")

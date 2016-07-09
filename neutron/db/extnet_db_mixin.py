@@ -272,4 +272,3 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         LOG.debug("External link '%s' was deleted.", id)
 
 # -------------------------------------------------------------------------------------------------------------------
-

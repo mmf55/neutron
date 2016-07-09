@@ -3,7 +3,6 @@ import oslo_messaging
 from oslo_config import cfg
 from oslo_log import log as logging
 
-from neutron.callbacks import registry, resources, events
 from neutron.common import topics
 from neutron.common import rpc as n_rpc
 from neutron.plugins.ml2.common import extnet_exceptions
@@ -27,9 +26,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                             net_ctrl.ExtNetController):
     def initialize_extnetcontroller(self):
 
-        # Subscribe for the creation of new ports.
-        registry.subscribe(self.create_port_callback, resources.PORT, events.AFTER_CREATE)
-
         config_dict = {device_ctrl: dev_name_list.split(';')
                        for device_ctrl, dev_name_list in cfg.CONF.EXTNET_CONTROLLER.device_controllers.items()}
 
@@ -43,6 +39,10 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         interface1 = self.get_extinterface(context, link.get('extinterface1_id'))
         interface2 = self.get_extinterface(context, link.get('extinterface2_id'))
 
+        if self._extinterface_has_extports(context, interface1.get('id')) \
+                or self._extinterface_has_extports(context, interface2.get('id')):
+            raise extnet_exceptions.ExtInterfaceHasPortsInUse()
+
         if interface1.get('extsegment_id') != interface2.get('extsegment_id'):
             raise extnet_exceptions.ExtInterfacesNotInSameSegment()
 
@@ -52,9 +52,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             raise extnet_exceptions.ExtLinkTypeNotSupportedOnSegment()
 
         if (link.get('type') == const.GRE and not (interface1.get('type') == 'l3' and
-                                                   interface2.get('type') == 'l3')) or \
-           (link.get('type') == const.VLAN and not (interface1.get('type') == 'l2' and
-                                                    interface2.get('type') == 'l2')):
+                                                           interface2.get('type') == 'l3')) or \
+                (link.get('type') == const.VLAN and not (interface1.get('type') == 'l2' and
+                                                                 interface2.get('type') == 'l2')):
             raise extnet_exceptions.ExtLinkTypeNotSupportedByInterfaces()
 
         link['segmentation_id'] = self._get_segmentation_id(context,
@@ -73,31 +73,77 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         # Save new link on the database
         return super(ExtNetControllerMixin, self).create_extlink(context, extlink)
 
-    def create_port_callback(self, resource, event, trigger, **kwargs):
-        context = kwargs.get('context')
-        port = kwargs.get('port')
+    def create_extport(self, context, port):
         ext_port = port.get('external_port')
-        if ext_port:
-            interface = self.get_extinterface(context, ext_port.get('extinterface_id'))
+        interface = self.get_extinterface(context, ext_port.get('extinterface_id'))
 
-            self.deploy_port(interface, ext_port.get('segmentation_id'))
+        if self._extinterface_has_extlinks(context, interface.get('id')):
+            raise extnet_exceptions.ExtPortErrorApplyingConfigs()
+
+        interface_extports = self._extinterface_has_extports(context, interface.get('id'))
+        if interface_extports:
+            if not next((x for x in interface_extports if x.port.network_id == port.get('network_id'))):
+                raise extnet_exceptions.ExtPortErrorApplyingConfigs()
+
+        if interface.get('type') == 'l2':
+            links = self._get_all_links_on_extsegment_by_type(context,
+                                                              interface.get('extsegment_id'),
+                                                              const.VLAN,
+                                                              port.get('network_id'))
+            if links:
+                ext_port['segmentation_id'] = links[0].segmentation_id
+            else:
+                raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
+
+        elif interface.get('type') == 'l3':
+            ext_port['segmentation_id'] = None
+
+        if not interface_extports:
+            if self.deploy_port(interface, ext_port.get('segmentation_id')) != const.OK:
+                raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
     # ------------------------------------ Auxiliary functions ---------------------------------------
+
+    def _extinterface_has_extports(self, context, interface_id):
+        interface = context.session.query(models.ExtInterface).filter_by(id=interface_id).first()
+        return interface.extports
+
+    def _extinterface_has_extlinks(self, context, interface_id):
+        links = context.session.query(models.ExtLink) \
+            .filter_by(or_(models.ExtLink.extinterface1_id == interface_id,
+                           models.ExtLink.extinterface2_id == interface_id))
+        return links
+
+    def _get_all_links_on_extsegment_by_type(self, context, segment_id, conn_type, network_id):
+        interfaces = context.session.query(models.ExtInterface).filter_by(extsegment_id=segment_id).all()
+        links = []
+        for interface in interfaces:
+            links += context.session.query(models.ExtLink) \
+                .filter_by(or_(models.ExtLink.extinterface1_id == interface.id,
+                               models.ExtLink.extinterface2_id == interface.id)) \
+                .filter_by(models.ExtLink.type == conn_type) \
+                .filter_by(models.ExtLink.network_id == network_id) \
+                .all()
+            links = list(set(links))
+        return links
 
     def _get_segmentation_id(self, context, segment_id, conn_type, network_id):
         segment = context.session.query(models.ExtSegment).filter_by(id=segment_id).first()
 
         if conn_type == const.VLAN:
-            interfaces = context.session.query(models.ExtInterface).filter_by(extsegment_id=segment_id).all()
-            for interface in interfaces:
-                link = context.session.query(models.ExtLink) \
-                    .filter_by(or_(models.ExtLink.extinterface1_id == interface.id,
-                                   models.ExtLink.extinterface2_id == interface.id)) \
-                    .filter_by(models.ExtLink.type == const.VLAN) \
-                    .filter_by(models.ExtLink.network_id == network_id) \
-                    .first()
-                if link:
-                    return link.segmentation_id
+            links = self._get_all_links_on_extsegment_by_type(context, segment_id, const.VLAN, network_id)
+            if links:
+                return links[0].segmentation_id
+            # interfaces = context.session.query(models.ExtInterface).filter_by(extsegment_id=segment_id).all()
+            # for interface in interfaces:
+            #     link = context.session.query(models.ExtLink) \
+            #         .filter_by(or_(models.ExtLink.extinterface1_id == interface.id,
+            #                        models.ExtLink.extinterface2_id == interface.id)) \
+            #         .filter_by(models.ExtLink.type == const.VLAN) \
+            #         .filter_by(models.ExtLink.network_id == network_id) \
+            #         .first()
+            #     if link:
+            #         return link.segmentation_id
             ids_avail = segment.vlan_ids_available
         else:
             ids_avail = segment.tun_ids_available
