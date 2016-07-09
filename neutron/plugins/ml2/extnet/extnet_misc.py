@@ -111,7 +111,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
     def _extinterface_has_extlinks(self, context, interface_id):
         links = context.session.query(models.ExtLink) \
             .filter_by(or_(models.ExtLink.extinterface1_id == interface_id,
-                           models.ExtLink.extinterface2_id == interface_id))
+                           models.ExtLink.extinterface2_id == interface_id)) \
+            .all()
         return links
 
     def _get_all_links_on_extsegment_by_type(self, context, segment_id, conn_type, network_id):
