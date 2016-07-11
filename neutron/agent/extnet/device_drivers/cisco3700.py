@@ -1,4 +1,5 @@
 import re
+import itertools
 from extnet_networkcontroller.device_drivers import driver_api
 from extnet_networkcontroller.common import const
 
@@ -10,28 +11,28 @@ COMMAND_PROMPT = '[#$>]'
 
 class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
-    def _handle_node_ids(self, available_list):
-
-        tunnel_int_avail_dict = available_list.split(',')
-
-        l = [[int(ids.split(':')[0]), int(ids.split(':')[1])]
-             if ids.split(':') > 1 else int(ids) for ids in tunnel_int_avail_dict]
+    def _get_node_id(self, available_list):
         # [(123, 130), (1000, 2000)]
+        l = [[int(ids.split(':')[0]), int(ids.split(':')[1])]
+             if len(ids.split(':')) > 1 else [int(ids)] for ids in available_list.split(',')]
 
-        ids = l[0]
-        if len(ids) > 1:
-            new_id = ids[0]
-            ids[0] -= 1
-            if ids[0] == ids[1]:
-                l[0] = ids[0]
-        else:
-            new_id = ids[0]
-            l.remove(ids[0])
+        num_list = list()
+        for item in l:
+            if len(item) > 1:
+                num_list += range(item[0], item[1] + 1)
+            else:
+                num_list += item
 
-        l = ['%s:%s' % (x[0], x[1]) if len(x) > 1 else str(x) for x in l]
-        available_list = ','.join(l)
+        num_list.sort()
 
-        return new_id
+        new_id = num_list.pop(0)
+
+        l2 = [':'.join([str(t[0][1]), str(t[-1][1])]) if t[0][1] - t[-1][1] != 0 else str(t[0][1]) for t in
+              (tuple(g[1]) for g in itertools.groupby(enumerate(num_list), lambda (i, x): i - x))]
+
+        available_list = ','.join(l2)
+
+        return new_id, available_list
 
     def _get_allowed_vlans_on_interface(self, interface):
         self._exit_config_mode()
@@ -50,8 +51,9 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
         if bridge_group:
             return bridge_group
         else:
-            new_bg = self._handle_node_ids(self.dev_config_dict.get('bridge_groups_available'))
-            self.dev_config_dict[vnetwork] = new_bg
+            new_bg, avail_list = self._get_node_id(self.dev_config_dict.get('bridge_groups_attributed'))
+            self.dev_config_dict['bridge_groups_attributed'][vnetwork] = new_bg
+            self.dev_config_dict['bridge_groups_available'] = avail_list
             self.save_device_configs()
             return new_bg
 
