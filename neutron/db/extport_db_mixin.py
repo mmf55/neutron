@@ -17,9 +17,6 @@ class ExtPortDBMixin(object):
     def _make_extport_dict(self, extport, fields=None):
         extport_dict = {
             extport_dict_ext.EXTPORT: {
-                'id': extport.id,
-                'name': extport.name,
-                'segmentation_id': extport.segmentation_id,
                 'extinterface_id': extport.extinterface_id
             }
         }
@@ -46,9 +43,6 @@ class ExtPortDBMixin(object):
         LOG.debug(result)
         with context.session.begin(subtransactions=True):
             extport_db = extnet_db.ExtPort(
-                id=result['id'],
-                name=data[extport_dict_ext.EXTPORT]['name'],
-                segmentation_id=data[extport_dict_ext.EXTPORT]['segmentation_id'],
                 extinterface_id=data[extport_dict_ext.EXTPORT]['extinterface_id']
             )
             context.session.add(extport_db)
@@ -58,8 +52,6 @@ class ExtPortDBMixin(object):
     def _process_update_port(self, context, data, result):
         extport_db = self._get_existing_extport(context, data['id'])
         with context.session.begin(subtransactions=True):
-            extport_db.name = data[extport_dict_ext.EXTPORT]['name']
-            extport_db.segmentation_id = data[extport_dict_ext.EXTPORT]['segmentation_id']
             extport_db.extinterface_id = data[extport_dict_ext.EXTPORT]['extinterface_id']
         result[extport_dict_ext.EXTPORT] = data[extport_dict_ext.EXTPORT]
         return self._make_extport_dict(extport_db)
