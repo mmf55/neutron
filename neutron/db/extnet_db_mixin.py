@@ -64,8 +64,8 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
 
     def _extinterface_has_links(self, context, extinterface):
         extinterface_links = context.session.query(models.ExtLink)\
-            .filter(or_(models.ExtLink.extnodeint1_id == extinterface.id,
-                        models.ExtLink.extnodeint2_id == extinterface.id))\
+            .filter(or_(models.ExtLink.extinterface1_id == extinterface.id,
+                        models.ExtLink.extinterface2_id == extinterface.id))\
             .all()
         return extinterface_links
 
