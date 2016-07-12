@@ -100,7 +100,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             ext_port['segmentation_id'] = None
 
         if not interface_extports:
-            if self.deploy_port(interface, ext_port.get('segmentation_id')) != const.OK:
+            if self.deploy_port(interface,
+                                ext_port.get('segmentation_id'),
+                                context=context) != const.OK:
                 raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
     # ------------------------------------ Auxiliary functions ---------------------------------------
