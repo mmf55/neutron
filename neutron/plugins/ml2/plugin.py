@@ -1126,6 +1126,7 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
         registry.notify(resources.PORT, events.AFTER_CREATE, self, **kwargs)
 
         ext_port = port.get('external_port')
+        LOG.debug(port)
         if ext_port:
             LOG.debug("I'm here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
             self.create_extport(context, port)
