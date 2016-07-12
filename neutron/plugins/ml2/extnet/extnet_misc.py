@@ -74,6 +74,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         return super(ExtNetControllerMixin, self).create_extlink(context, extlink)
 
     def create_extport(self, context, port):
+        port = port.get('port')
         ext_port = port.get('external_port')
         interface = self.get_extinterface(context, ext_port.get('extinterface_id'))
 
