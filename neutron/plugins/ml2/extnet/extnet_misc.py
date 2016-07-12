@@ -110,8 +110,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
     def _extinterface_has_extlinks(self, context, interface_id):
         links = context.session.query(models.ExtLink) \
-            .filter_by(or_(models.ExtLink.extinterface1_id == interface_id,
-                           models.ExtLink.extinterface2_id == interface_id)) \
+            .filter(or_(models.ExtLink.extinterface1_id == interface_id,
+                        models.ExtLink.extinterface2_id == interface_id)) \
             .all()
         return links
 
@@ -120,10 +120,10 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         links = []
         for interface in interfaces:
             links += context.session.query(models.ExtLink) \
-                .filter_by(or_(models.ExtLink.extinterface1_id == interface.id,
-                               models.ExtLink.extinterface2_id == interface.id)) \
-                .filter_by(models.ExtLink.type == conn_type) \
-                .filter_by(models.ExtLink.network_id == network_id) \
+                .filter(or_(models.ExtLink.extinterface1_id == interface.id,
+                            models.ExtLink.extinterface2_id == interface.id)) \
+                .filter(models.ExtLink.type == conn_type) \
+                .filter(models.ExtLink.network_id == network_id) \
                 .all()
             links = list(set(links))
         return links

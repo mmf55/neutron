@@ -51,7 +51,7 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
         if bridge_group:
             return bridge_group
         else:
-            new_bg, avail_list = self._get_node_id(self.dev_config_dict.get('bridge_groups_attributed'))
+            new_bg, avail_list = self._get_node_id(self.dev_config_dict.get('bridge_groups_available'))
             self.dev_config_dict['bridge_groups_attributed'][vnetwork] = new_bg
             self.dev_config_dict['bridge_groups_available'] = avail_list
             self.save_device_configs()
