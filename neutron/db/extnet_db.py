@@ -12,8 +12,7 @@ class ExtPort(model_base.BASEV2):
                                  ondelete="CASCADE"),
                    primary_key=True)
     segmentation_id = sa.Column(sa.String(36))
-    extinterface_id = sa.Column(sa.String(36), sa.ForeignKey("extinterfaces.id",
-                                                             ondelete="CASCADE"))
+    extinterface_id = sa.Column(sa.String(36), sa.ForeignKey("extinterfaces.id"))
     extinterface = orm.relationship("ExtInterface",
                                     back_populates='extports')
     port = orm.relationship(models_v2.Port)
@@ -30,11 +29,10 @@ class ExtInterface(model_base.BASEV2, models_v2.HasId):
     node_driver = sa.Column(sa.String(36))
 
     extsegment_id = sa.Column(sa.String(36),
-                              sa.ForeignKey('extsegments.id', ondelete="CASCADE"))
+                              sa.ForeignKey('extsegments.id'))
 
     extsegment = orm.relationship("ExtSegment",
-                                  back_populates='extinterfaces',
-                                  cascade='all,delete')
+                                  back_populates='extinterfaces')
 
     extports = orm.relationship("ExtPort",
                                 back_populates='extinterface')
@@ -60,10 +58,8 @@ class ExtLink(model_base.BASEV2, models_v2.HasId):
     type = sa.Column(sa.String(36))
     segmentation_id = sa.Column(sa.String(36))
 
-    extinterface1_id = sa.Column(sa.String(36), sa.ForeignKey("extinterfaces.id",
-                                                              ondelete="CASCADE"))
-    extinterface2_id = sa.Column(sa.String(36), sa.ForeignKey("extinterfaces.id",
-                                                              ondelete="CASCADE"))
+    extinterface1_id = sa.Column(sa.String(36), sa.ForeignKey("extinterfaces.id"))
+    extinterface2_id = sa.Column(sa.String(36), sa.ForeignKey("extinterfaces.id"))
 
     network_id = sa.Column(sa.String(36), sa.ForeignKey("networks.id"),
                            nullable=False)
