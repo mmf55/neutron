@@ -164,6 +164,8 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
             self._send_command('interface Tunnel%s' % segmentation_id)
 
+            self._send_command('tunnel key %s' % segmentation_id)
+
             self._send_command('no ip address')
 
             self._send_command('tunnel source %s' % interface_name)
