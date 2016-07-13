@@ -177,6 +177,8 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
             self._send_command('bridge-group %s' % bridge_group)
 
+            self._send_command('bridge-group %s spanning-disabled' % bridge_group)
+
         elif link_type == const.VLAN:
 
             vlans_allowed = self._get_allowed_vlans_on_interface(interface_name)
