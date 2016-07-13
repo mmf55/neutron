@@ -93,7 +93,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                                               port.get('network_id'))
             if links:
                 ext_port['segmentation_id'] = links[0].segmentation_id
-                LOG.debug(ext_port['segmentation_id'])
             else:
                 raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
 

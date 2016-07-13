@@ -24,8 +24,8 @@ class ExtNetDeviceControllerMixin(object):
     def deploy_port(self, ctxt, interface, segmentation_id, **kwargs):
         return self.load_driver(interface.get('node_name'),
                                 interface.get('node_driver')).deploy_port(interface.get('type'),
-                                                                          segmentation_id,
                                                                           interface.get('name'),
+                                                                          segmentation_id,
                                                                           vnetwork=kwargs.get('vnetwork'))
 
     def deploy_link(self, ctxt, interface, segmentation_id, network_type, **kwargs):
