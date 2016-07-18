@@ -18,6 +18,16 @@ class ExtPort(model_base.BASEV2):
     port = orm.relationship(models_v2.Port)
 
 
+class ExtNode(model_base.BASEV2, models_v2.HasId):
+    __tablename__ = "extnodes"
+
+    name = sa.Column(sa.String(36))
+    ip_address = sa.Column(sa.String(36))
+
+    extinterfaces = orm.relationship("ExtInterface",
+                                     back_populates='extnode')
+
+
 class ExtInterface(model_base.BASEV2, models_v2.HasId):
     __tablename__ = "extinterfaces"
 
@@ -26,10 +36,15 @@ class ExtInterface(model_base.BASEV2, models_v2.HasId):
     type = sa.Column(sa.String(36))
     ip_address = sa.Column(sa.String(36))
     node_name = sa.Column(sa.String(36))
-    node_driver = sa.Column(sa.String(36))
+    # node_driver = sa.Column(sa.String(36))
+    extnode_id = sa.Column(sa.String(36),
+                           sa.ForeignKey('extnodes.id'))
 
     extsegment_id = sa.Column(sa.String(36),
                               sa.ForeignKey('extsegments.id'))
+
+    extnode = orm.relationship("ExtNode",
+                               back_populates='extinterfaces')
 
     extsegment = orm.relationship("ExtSegment",
                                   back_populates='extinterfaces')

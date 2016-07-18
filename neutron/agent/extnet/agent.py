@@ -1,4 +1,6 @@
 import imp
+import os
+import json
 
 from oslo_config import cfg
 from oslo_log import log as logging
@@ -22,32 +24,40 @@ class ExtNetDeviceControllerMixin(object):
         super(ExtNetDeviceControllerMixin, self).__init__()
 
     def deploy_port(self, ctxt, interface, segmentation_id, **kwargs):
-        return self.load_driver(interface.get('node_name'),
-                                interface.get('node_driver')).deploy_port(interface.get('type'),
-                                                                          interface.get('name'),
-                                                                          segmentation_id,
-                                                                          vnetwork=kwargs.get('vnetwork'))
+        return self.load_driver(interface.get('node_name')).deploy_port(interface.get('type'),
+                                                                        interface.get('name'),
+                                                                        segmentation_id,
+                                                                        vnetwork=kwargs.get('vnetwork'))
 
     def deploy_link(self, ctxt, interface, segmentation_id, network_type, **kwargs):
         LOG.debug("Deploy_link on %s" % interface.get('name'))
-        return self.load_driver(interface.get('node_name'),
-                                interface.get('node_driver')).deploy_link(network_type,
-                                                                          interface.get('name'),
-                                                                          kwargs.get('remote_ip'),
-                                                                          segmentation_id,
-                                                                          vnetwork=kwargs.get('vnetwork'))
+        return self.load_driver(interface.get('node_name')).deploy_link(network_type,
+                                                                        interface.get('name'),
+                                                                        kwargs.get('remote_ip'),
+                                                                        segmentation_id,
+                                                                        vnetwork=kwargs.get('vnetwork'))
 
     def device_controller_name(self):
         return topics.EXTNET_AGENT
 
-    def load_driver(self, device_name, device_driver):
-        for driver_str in self.config_dict.get('device_drivers'):
-            name, module_path = driver_str.split(':')
-            if device_driver.lower() == name.lower():
-                mod = imp.load_source(name.lower(), module_path)
-                Class = getattr(mod, name)
-                return Class(device_name, self.config_dict.get('device_configs_path'))
-            return
+    def load_driver(self, device_name):
+        with open(os.path.join(self.config_dict.get('device_configs_path'), device_name + '.json')) as device_json:
+            config_dict = json.load(device_json)
+        dev_drv_string = config_dict.get('device_driver')
+        name, module_path = dev_drv_string.split(':')
+
+        mod = imp.load_source(name.lower(), module_path)
+        Class = getattr(mod, name)
+        return Class(device_name, self.config_dict.get('device_configs_path'))
+
+    # def load_driver2(self, device_name, device_driver):
+    #     for driver_str in self.config_dict.get('device_drivers'):
+    #         name, module_path = driver_str.split(':')
+    #         if device_driver.lower() == name.lower():
+    #             mod = imp.load_source(name.lower(), module_path)
+    #             Class = getattr(mod, name)
+    #             return Class(device_name, self.config_dict.get('device_configs_path'))
+    #         return
 
 
 # This class do the necessary setup for the external devices device controller to be launched as a neutron agent.

@@ -55,6 +55,14 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         }
         return self._fields(extinterface_dict, fields)
 
+    def _make_extnode_dict(self, extnode, fields=None):
+        extnode_dict = {
+            'id': extnode.id,
+            'name': extnode.name,
+            'ip_address': extnode.ip_address,
+        }
+        return self._fields(extnode_dict, fields)
+
     def _get_object_by_id(self, context, model, id):
         try:
             object = context.session.query(model).filter_by(id=id).first()
@@ -68,6 +76,12 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
                         models.ExtLink.extinterface2_id == extinterface.id))\
             .all()
         return extinterface_links
+
+    def _extnode_has_interfaces(self, context, extnode):
+        extnode_interfaces = context.session.query(models.ExtInterface) \
+            .filter(models.ExtInterface.extnode_id == extnode.id) \
+            .all()
+        return extnode_interfaces
 
     def _make_extsegment_dict(self, extsegment, fields=None):
         extsegment_dict = {
@@ -112,6 +126,56 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         return resource
 
     # --------------------- Database operations related with the external nodes. --------------------------------------
+
+    def create_extnode(self, context, extnode):
+        """Check if the request was made by the admin"""
+        self._admin_check(context, 'CREATE')
+        node = extnode['extnode']
+        with context.session.begin(subtransactions=True):
+            node_db = models.ExtNode(
+                id=uuidutils.generate_uuid(),
+                name=node.get('name'),
+                ip_address=node.get('ip_address'),
+            )
+            context.session.add(node_db)
+        """Create and return dictionary for the client."""
+        return self._make_extnode_dict(node_db)
+
+    def update_extnode(self, context, id, extnode):
+        """Check if the request was made by the admin"""
+        self._admin_check(context, 'UPDATE')
+        node = extnode['extnode']
+        with context.session.begin(subtransactions=True):
+            node_in_db = self._get_object_by_id(context, models.ExtNode, id)
+            node_in_db.name = node['name']
+            node_in_db.ip_address = node['ip_address']
+        return self._make_extnode_dict(node_in_db)
+
+    def get_extnodes(self, context, filters=None, fields=None):
+        self._admin_check(context, 'GET')
+        return self._get_collection(context,
+                                    models.ExtNode,
+                                    self._make_extnode_dict,
+                                    filters=filters)
+
+    def get_extnode(self, context, id, fields=None):
+        self._admin_check(context, 'GET')
+        node = context.session.query(models.ExtNode) \
+            .filter_by(id=id) \
+            .first()
+        return self._make_extnode_dict(node, fields=fields)
+
+    def delete_extnode(self, context, id):
+        self._admin_check(context, 'DELETE')
+        with context.session.begin(subtransactions=True):
+            node = self._get_object_by_id(context, models.ExtNode, id)
+            if self._extnode_has_interfaces(context, node):
+                raise extnet_exceptions.ExtNodeHasInterfacesInUse(id=id)
+            context.session.delete(node)
+        LOG.debug("External node '%s' was deleted.", id)
+
+    # --------------------- Database operations related with the external interfaces. ---------------------------------
+
     def create_extinterface(self, context, extinterface):
         """Check if the request was made by the admin"""
         self._admin_check(context, 'CREATE')

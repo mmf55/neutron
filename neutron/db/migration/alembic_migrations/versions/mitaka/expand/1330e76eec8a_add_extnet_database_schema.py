@@ -41,14 +41,22 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     mysql_engine='InnoDB'
     )
+    op.create_table('extnodes',
+    sa.Column('id', sa.String(length=36), nullable=False),
+    sa.Column('name', sa.String(length=36), nullable=True),
+    sa.Column('ip_address', sa.String(length=36), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    mysql_engine='InnoDB'
+    )
     op.create_table('extinterfaces',
     sa.Column('id', sa.String(length=36), nullable=False),
     sa.Column('name', sa.String(length=36), nullable=True),
     sa.Column('type', sa.String(length=36), nullable=True),
     sa.Column('node_name', sa.String(length=36), nullable=True),
     sa.Column('ip_address', sa.String(length=36), nullable=True),
-    sa.Column('node_driver', sa.String(length=36), nullable=True),
+    sa.Column('extnode_id', sa.String(length=36), nullable=True),
     sa.Column('extsegment_id', sa.String(length=36), nullable=True),
+    sa.ForeignKeyConstraint(['extnode_id'], ['extnodes.id']),
     sa.ForeignKeyConstraint(['extsegment_id'], ['extsegments.id']),
     sa.PrimaryKeyConstraint('id'),
     mysql_engine='InnoDB'

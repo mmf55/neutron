@@ -11,6 +11,10 @@ class ExtInterfaceHasLinksInUse(exceptions.InUse):
     message = _("External interface %(id)s has links in use.")
 
 
+class ExtNodeHasInterfacesInUse(exceptions.InUse):
+    message = _("External node %(id)s has interfaces in use.")
+
+
 class ExtConnectionNotFound(exceptions.NotFound):
     message = _("External segment %(id)s could not be found.")
 

@@ -158,7 +158,8 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
                                     "extinterface",
                                     "extsegment",
                                     "extlink",
-                                    "extport"
+                                    "extport",
+                                    "extnode",
                                     ]
 
     @property
