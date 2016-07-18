@@ -7,31 +7,32 @@ class TopologyDiscovery(snmp.SnmpCisco,
                         topology_discovery_api.TopologyDicoveryApi):
 
     def __init__(self):
-        self.dev_list = []
+        self.dev_dict = {}
 
     def get_devices_info(self, ip_address, **kwargs):
         if not self._host_already_checked(ip_address):
             self.connect(ip_address, community='public', version=2)
-            node_ints = self.get_node_info_dict()
-            if node_ints:
-                self.dev_list += [node_ints]
-                node, node_dict = node_ints.items()[0]
-                node_ints = [node_ints]
+            node_info = self.get_node_info_dict()
+            if node_info:
+                self.dev_dict[node_info.keys()[0]] = node_info.values()[0]
+                node, node_dict = node_info.items()[0]
                 for interface in node_dict['interfaces']:
                     n_hops_list = interface['next_hops']
                     if n_hops_list:
                         for ip_address in n_hops_list:
                             # print ip_address
-                            node_ints += self.get_devices_info(ip_address)
-                return node_ints
+                            node_dict = self.get_devices_info(ip_address)
+                            if node_dict:
+                                node_info[node_dict.keys()[0]] = node_dict.values()[0]
+                return node_info
 
-        return []
+        return None
 
             # self.dev_list.append()
 
     def _host_already_checked(self, ip_address):
-        for node_dict in self.dev_list:
-            interfaces_list = node_dict.items()[0][1]['interfaces']
+        for node, node_info in self.dev_dict.items():
+            interfaces_list = node_info['interfaces']
             return next((x for x in interfaces_list
                          if x['ip_address'] == ip_address), None)
 
