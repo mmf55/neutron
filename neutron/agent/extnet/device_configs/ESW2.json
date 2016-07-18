@@ -1,0 +1,10 @@
+{
+  "device_driver": "Cisco3700:/home/mfernandes/drivers_and_configs/cisco3700.py",
+  "bridge_groups_available": "3:200",
+  "password": "pass",
+  "bridge_groups_attributed": {
+    "7fd4ee18-5124-469e-a363-9bf2efdb5fbe": 2,
+    "54494f0f-0b36-480d-bed0-b0d6430e9d06": 1
+  },
+  "port": 23
+}

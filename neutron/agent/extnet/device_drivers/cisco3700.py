@@ -59,7 +59,7 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
     def _init_telnet_session(self):
         try:
-            self.spawn = pexpect.spawn('telnet %s %s' % (self.host, self.port))
+            self.spawn = pexpect.spawn('telnet %s %s' % (self.ip_address, self.port))
             self.spawn.expect('Password:')
             self.spawn.sendline(self.password)
             self.spawn.expect(COMMAND_PROMPT)
@@ -208,8 +208,7 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
         self._close_telnet_session()
         return const.OK
 
-    def __init__(self, device_name, dev_config_location):
-        super(Cisco3700, self).__init__(device_name, dev_config_location)
+    def __init__(self, device_name, ip_address, dev_config_location):
+        super(Cisco3700, self).__init__(device_name, ip_address, dev_config_location)
         self.password = self.dev_config_dict.get('password')
         self.port = self.dev_config_dict.get('port')
-        self.host = self.dev_config_dict.get('host')

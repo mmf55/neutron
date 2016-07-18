@@ -5,8 +5,10 @@ from oslo_log import log as logging
 
 from neutron.common import topics
 from neutron.common import rpc as n_rpc
+
 from neutron.plugins.ml2.common import extnet_exceptions
 from neutron.plugins.ml2.extnet import config
+from neutron.plugins.ml2.extnet.topology_discovery import topo_discovery
 
 from neutron.db import extnet_db_mixin
 from neutron.db import extnet_db as models
@@ -32,12 +34,25 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         device_ctrl_mgr = ExtNetDeviceCtrlManager(config_dict)
         super(ExtNetControllerMixin, self).__init__(device_ctrl_mgr)
 
+    def create_extnode(self, context, extnode):
+        node = extnode['extnode']
+
+        if node.get('topology_discover'):
+            td = topo_discovery.TopologyDiscovery()
+            topo_list = td.get_devices_info(node.get('ip_address'))
+
+
+        return super(ExtNetControllerMixin, self).create_extnode(context, extnode)
+
     def create_extlink(self, context, extlink):
 
         # Get the necessary info
         link = extlink['extlink']
         interface1 = self.get_extinterface(context, link.get('extinterface1_id'))
         interface2 = self.get_extinterface(context, link.get('extinterface2_id'))
+
+        node1 = self.get_extnode(context, interface1.get('extnode_id'))
+        node2 = self.get_extnode(context, interface2.get('extnode_id'))
 
         if self._extinterface_has_extports(context, interface1.get('id')) \
                 or self._extinterface_has_extports(context, interface2.get('id')):
@@ -66,6 +81,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         if self.deploy_link(link,
                             interface1,
                             interface2,
+                            node1,
+                            node2,
                             vnetwork=link.get('network_id'),
                             context=context) != const.OK:
             raise extnet_exceptions.ExtLinkErrorApplyingConfigs()
@@ -183,10 +200,10 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
     def __init__(self, config):
         super(ExtNetDeviceCtrlManager, self).__init__(config)
 
-    def deploy_link_on_node(self, interface, network_type, segmentation_id, **kwargs):
+    def deploy_link_on_node(self, interface, node, network_type, segmentation_id, **kwargs):
         context = kwargs.get('context')
-        node = interface['node_name']
-        topic = self.get_device_controller(node)
+        node_name = node['name']
+        topic = self.get_device_controller(node_name)
 
         topic_create_extlink = topics.get_topic_name(topic,
                                                      topics.EXTNET_LINK,
@@ -198,16 +215,17 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
                                timeout=30)
         return cctxt.call(context,
                           'deploy_link',
+                          node=node,
                           segmentation_id=segmentation_id,
                           network_type=network_type,
                           interface=interface,
                           vnetwork=kwargs.get('vnetwork'),
                           remote_ip=kwargs.get('remote_ip'))
 
-    def deploy_port_on_node(self, interface, segmentation_id, **kwargs):
+    def deploy_port_on_node(self, interface, node, segmentation_id, **kwargs):
         context = kwargs.get('context')
-        node = interface['node_name']
-        topic = self.get_device_controller(node)
+        node_name = node['name']
+        topic = self.get_device_controller(node_name)
         topic_create_extport = topics.get_topic_name(topic,
                                                      topics.EXTNET_PORT,
                                                      topics.CREATE)
@@ -220,13 +238,14 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
         return cctxt.call(context,
                           'deploy_port',
                           segmentation_id=segmentation_id,
+                          node=node,
                           interface=interface,
                           vnetwork=kwargs.get('vnetwork'))
 
 
-# This turns the OVS agent to a device controller itself.
+# This turns the OVS agent to a device controller.
 class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
-    def deploy_link(self, ctxt, interface, segmentation_id, network_type, **kwargs):
+    def deploy_link(self, ctxt, interface, node, segmentation_id, network_type, **kwargs):
         LOG.debug("Deploy_link on %s" % interface.get('name'))
         network_id = kwargs.get('vnetwork')
 
