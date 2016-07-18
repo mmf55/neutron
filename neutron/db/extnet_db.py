@@ -35,7 +35,7 @@ class ExtInterface(model_base.BASEV2, models_v2.HasId):
     # l2, l3
     type = sa.Column(sa.String(36))
     ip_address = sa.Column(sa.String(36))
-    node_name = sa.Column(sa.String(36))
+    # node_name = sa.Column(sa.String(36))
     # node_driver = sa.Column(sa.String(36))
     extnode_id = sa.Column(sa.String(36),
                            sa.ForeignKey('extnodes.id'))
