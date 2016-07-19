@@ -49,8 +49,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
             'name': extinterface.name,
             'type': extinterface.type,
             'ip_address': extinterface.ip_address,
-            'node_name': extinterface.node_name,
-            'node_driver': extinterface.node_driver,
+            'extnode_id': extinterface.extnode_id,
             'extsegment_id': extinterface.extsegment_id
         }
         return self._fields(extinterface_dict, fields)
