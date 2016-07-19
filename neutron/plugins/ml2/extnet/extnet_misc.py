@@ -7,6 +7,8 @@ from oslo_log import log as logging
 from neutron.common import topics
 from neutron.common import rpc as n_rpc
 
+from neutron.callbacks import registry, resources, events
+
 from neutron.plugins.ml2.common import extnet_exceptions
 from neutron.plugins.ml2.extnet import config
 from neutron.plugins.ml2.extnet.topology_discovery import topo_discovery
@@ -33,6 +35,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                        for device_ctrl, dev_name_list in cfg.CONF.EXTNET_CONTROLLER.device_controllers.items()}
 
         device_ctrl_mgr = ExtNetDeviceCtrlManager(config_dict)
+
+        registry.subscribe(self.delete_extport, resources.PORT, events.BEFORE_DELETE)
+
         super(ExtNetControllerMixin, self).__init__(device_ctrl_mgr)
 
     def create_extnode(self, context, extnode):
@@ -118,6 +123,35 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         # Save new link on the database
         return super(ExtNetControllerMixin, self).create_extlink(context, extlink)
 
+    def delete_extlink(self, context, id):
+        link = self.get_extlink(context, id)
+
+        interface1 = self.get_extinterface(context, link.get('extinterface1_id'))
+        interface2 = self.get_extinterface(context, link.get('extinterface2_id'))
+
+        node1 = self.get_extnode(context, interface1.get('extnode_id'))
+        node2 = self.get_extnode(context, interface2.get('extnode_id'))
+
+        segment = self.get_extsegment(context, interface1.get('extsegment_id'))
+
+        if self._set_segmentation_id(context,
+                                     link.get('segmentation_id'),
+                                     segment.get('id'),
+                                     link.get('type'),
+                                     link.get('network_id')) != const.OK:
+            raise extnet_exceptions.ExtLinkErrorInSetSegID()
+
+        if self.undeploy_link(link,
+                              interface1,
+                              interface2,
+                              node1,
+                              node2,
+                              vnetwork=link.get('network_id'),
+                              context=context) != const.OK:
+            raise extnet_exceptions.ExtLinkErrorApplyingConfigs()
+
+        return super(ExtNetControllerMixin, self).delete_extlink(context, id)
+
     def create_extport(self, context, port):
         port = port.get('port')
         ext_port = port.get('external_port')[0]
@@ -148,6 +182,15 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             if self.deploy_port(interface,
                                 ext_port.get('segmentation_id'),
                                 context=context) != const.OK:
+                raise extnet_exceptions.ExtPortErrorApplyingConfigs()
+
+    def delete_extport(self, context, port):
+        port = self.get_extport(context, port.get('port_id'))
+        if port:
+            interface = self.get_extinterface(context, port.get('extinterface_id'))
+            if self.undeploy_port(interface,
+                                  port.get('segmentation_id'),
+                                  context=context) != const.OK:
                 raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
     # ------------------------------------ Auxiliary functions ---------------------------------------
@@ -183,16 +226,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             links = self._get_all_links_on_extsegment_by_type(context, segment_id, const.VLAN, network_id)
             if links:
                 return links[0].segmentation_id
-            # interfaces = context.session.query(models.ExtInterface).filter_by(extsegment_id=segment_id).all()
-            # for interface in interfaces:
-            #     link = context.session.query(models.ExtLink) \
-            #         .filter_by(or_(models.ExtLink.extinterface1_id == interface.id,
-            #                        models.ExtLink.extinterface2_id == interface.id)) \
-            #         .filter_by(models.ExtLink.type == const.VLAN) \
-            #         .filter_by(models.ExtLink.network_id == network_id) \
-            #         .first()
-            #     if link:
-            #         return link.segmentation_id
+
             ids_avail = segment.vlan_ids_available
         else:
             ids_avail = segment.tun_ids_available
@@ -222,6 +256,42 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         return seg_id
 
+    def _set_segmentation_id(self, context, id_to_set, segment_id, conn_type, network_id):
+        segment = context.session.query(models.ExtSegment).filter_by(id=segment_id).first()
+
+        if conn_type == const.VLAN:
+            links = self._get_all_links_on_extsegment_by_type(context, segment_id, const.VLAN, network_id)
+            links = filter((lambda x: x.id != id_to_set), links)
+            if links:
+                return const.OK
+            ids_avail = segment.vlan_ids_available
+        else:
+            ids_avail = segment.tun_ids_available
+
+            # [(123, 130), (1000, 2000)]
+            l = [[int(ids.split(':')[0]), int(ids.split(':')[1])]
+                 if len(ids.split(':')) > 1 else [int(ids)] for ids in ids_avail.split(',')]
+
+            num_list = list()
+            for item in l:
+                if len(item) > 1:
+                    num_list += range(item[0], item[1] + 1)
+                else:
+                    num_list += item
+
+            num_list.append(id_to_set)
+            num_list.sort()
+
+            l2 = [':'.join([str(t[0][1]), str(t[-1][1])]) if t[0][1] - t[-1][1] != 0 else str(t[0][1]) for t in
+                  (tuple(g[1]) for g in itertools.groupby(enumerate(num_list), lambda (i, x): i - x))]
+
+            if conn_type == const.VLAN:
+                segment.vlan_ids_available = ','.join(l2)
+            else:
+                segment.tun_ids_available = ','.join(l2)
+
+            return const.OK
+
 
 # Controls the deploy requests by directing themselves to the correspondent device controller
 class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
@@ -250,6 +320,27 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
                           vnetwork=kwargs.get('vnetwork'),
                           remote_ip=kwargs.get('remote_ip'))
 
+    def undeploy_link_on_node(self, interface, node, network_type, **kwargs):
+        context = kwargs.get('context')
+        node_name = node['name']
+        topic = self.get_device_controller(node_name)
+
+        topic_create_extlink = topics.get_topic_name(topic,
+                                                     topics.EXTNET_LINK,
+                                                     topics.DELETE)
+        target = oslo_messaging.Target(topic=topic, version='1.0')
+        client = n_rpc.get_client(target)
+        cctxt = client.prepare(topic=topic_create_extlink,
+                               fanout=False,
+                               timeout=30)
+        return cctxt.call(context,
+                          'undeploy_link',
+                          node=node,
+                          interface=interface,
+                          network_type=network_type,
+                          vnetwork=kwargs.get('vnetwork'),
+                          remote_ip=kwargs.get('remote_ip'))
+
     def deploy_port_on_node(self, interface, node, segmentation_id, **kwargs):
         context = kwargs.get('context')
         node_name = node['name']
@@ -265,6 +356,26 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
 
         return cctxt.call(context,
                           'deploy_port',
+                          segmentation_id=segmentation_id,
+                          node=node,
+                          interface=interface,
+                          vnetwork=kwargs.get('vnetwork'))
+
+    def undeploy_port_on_node(self, interface, node, segmentation_id, **kwargs):
+        context = kwargs.get('context')
+        node_name = node['name']
+        topic = self.get_device_controller(node_name)
+        topic_create_extport = topics.get_topic_name(topic,
+                                                     topics.EXTNET_PORT,
+                                                     topics.DELETE)
+        target = oslo_messaging.Target(topic=topic, version='1.0')
+        client = n_rpc.get_client(target)
+        cctxt = client.prepare(topic=topic_create_extport,
+                               fanout=False,
+                               timeout=30)
+
+        return cctxt.call(context,
+                          'undeploy_port',
                           segmentation_id=segmentation_id,
                           node=node,
                           interface=interface,
@@ -297,4 +408,22 @@ class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
                                                  self.local_ip,
                                                  lvid=lvid,
                                                  tid=segmentation_id)
+        return const.OK
+
+    def undeploy_link(self, ctxt, interface, node, network_type, **kwargs):
+
+        LOG.debug("Undeploy_link on %s" % interface.get('name'))
+        network_id = kwargs.get('vnetwork')
+
+        lvid = self.local_vlan_map.get(network_id).vlan
+
+        if network_type == const.VLAN:
+            self.reclaim_local_vlan(network_id)
+
+        elif network_type == const.GRE:
+            remote_ip = kwargs.get('remote_ip')
+            port_name = self.get_tunnel_name(
+                network_type, self.local_ip, remote_ip)
+            self.int_br.delete_external_tunnel_port(port_name,
+                                                    lvid=lvid)
         return const.OK

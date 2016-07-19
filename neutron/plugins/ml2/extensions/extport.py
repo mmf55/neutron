@@ -33,4 +33,3 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
         if result.get(extport.EXTPORT) is None:
             result[extport.EXTPORT] = (extport.EXTENDED_ATTRIBUTES_2_0['ports']
                                        [extport.EXTPORT]['default'])
-

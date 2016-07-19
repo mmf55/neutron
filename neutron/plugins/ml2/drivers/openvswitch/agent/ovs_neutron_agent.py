@@ -378,7 +378,8 @@ class OVSNeutronAgent(sg_rpc.SecurityGroupAgentRpcCallbackMixin,
                      [topics.SECURITY_GROUP, topics.UPDATE],
                      [topics.DVR, topics.UPDATE],
                      [topics.NETWORK, topics.UPDATE],
-                     [topics.EXTNET_LINK, topics.CREATE]]
+                     [topics.EXTNET_LINK, topics.CREATE],
+                     [topics.EXTNET_LINK, topics.DELETE]]
         if self.l2_pop:
             consumers.append([topics.L2POPULATION, topics.UPDATE])
         self.connection = agent_rpc.create_consumers([self],

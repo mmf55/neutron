@@ -29,6 +29,12 @@ class ExtNetDeviceControllerMixin(object):
                                                   segmentation_id,
                                                   vnetwork=kwargs.get('vnetwork'))
 
+    def undeploy_port(self, ctxt, interface, node, segmentation_id, **kwargs):
+        return self.load_driver(node).undeploy_port(interface.get('type'),
+                                                    interface.get('name'),
+                                                    segmentation_id,
+                                                    vnetwork=kwargs.get('vnetwork'))
+
     def deploy_link(self, ctxt, interface, node, segmentation_id, network_type, **kwargs):
         LOG.debug("Deploy_link on %s" % interface.get('name'))
         return self.load_driver(node).deploy_link(network_type,
@@ -36,6 +42,13 @@ class ExtNetDeviceControllerMixin(object):
                                                   kwargs.get('remote_ip'),
                                                   segmentation_id,
                                                   vnetwork=kwargs.get('vnetwork'))
+
+    def undeploy_link(self, ctxt, interface, node, segmentation_id, network_type, **kwargs):
+        return self.load_driver(node).undeploy_link(network_type,
+                                                    interface.get('type'),
+                                                    interface.get('name'),
+                                                    segmentation_id,
+                                                    vnetwork=kwargs.get('vnetwork'))
 
     def device_controller_name(self):
         return topics.EXTNET_AGENT
@@ -83,7 +96,9 @@ class ExtNetAgent(ExtNetDeviceControllerMixin,
         self.context = context.get_admin_context_without_session()
         # Define the listening consumers for the agent
         consumers = [[topics.EXTNET_PORT, topics.CREATE],
-                     [topics.EXTNET_LINK, topics.CREATE], ]
+                     [topics.EXTNET_LINK, topics.CREATE],
+                     [topics.EXTNET_PORT, topics.DELETE],
+                     [topics.EXTNET_LINK, topics.DELETE], ]
         self.connection = agent_rpc.create_consumers([self],
                                                      topics.EXTNET_AGENT,
                                                      consumers,

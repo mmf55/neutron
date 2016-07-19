@@ -65,3 +65,7 @@ class ExtPortErrorApplyingConfigs(exceptions.BadRequest):
 
 class ExtInterfaceHasPortsInUse(exceptions.InUse):
     message = _("External interface has ports in use.")
+
+
+class ExtLinkErrorInSetSegID(exceptions.Invalid):
+    message = _(" Error returning the segmentation ID to the available pool.")

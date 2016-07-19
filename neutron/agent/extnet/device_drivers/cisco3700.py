@@ -89,9 +89,6 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
         self.spawn.expect(COMMAND_PROMPT)
         return self.spawn.before
 
-    def undeploy_link(self, link):
-        pass
-
     def deploy_port(self, interface_type, interface_name, link_segmentation_id, **kwargs):
         self._init_telnet_session()
         self._enter_config_mode()
@@ -143,6 +140,44 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
     def driver_protocol(self):
         return 'telnet'
+
+    def undeploy_link(self,
+                      link_type,
+                      interface_name,
+                      segmentation_id,
+                      **kwargs):
+
+        self._init_telnet_session()
+        self._enter_config_mode()
+
+        if link_type == const.GRE:
+
+            self._send_command('no interface Tunnel%s' % segmentation_id)
+
+        elif link_type == const.VLAN:
+
+            self._exit_config_mode()
+
+            self._send_command('vlan database')
+
+            self._send_command('no vlan %s' % segmentation_id)
+
+            self._send_command('exit')
+
+            self._enter_config_mode()
+
+            self._send_command('no interface vlan %s' % segmentation_id)
+
+            self._send_command('interface %s' % interface_name)
+
+            self._send_command('switchport trunk allowed vlan remove %s' % segmentation_id)
+
+        else:
+            return "ERROR - Link type not supported by the driver %s" % self.driver_name()
+
+        self._exit_config_mode()
+        self._close_telnet_session()
+        return const.OK
 
     def deploy_link(self,
                     link_type,
