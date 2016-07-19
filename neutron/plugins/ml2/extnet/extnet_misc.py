@@ -43,6 +43,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             topo_dict = td.get_devices_info(node.get('ip_address'))
             nodes_created = []
             for node, node_info_dict in topo_dict.items():
+                if self.get_extnode_by_name(context, node):
+                    continue
                 node_dict = dict(name=node,
                                  ip_address=node_info_dict.get('ip_address'))
                 node_dict = {'extnode': node_dict}
