@@ -1,4 +1,5 @@
 import itertools
+import re
 import oslo_messaging
 from oslo_config import cfg
 from oslo_log import log as logging
@@ -47,17 +48,19 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 node_created = self.create_extnode(context, node_dict)
 
                 for interface in node_info_dict.get('interfaces'):
-                    if interface.get('ip_address') is not None:
-                        net_type = 'l3'
-                    else:
-                        net_type = 'l2'
-                    interface_dict = dict(name=interface.get('name'),
-                                          ip_address=interface.get('ip_address'),
-                                          type=net_type,
-                                          extnode_id=node_created.get('id')
-                                          )
-                    interface_dict = {'extinterface': interface_dict}
-                    self.create_extinterface(context, interface_dict)
+                    p = re.compile("^FastEthernet")
+                    if p.match(interface.get('name')):
+                        if interface.get('ip_address') is not None:
+                            net_type = 'l3'
+                        else:
+                            net_type = 'l2'
+                        interface_dict = dict(name=interface.get('name'),
+                                              ip_address=interface.get('ip_address'),
+                                              type=net_type,
+                                              extnode_id=node_created.get('id')
+                                              )
+                        interface_dict = {'extinterface': interface_dict}
+                        self.create_extinterface(context, interface_dict)
 
         return super(ExtNetControllerMixin, self).create_extnode(context, extnode)
 
