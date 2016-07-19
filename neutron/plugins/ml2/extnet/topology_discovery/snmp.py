@@ -5,11 +5,11 @@ from easysnmp import exceptions
 import topology_discovery_api
 
 
-OID_NODE_NAME = '1.3.6.1.2.1.1.5.0'
-OID_NODE_IFDESCR = '1.3.6.1.2.1.2.2.1.2'
-OID_NODE_IFOPERSTATUS = '1.3.6.1.2.1.2.2.1.8'
-OID_NODE_IPADDRESS = '1.3.6.1.2.1.4.20.1.2'
-OID_NODE_NEXTHOPS = '1.3.6.1.2.1.4.22.1.3'
+OID_NODE_NAME = 'iso.3.6.1.2.1.1.5.0.'
+OID_NODE_IFDESCR = 'iso.3.6.1.2.1.2.2.1.2.'
+OID_NODE_IFOPERSTATUS = 'iso.3.6.1.2.1.2.2.1.8.'
+OID_NODE_IPADDRESS = 'iso.3.6.1.2.1.4.20.1.2.'
+OID_NODE_NEXTHOPS = 'iso.3.6.1.2.1.4.22.1.3.'
 
 
 class SnmpCisco(topology_discovery_api.TopoDiscMechanismApi):
@@ -29,15 +29,15 @@ class SnmpCisco(topology_discovery_api.TopoDiscMechanismApi):
         p2 = re.compile("^Vlan")
         fe_ints_list = [x for x in self.session.walk(OID_NODE_IFDESCR)
                         if (p1.match(x.value) or p2.match(x.value)) and
-                        self.session.get(OID_NODE_IFOPERSTATUS+'.'+x.oid_index).value == '1']
+                        self.session.get(OID_NODE_IFOPERSTATUS+x.oid.split(OID_NODE_IFDESCR)[1]).value == '1']
 
-        ips_list = [(x.value, x.oid_index) for x in self.session.walk(OID_NODE_IPADDRESS)]
+        ips_list = [(x.value, x.oid.split(OID_NODE_IPADDRESS)[1]) for x in self.session.walk(OID_NODE_IPADDRESS)]
         # print ips_list
         for interface in fe_ints_list:
             # print interface
-            ip_address = next((x[1] for x in ips_list if x[0] == interface.oid_index), None)
+            ip_address = next((x[1] for x in ips_list if x[0] == interface.oid.split(OID_NODE_IFDESCR)[1]), None)
             # print ip_address
-            next_hops = [x.value for x in self.session.walk(OID_NODE_NEXTHOPS+'.'+interface.oid_index)
+            next_hops = [x.value for x in self.session.walk(OID_NODE_NEXTHOPS+interface.oid.split(OID_NODE_IFDESCR)[1])
                          if ip_address != x.value]
             # print next_hops
             d = dict(name=interface.value,
