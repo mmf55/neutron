@@ -186,8 +186,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
                 name=interface.get('name'),
                 type=interface.get('type'),
                 ip_address=interface.get('ip_address'),
-                node_name=interface.get('node_name'),
-                node_driver=interface.get('node_driver'),
+                extnode_id=interface.get('extnode_id'),
                 extsegment_id=interface.get('extsegment_id')
             )
             context.session.add(interface_db)
@@ -203,8 +202,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
             interface_in_db.name = interface['name']
             interface_in_db.type = interface['type']
             interface_in_db.ip_address = interface['ip_address']
-            interface_in_db.node_name = interface['node_name']
-            interface_in_db.node_driver = interface['node_driver']
+            interface_in_db.extnode_id = interface['extnode_id']
             interface_in_db.extsegment_id = interface['extsegment_id']
         return self._make_extinterface_dict(interface_in_db)
 
