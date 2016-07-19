@@ -3,6 +3,10 @@ from neutron_lib import exceptions
 from neutron._i18n import _
 
 
+class ExtNetNodeAlreadyExist(exceptions.NotFound):
+    message = _("External node already exists.")
+
+
 class ExtNetObjectNotFound(exceptions.NotFound):
     message = _("%(model_name) %(id)s could not be found.")
 
