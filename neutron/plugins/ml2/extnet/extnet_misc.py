@@ -41,7 +41,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         if node.get('topology_discover'):
             td = topo_discovery.TopologyDiscovery()
             topo_dict = td.get_devices_info(node.get('ip_address'))
-            for node, node_info_dict in topo_dict:
+            for node, node_info_dict in topo_dict.items():
                 node_dict = dict(name=node,
                                  ip_address=node_info_dict.get('ip_address'))
                 node_dict = {'extnode': node_dict}
