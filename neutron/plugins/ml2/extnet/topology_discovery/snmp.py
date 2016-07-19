@@ -27,7 +27,6 @@ class SnmpCisco(topology_discovery_api.TopoDiscMechanismApi):
         int_list = []
         p1 = re.compile("^FastEthernet")
         p2 = re.compile("^Vlan")
-        print self.session.walk(OID_NODE_IFDESCR)
         fe_ints_list = [x for x in self.session.walk(OID_NODE_IFDESCR)
                         if (p1.match(x.value) or p2.match(x.value)) and
                         self.session.get(OID_NODE_IFOPERSTATUS+x.oid.split(OID_NODE_IFDESCR)[1]).value == '1']
