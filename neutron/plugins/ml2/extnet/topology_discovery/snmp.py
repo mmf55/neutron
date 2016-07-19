@@ -5,11 +5,11 @@ from easysnmp import exceptions
 import topology_discovery_api
 
 
-OID_NODE_NAME = 'sysName.0'
-OID_NODE_IFDESCR = 'ifDescr'
-OID_NODE_IFOPERSTATUS = 'ifOperStatus'
-OID_NODE_IPADDRESS = 'ipAdEntIfIndex'
-OID_NODE_NEXTHOPS = 'ipNetToMediaNetAddress'
+OID_NODE_NAME = '1.3.6.1.2.1.1.5.0'
+OID_NODE_IFDESCR = '1.3.6.1.2.1.2.2.1.2'
+OID_NODE_IFOPERSTATUS = '1.3.6.1.2.1.2.2.1.8'
+OID_NODE_IPADDRESS = '1.3.6.1.2.1.4.20.1.2'
+OID_NODE_NEXTHOPS = '1.3.6.1.2.1.4.22.1.3'
 
 
 class SnmpCisco(topology_discovery_api.TopoDiscMechanismApi):
