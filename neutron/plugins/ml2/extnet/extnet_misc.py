@@ -45,7 +45,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 node_dict = dict(name=node,
                                  ip_address=node_info_dict.get('ip_address'))
                 node_dict = {'extnode': node_dict}
-                node_created = self.create_extnode(context, node_dict)
+                node_created = super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
 
                 for interface in node_info_dict.get('interfaces'):
                     p = re.compile("^FastEthernet")
@@ -60,7 +60,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                               extnode_id=node_created.get('id')
                                               )
                         interface_dict = {'extinterface': interface_dict}
-                        self.create_extinterface(context, interface_dict)
+                        super(ExtNetControllerMixin, self).create_extinterface(context, interface_dict)
 
         return super(ExtNetControllerMixin, self).create_extnode(context, extnode)
 
