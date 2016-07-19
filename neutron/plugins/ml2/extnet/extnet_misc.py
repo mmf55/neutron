@@ -61,7 +61,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                               )
                         interface_dict = {'extinterface': interface_dict}
                         super(ExtNetControllerMixin, self).create_extinterface(context, interface_dict)
-            return node
         else:
             return super(ExtNetControllerMixin, self).create_extnode(context, extnode)
 
