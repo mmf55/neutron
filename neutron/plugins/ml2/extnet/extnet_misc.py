@@ -41,11 +41,13 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         if node.get('topology_discover'):
             td = topo_discovery.TopologyDiscovery()
             topo_dict = td.get_devices_info(node.get('ip_address'))
+            nodes_created = []
             for node, node_info_dict in topo_dict.items():
                 node_dict = dict(name=node,
                                  ip_address=node_info_dict.get('ip_address'))
                 node_dict = {'extnode': node_dict}
                 node_created = super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
+                nodes_created.append(node_created)
 
                 for interface in node_info_dict.get('interfaces'):
                     p = re.compile("^FastEthernet")
@@ -61,6 +63,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                               )
                         interface_dict = {'extinterface': interface_dict}
                         super(ExtNetControllerMixin, self).create_extinterface(context, interface_dict)
+            return nodes_created
         else:
             return super(ExtNetControllerMixin, self).create_extnode(context, extnode)
 
