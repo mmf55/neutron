@@ -292,6 +292,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             else:
                 segment.tun_ids_available = ','.join(l2)
 
+            context.session.commit()
+
             return const.OK
 
 
