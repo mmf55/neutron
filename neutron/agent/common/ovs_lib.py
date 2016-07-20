@@ -390,7 +390,6 @@ class OVSBridge(BaseOVS):
 
     def delete_external_tunnel_port(self, port_name,
                                     lvid=None):
-
         self.delete_port(port_name)
 
     def add_patch_port(self, local_name, remote_name):
