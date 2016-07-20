@@ -43,8 +43,8 @@ class ExtNetDeviceControllerMixin(object):
                                                   vnetwork=kwargs.get('vnetwork'))
 
     def undeploy_link(self, ctxt, interface, node, segmentation_id, network_type, **kwargs):
+        LOG.debug("Undeploy_link on %s" % interface.get('name'))
         return self.load_driver(node).undeploy_link(network_type,
-                                                    interface.get('type'),
                                                     interface.get('name'),
                                                     segmentation_id,
                                                     vnetwork=kwargs.get('vnetwork'))
