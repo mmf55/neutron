@@ -111,14 +111,14 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                                             link.get('network_id'))
 
         # Call create link to make the changes on the network.
-        # if self.deploy_link(link,
-        #                     interface1,
-        #                     interface2,
-        #                     node1,
-        #                     node2,
-        #                     vnetwork=link.get('network_id'),
-        #                     context=context) != const.OK:
-        #     raise extnet_exceptions.ExtLinkErrorApplyingConfigs()
+        if self.deploy_link(link,
+                            interface1,
+                            interface2,
+                            node1,
+                            node2,
+                            vnetwork=link.get('network_id'),
+                            context=context) != const.OK:
+            raise extnet_exceptions.ExtLinkErrorApplyingConfigs()
 
         # Save new link on the database
         return super(ExtNetControllerMixin, self).create_extlink(context, extlink)
@@ -134,14 +134,14 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         segment = self.get_extsegment(context, interface1.get('extsegment_id'))
 
-        # if self.undeploy_link(link,
-        #                       interface1,
-        #                       interface2,
-        #                       node1,
-        #                       node2,
-        #                       vnetwork=link.get('network_id'),
-        #                       context=context) != const.OK:
-        #     raise extnet_exceptions.ExtLinkErrorApplyingConfigs()
+        if self.undeploy_link(link,
+                              interface1,
+                              interface2,
+                              node1,
+                              node2,
+                              vnetwork=link.get('network_id'),
+                              context=context) != const.OK:
+            raise extnet_exceptions.ExtLinkErrorApplyingConfigs()
 
         if self._set_segmentation_id(context,
                                      link.get('segmentation_id'),
