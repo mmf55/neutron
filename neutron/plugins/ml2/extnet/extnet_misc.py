@@ -134,13 +134,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         segment = self.get_extsegment(context, interface1.get('extsegment_id'))
 
-        if self._set_segmentation_id(context,
-                                     link.get('segmentation_id'),
-                                     segment.get('id'),
-                                     link.get('type'),
-                                     link.get('network_id')) != const.OK:
-            raise extnet_exceptions.ExtLinkErrorInSetSegID()
-
         if self.undeploy_link(link,
                               interface1,
                               interface2,
@@ -149,6 +142,13 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                               vnetwork=link.get('network_id'),
                               context=context) != const.OK:
             raise extnet_exceptions.ExtLinkErrorApplyingConfigs()
+
+        if self._set_segmentation_id(context,
+                                     link.get('segmentation_id'),
+                                     segment.get('id'),
+                                     link.get('type'),
+                                     link.get('network_id')) != const.OK:
+            raise extnet_exceptions.ExtLinkErrorInSetSegID()
 
         return super(ExtNetControllerMixin, self).delete_extlink(context, id)
 
@@ -259,6 +259,11 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
     def _set_segmentation_id(self, context, id_to_set, segment_id, conn_type, network_id):
         segment = context.session.query(models.ExtSegment).filter_by(id=segment_id).first()
 
+        LOG.debug(id_to_set)
+        LOG.debug(segment_id)
+        LOG.debug(conn_type)
+        LOG.debug(network_id)
+
         if conn_type == const.VLAN:
             links = self._get_all_links_on_extsegment_by_type(context, segment_id, const.VLAN, network_id)
             links = filter((lambda x: x.id != id_to_set), links)
@@ -282,8 +287,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             num_list.append(int(id_to_set))
             num_list.sort()
 
-            print num_list
-
             l2 = [':'.join([str(t[0][1]), str(t[-1][1])]) if t[0][1] - t[-1][1] != 0 else str(t[0][1]) for t in
                   (tuple(g[1]) for g in itertools.groupby(enumerate(num_list), lambda (i, x): i - x))]
 
@@ -291,8 +294,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 segment.vlan_ids_available = ','.join(l2)
             else:
                 segment.tun_ids_available = ','.join(l2)
-
-            context.session.commit()
 
             return const.OK
 
