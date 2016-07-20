@@ -126,8 +126,30 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
         return msg
 
-    def undeploy_port(self, port):
-        pass
+    def undeploy_port(self, interface_type, interface_name, link_segmentation_id, **kwargs):
+        self._init_telnet_session()
+        self._enter_config_mode()
+
+        self._send_command('interface %s' % interface_name)
+
+        if interface_type == const.L3:
+
+            bridge_group = self._get_bridge_group(kwargs.get('vnetwork'))
+
+            self._send_command('no bridge-group %s' % bridge_group)
+
+            msg = const.OK
+
+        elif interface_type == const.L2 and link_segmentation_id:
+
+            self._send_command('no switchport access vlan %s' % link_segmentation_id)
+
+            msg = const.OK
+
+        self._exit_config_mode()
+        self._close_telnet_session()
+
+        return msg
 
     def driver_name(self):
         return "Cisco 3700"
