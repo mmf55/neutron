@@ -156,21 +156,13 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
         elif link_type == const.VLAN:
 
-            self._exit_config_mode()
-
-            self._send_command('vlan database')
-
-            self._send_command('no vlan %s' % segmentation_id)
-
-            self._send_command('exit')
-
-            self._enter_config_mode()
-
             self._send_command('interface %s' % interface_name)
 
             self._send_command('switchport trunk allowed vlan remove %s' % segmentation_id)
 
             self._send_command('no interface vlan %s' % segmentation_id)
+
+            self._send_command('vd %s' % segmentation_id)
 
         else:
             return "ERROR - Link type not supported by the driver %s" % self.driver_name()
