@@ -186,8 +186,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
     def delete_extport(self, resource, event, plugin, **kwargs):
         context = kwargs['context']
-        port = kwargs['port']
-        port = self.get_extport(context, port.get('port_id'))
+        port_id = kwargs['port_id']
+        port = self.get_extport(context, port_id)
         if port:
             interface = self.get_extinterface(context, port.get('extinterface_id'))
             if self.undeploy_port(interface,
