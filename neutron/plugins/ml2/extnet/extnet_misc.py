@@ -282,6 +282,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             num_list.append(int(id_to_set))
             num_list.sort()
 
+            print num_list
+
             l2 = [':'.join([str(t[0][1]), str(t[-1][1])]) if t[0][1] - t[-1][1] != 0 else str(t[0][1]) for t in
                   (tuple(g[1]) for g in itertools.groupby(enumerate(num_list), lambda (i, x): i - x))]
 
