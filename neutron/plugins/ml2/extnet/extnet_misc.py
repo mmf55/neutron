@@ -157,6 +157,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         ext_port = port.get('external_port')[0]
         interface = self.get_extinterface(context, ext_port.get('extinterface_id'))
 
+        node = self.get_extnode(context, interface.get('extnode_id'))
+
         if self._extinterface_has_extlinks(context, interface.get('id')):
             raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
@@ -180,6 +182,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         if not interface_extports:
             if self.deploy_port(interface,
+                                node,
                                 ext_port.get('segmentation_id'),
                                 context=context) != const.OK:
                 raise extnet_exceptions.ExtPortErrorApplyingConfigs()
