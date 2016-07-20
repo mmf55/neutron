@@ -173,6 +173,7 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
             self._send_command('switchport trunk allowed vlan remove %s' % segmentation_id)
 
         else:
+            print 'Here!'
             return "ERROR - Link type not supported by the driver %s" % self.driver_name()
 
         self._exit_config_mode()
