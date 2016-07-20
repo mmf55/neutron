@@ -294,6 +294,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
             if conn_type == const.VLAN:
                 segment.vlan_ids_available = ','.join(l2)
+                LOG.debug(','.join(l2))
+                LOG.debug(segment.vlan_ids_available)
             else:
                 segment.tun_ids_available = ','.join(l2)
 
