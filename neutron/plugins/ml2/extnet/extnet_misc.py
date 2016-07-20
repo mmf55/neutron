@@ -260,45 +260,36 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         segment = context.session.query(models.ExtSegment).filter_by(id=segment_id).first()
 
-        LOG.debug(id_to_set)
-        LOG.debug(segment_id)
-        LOG.debug(conn_type)
-        LOG.debug(network_id)
-
         if conn_type == const.VLAN:
             links = self._get_all_links_on_extsegment_by_type(context, segment_id, const.VLAN, network_id)
             links = {x for x in links if x['segmentation_id'] != id_to_set}
             if links:
-                LOG.debug(links)
                 return const.OK
             ids_avail = segment.vlan_ids_available
         else:
             ids_avail = segment.tun_ids_available
 
-            # [(123, 130), (1000, 2000)]
-            l = [[int(ids.split(':')[0]), int(ids.split(':')[1])]
-                 if len(ids.split(':')) > 1 else [int(ids)] for ids in ids_avail.split(',')]
+        # [(123, 130), (1000, 2000)]
+        l = [[int(ids.split(':')[0]), int(ids.split(':')[1])]
+             if len(ids.split(':')) > 1 else [int(ids)] for ids in ids_avail.split(',')]
 
-            num_list = list()
-            for item in l:
-                if len(item) > 1:
-                    num_list += range(item[0], item[1] + 1)
-                else:
-                    num_list += item
-
-            num_list.append(int(id_to_set))
-            num_list.sort()
-
-            l2 = [':'.join([str(t[0][1]), str(t[-1][1])]) if t[0][1] - t[-1][1] != 0 else str(t[0][1]) for t in
-                  (tuple(g[1]) for g in itertools.groupby(enumerate(num_list), lambda (i, x): i - x))]
-
-            LOG.debug(const.OK)
-            if conn_type == const.VLAN:
-                segment.vlan_ids_available = ','.join(l2)
-                LOG.debug(','.join(l2))
-                LOG.debug(segment.vlan_ids_available)
+        num_list = list()
+        for item in l:
+            if len(item) > 1:
+                num_list += range(item[0], item[1] + 1)
             else:
-                segment.tun_ids_available = ','.join(l2)
+                num_list += item
+
+        num_list.append(int(id_to_set))
+        num_list.sort()
+
+        l2 = [':'.join([str(t[0][1]), str(t[-1][1])]) if t[0][1] - t[-1][1] != 0 else str(t[0][1]) for t in
+              (tuple(g[1]) for g in itertools.groupby(enumerate(num_list), lambda (i, x): i - x))]
+
+        if conn_type == const.VLAN:
+            segment.vlan_ids_available = ','.join(l2)
+        else:
+            segment.tun_ids_available = ','.join(l2)
 
         return const.OK
 
