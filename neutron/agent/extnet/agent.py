@@ -19,8 +19,7 @@ LOG = logging.getLogger(__name__)
 # This class holds the main logic of the external devices device controller.
 class ExtNetDeviceControllerMixin(object):
     def initialize(self, config):
-        self.config_dict = dict(device_drivers=config.device_drivers,
-                                device_configs_path=config.device_configs_path)
+        self.config_dict = dict(device_configs_path=config.device_configs_path)
         super(ExtNetDeviceControllerMixin, self).__init__()
 
     def deploy_port(self, ctxt, interface, node, segmentation_id, **kwargs):
