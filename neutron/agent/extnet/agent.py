@@ -55,6 +55,7 @@ class ExtNetDeviceControllerMixin(object):
     def load_driver(self, node):
         node_name = node.get('name')
         node_ip_address = node.get('ip_address')
+        print node_name
         with open(os.path.join(self.config_dict.get('device_configs_path'), node_name + '.json')) as device_json:
             config_dict = json.load(device_json)
         dev_drv_string = config_dict.get('device_driver')
