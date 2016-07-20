@@ -184,7 +184,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                 context=context) != const.OK:
                 raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
-    def delete_extport(self, context, port):
+    def delete_extport(self, resource, event, **kwargs):
+        context = kwargs.get('context')
+        port = kwargs.get('port')
         port = self.get_extport(context, port.get('port_id'))
         if port:
             interface = self.get_extinterface(context, port.get('extinterface_id'))
