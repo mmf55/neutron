@@ -322,7 +322,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
                           vnetwork=kwargs.get('vnetwork'),
                           remote_ip=kwargs.get('remote_ip'))
 
-    def undeploy_link_on_node(self, interface, node, network_type, **kwargs):
+    def undeploy_link_on_node(self, interface, node, network_type, segmentation_id, **kwargs):
         context = kwargs.get('context')
         node_name = node['name']
         topic = self.get_device_controller(node_name)
