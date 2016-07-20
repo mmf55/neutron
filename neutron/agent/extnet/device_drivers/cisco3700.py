@@ -162,7 +162,7 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
             self._send_command('no interface vlan %s' % segmentation_id)
 
-            self._send_command('vd %s' % segmentation_id)
+            self._send_command('no vlan %s' % segmentation_id)
 
         else:
             return "ERROR - Link type not supported by the driver %s" % self.driver_name()
@@ -214,7 +214,9 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
             elif str(segmentation_id) not in vlans_allowed.split(','):
                 vlans_allowed = str(segmentation_id) + ',' + vlans_allowed
 
-            self._send_command('va %s' % segmentation_id)
+            # self._send_command('va %s' % segmentation_id)
+
+            self._send_command('vlan %s' % segmentation_id)
 
             self._send_command('interface vlan %s' % segmentation_id)
 
