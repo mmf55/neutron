@@ -268,8 +268,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         if conn_type == const.VLAN:
             links = self._get_all_links_on_extsegment_by_type(context, segment_id, const.VLAN, network_id)
             links = {x for x in links if x['segmentation_id'] != id_to_set}
-            LOG.debug(links)
             if links:
+                LOG.debug(links)
                 return const.OK
             ids_avail = segment.vlan_ids_available
         else:
