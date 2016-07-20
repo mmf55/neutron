@@ -338,6 +338,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
         return cctxt.call(context,
                           'undeploy_link',
                           node=node,
+                          segmentation_id=segmentation_id,
                           interface=interface,
                           network_type=network_type,
                           vnetwork=kwargs.get('vnetwork'),
@@ -412,7 +413,7 @@ class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
                                                  tid=segmentation_id)
         return const.OK
 
-    def undeploy_link(self, ctxt, interface, node, network_type, **kwargs):
+    def undeploy_link(self, ctxt, interface, node, network_type, segmentation_id, **kwargs):
 
         LOG.debug("Undeploy_link on %s" % interface.get('name'))
         network_id = kwargs.get('vnetwork')
