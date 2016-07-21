@@ -290,7 +290,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
     def delete_extsegment(self, context, id):
         self._admin_check(context, 'DELETE')
         with context.session.begin(subtransactions=True):
-            extsegment_db = self._get_object_by_id(context, models.ExtInterface, id)
+            extsegment_db = self._get_object_by_id(context, models.ExtSegment, id)
             if self._get_object_by_id(context, models.ExtSegment, extsegment_db):
                 raise extnet_exceptions.ExtSegmentHasLinksInUse(id=id)
             context.session.delete(extsegment_db)
