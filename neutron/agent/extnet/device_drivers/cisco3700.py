@@ -146,6 +146,11 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
             msg = const.OK
 
+        else:
+
+            msg = "ERROR - Interface type not supported." \
+                  % interface_name
+
         self._exit_config_mode()
         self._close_telnet_session()
 
