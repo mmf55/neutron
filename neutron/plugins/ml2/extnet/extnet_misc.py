@@ -186,10 +186,12 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                         x.extinterface2_id in node_interfaces) and x.type == const.VLAN), None)
                 if not segmentation_id:
                     raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
+                LOG.debug(segmentation_id)
         else:
             raise extnet_exceptions.ExtSegmentHasNoLinks()
 
         if len(interface_extports) == 1:
+            LOG.debug(interface_extports)
             if self.deploy_port(interface,
                                 node,
                                 segmentation_id,
