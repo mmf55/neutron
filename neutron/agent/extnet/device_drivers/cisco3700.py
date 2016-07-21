@@ -126,9 +126,6 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
         return msg
 
     def undeploy_port(self, interface_type, interface_name, link_segmentation_id, **kwargs):
-        print interface_type
-        print interface_name
-        print link_segmentation_id
         self._init_telnet_session()
         self._enter_config_mode()
 

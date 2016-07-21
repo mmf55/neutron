@@ -164,7 +164,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         interface_extports = self._extinterface_has_extports(context, interface.get('id'))
         if interface_extports:
-            if next((x for x in interface_extports if x.port.network_id != port.get('network_id')), None):
+            port_on_db = self.get_port(interface_extports[0].id)
+            if port_on_db.get('network_id') != port.get('network_id'):
                 raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
         if interface.get('type') == 'l2':
@@ -212,11 +213,14 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             elif interface.get('type') == 'l3':
                 ext_port['segmentation_id'] = None
 
-            if self.undeploy_port(interface,
-                                  node,
-                                  ext_port.get('segmentation_id'),
-                                  context=context) != const.OK:
-                raise extnet_exceptions.ExtPortErrorApplyingConfigs()
+            interface_extports = self._extinterface_has_extports(context, interface.get('id'))
+
+            if len(interface_extports) == 1:
+                if self.undeploy_port(interface,
+                                      node,
+                                      ext_port.get('segmentation_id'),
+                                      context=context) != const.OK:
+                    raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
     # ------------------------------------ Auxiliary functions ---------------------------------------
 
