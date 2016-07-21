@@ -73,3 +73,7 @@ class ExtLinkErrorInSetSegID(exceptions.Invalid):
 
 class ExtSegmentHasNoLinks(exceptions.Invalid):
     message = _("Segment has no links deployed.")
+
+
+class ExtNodeErrorOnTopologyDiscover(exceptions.NotAuthorized):
+    message = _("Error when discovering the network topology.")
