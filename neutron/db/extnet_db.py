@@ -11,7 +11,6 @@ class ExtPort(model_base.BASEV2):
                    sa.ForeignKey("ports.id",
                                  ondelete="CASCADE"),
                    primary_key=True)
-    segmentation_id = sa.Column(sa.String(36))
     extinterface_id = sa.Column(sa.String(36), sa.ForeignKey("extinterfaces.id"))
     extinterface = orm.relationship("ExtInterface",
                                     back_populates='extports')

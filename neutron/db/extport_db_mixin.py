@@ -43,7 +43,8 @@ class ExtPortDBMixin(object):
         LOG.debug(result)
         with context.session.begin(subtransactions=True):
             extport_db = extnet_db.ExtPort(
-                extinterface_id=data[extport_dict_ext.EXTPORT][0]['extinterface_id']
+                id=result['id'],
+                extinterface_id=data[extport_dict_ext.EXTPORT][0]['extinterface_id'],
             )
             context.session.add(extport_db)
         result[extport_dict_ext.EXTPORT] = data[extport_dict_ext.EXTPORT]

@@ -63,8 +63,6 @@ def upgrade():
     )
     op.create_table('extports',
     sa.Column('id', sa.String(length=36), nullable=False),
-    sa.Column('name', sa.String(length=36), nullable=True),
-    sa.Column('segmentation_id', sa.String(length=36), nullable=False),
     sa.Column('extinterface_id', sa.String(length=36), nullable=True),
     sa.ForeignKeyConstraint(['extinterface_id'], ['extinterfaces.id']),
     sa.ForeignKeyConstraint(['id'], ['ports.id'], ondelete='CASCADE'),
