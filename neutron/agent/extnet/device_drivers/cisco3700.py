@@ -118,8 +118,7 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
         else:
 
-            msg = "ERROR - Interface type not supported." \
-                  % interface_name
+            msg = "ERROR - Interface type not supported."
 
         self._exit_config_mode()
         self._close_telnet_session()
@@ -127,6 +126,9 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
         return msg
 
     def undeploy_port(self, interface_type, interface_name, link_segmentation_id, **kwargs):
+        print interface_type
+        print interface_name
+        print link_segmentation_id
         self._init_telnet_session()
         self._enter_config_mode()
 
@@ -148,8 +150,7 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
         else:
 
-            msg = "ERROR - Interface type not supported." \
-                  % interface_name
+            msg = "ERROR - Interface type not supported."
 
         self._exit_config_mode()
         self._close_telnet_session()
