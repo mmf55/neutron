@@ -28,8 +28,6 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
             self._process_update_port(plugin_context, data, result)
 
     def extend_port_dict(self, session, base_model, result):
-        LOG.debug(base_model)
-        LOG.debug(result)
         if result.get(extport.EXTPORT) is None:
             result[extport.EXTPORT] = (extport.EXTENDED_ATTRIBUTES_2_0['ports']
                                        [extport.EXTPORT]['default'])
