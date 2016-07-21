@@ -131,6 +131,21 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         }
         return self._fields(port_created, fields)
 
+    def _extinterface_has_extlinks(self, context, interface_id):
+        links = context.session.query(models.ExtLink) \
+            .filter(or_(models.ExtLink.extinterface1_id == interface_id,
+                        models.ExtLink.extinterface2_id == interface_id)) \
+            .all()
+        return links
+
+    def _check_extsegment_has_links(self, context, extsegment_db):
+        interfaces_db = extsegment_db.extinterfaces
+        for interfaces_db in interfaces_db:
+            links = self._extinterface_has_extlinks(interfaces_db.id)
+            if links:
+                return True
+        return False
+
     def get_extport(self, context, id, fields=None):
         self._admin_check(context, 'GET')
         port = context.session.query(models.ExtPort) \
@@ -291,7 +306,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         self._admin_check(context, 'DELETE')
         with context.session.begin(subtransactions=True):
             extsegment_db = self._get_object_by_id(context, models.ExtSegment, id)
-            if self._get_object_by_id(context, models.ExtSegment, extsegment_db):
+            if self._check_extsegment_has_links(context, extsegment_db):
                 raise extnet_exceptions.ExtSegmentHasLinksInUse(id=id)
             context.session.delete(extsegment_db)
         LOG.debug("External segment '%s' was deleted.", id)
