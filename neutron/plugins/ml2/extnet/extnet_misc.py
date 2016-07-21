@@ -38,6 +38,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         registry.subscribe(self.delete_extport, resources.PORT, events.BEFORE_DELETE)
 
+        registry.subscribe(self.create_extport, resources.PORT, events.AFTER_CREATE)
+
         super(ExtNetControllerMixin, self).__init__(device_ctrl_mgr)
 
     def create_extnode(self, context, extnode):
@@ -152,8 +154,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         return super(ExtNetControllerMixin, self).delete_extlink(context, id)
 
-    def create_extport(self, context, port):
-        port = port.get('port')
+    def create_extport(self, resource, event, plugin, **kwargs):
+        port = kwargs.get('port')
+        context = kwargs.get('context')
         ext_port = port.get('external_port')[0]
         interface = self.get_extinterface(context, ext_port.get('extinterface_id'))
 
