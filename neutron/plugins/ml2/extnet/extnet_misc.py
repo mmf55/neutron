@@ -376,7 +376,6 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
         cctxt = client.prepare(topic=topic_create_extlink,
                                fanout=False,
                                timeout=30)
-        LOG.debug(kwargs.get('remote_ip'))
         return cctxt.call(context,
                           'undeploy_link',
                           node=node,
