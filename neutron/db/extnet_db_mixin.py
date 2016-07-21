@@ -127,7 +127,6 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
     def _make_extport_dict(self, port, fields=None):
         port_created = {
             'id': port.id,
-            'segmentation_id': port.segmentation_id,
             'extinterface_id': port.extinterface_id,
         }
         return self._fields(port_created, fields)
