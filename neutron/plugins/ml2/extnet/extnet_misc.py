@@ -180,7 +180,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             else:
                 raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
 
-        if not interface_extports:
+        if len(interface_extports) == 1:
             if self.deploy_port(interface,
                                 node,
                                 segmentation_id,
