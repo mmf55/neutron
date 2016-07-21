@@ -14,7 +14,12 @@ class ExtPort(model_base.BASEV2):
     extinterface_id = sa.Column(sa.String(36), sa.ForeignKey("extinterfaces.id"))
     extinterface = orm.relationship("ExtInterface",
                                     back_populates='extports')
-    port = orm.relationship(models_v2.Port)
+    # port = orm.relationship(models_v2.Port)
+
+    port = orm.relationship(
+        models_v2.Port,
+        backref=orm.backref("extport", uselist=False,
+                            cascade='delete', lazy='joined'))
 
 
 class ExtNode(model_base.BASEV2, models_v2.HasId):
