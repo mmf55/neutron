@@ -164,7 +164,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         interface_extports = self._extinterface_has_extports(context, interface.get('id'))
         if interface_extports:
-            port_on_db = self.get_port(interface_extports[0].id)
+            port_on_db = self.get_port(context, interface_extports[0].id)
             if port_on_db.get('network_id') != port.get('network_id'):
                 raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
