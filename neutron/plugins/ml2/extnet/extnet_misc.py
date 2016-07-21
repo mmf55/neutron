@@ -180,8 +180,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         elif interface.get('type') == 'l3':
             ext_port['segmentation_id'] = None
 
-        LOG.debug(interface_extports)
         if not interface_extports:
+            LOG.debug(ext_port)
             if self.deploy_port(interface,
                                 node,
                                 ext_port.get('segmentation_id'),
