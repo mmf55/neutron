@@ -468,6 +468,10 @@ class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
             remote_ip = kwargs.get('remote_ip')
             port_name = self.get_tunnel_name(
                 network_type, self.local_ip, remote_ip)
+            LOG.debug(port_name)
+            LOG.debug(network_type)
+            LOG.debug(self.local_ip)
+            LOG.debug(remote_ip)
             self.int_br.delete_external_tunnel_port(port_name,
                                                     lvid=lvid)
         return const.OK
