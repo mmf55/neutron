@@ -194,8 +194,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         ext_port = self.get_extport(context, port_id)
         port = self.get_port(context, port_id)
 
-        LOG.debug(ext_port)
-
         if ext_port:
             interface = self.get_extinterface(context, ext_port.get('extinterface_id'))
             node = self.get_extnode(context, interface.get('extnode_id'))

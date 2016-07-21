@@ -1127,6 +1127,7 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
 
         ext_port = port['port'].get('external_port')
         if ext_port:
+            LOG.debug(ext_port)
             self.create_extport(context, port)
 
         try:
@@ -1431,6 +1432,8 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
                 LOG.debug("The port '%s' was deleted", id)
                 return
             port = self._make_port_dict(port_db)
+
+            LOG.debug(port)
 
             network = self.get_network(context, port['network_id'])
             bound_mech_contexts = []
