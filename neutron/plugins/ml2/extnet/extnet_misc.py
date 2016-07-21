@@ -210,6 +210,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         if ext_port:
             interface = self.get_extinterface(context, ext_port.get('extinterface_id'))
+            LOG.debug(interface)
             node = self.get_extnode(context, interface.get('extnode_id'))
 
             if interface.get('type') == 'l2':
