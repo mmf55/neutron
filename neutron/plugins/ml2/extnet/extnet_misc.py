@@ -173,15 +173,21 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             if port_on_db.get('network_id') != port.get('network_id'):
                 raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
-        if interface.get('type') == 'l2':
-            links = self._get_all_links_on_extsegment_by_type(context,
-                                                              interface.get('extsegment_id'),
-                                                              const.VLAN,
-                                                              port.get('network_id'))
-            if links:
-                segmentation_id = links[0].segmentation_id
-            else:
-                raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
+        links = self._get_all_links_on_extsegment_by_type(context,
+                                                          interface.get('extsegment_id'),
+                                                          const.VLAN,
+                                                          port.get('network_id'))
+        if links:
+            if interface.get('type') == 'l2':
+                node_interfaces = self._get_node_interfaces(context, interface.get('id'), 'l2')
+                node_interfaces = [x.segmentation_id for x in node_interfaces]
+                segmentation_id = next((x.segmentation_id for x in links
+                                        if (x.extinterface1_id in node_interfaces or
+                                        x.extinterface2_id in node_interfaces) and x.type == const.VLAN), None)
+                if not segmentation_id:
+                    raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
+        else:
+            raise extnet_exceptions.ExtSegmentHasNoLinks()
 
         if len(interface_extports) == 1:
             if self.deploy_port(interface,
@@ -223,6 +229,17 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                     raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
     # ------------------------------------ Auxiliary functions ---------------------------------------
+
+    def _get_node_interfaces(self, context, interface_id, type=None):
+        if type:
+            interface = context.session.query(models.ExtInterface)\
+                .filter_by(id=interface_id)\
+                .filter_by(type=type)\
+                .first()
+        else:
+            interface = context.session.query(models.ExtInterface).filter_by(id=interface_id).first()
+
+        return interface.extnode.extinterfaces
 
     def _extinterface_has_extports(self, context, interface_id):
         interface = context.session.query(models.ExtInterface).filter_by(id=interface_id).first()

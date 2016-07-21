@@ -68,4 +68,8 @@ class ExtInterfaceHasPortsInUse(exceptions.InUse):
 
 
 class ExtLinkErrorInSetSegID(exceptions.Invalid):
-    message = _(" Error returning the segmentation ID to the available pool.")
+    message = _("Error returning the segmentation ID to the available pool.")
+
+
+class ExtSegmentHasNoLinks(exceptions.Invalid):
+    message = _("Segment has no links deployed.")
