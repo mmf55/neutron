@@ -1125,9 +1125,9 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
         kwargs = {'context': context, 'port': result}
         registry.notify(resources.PORT, events.AFTER_CREATE, self, **kwargs)
 
-        ext_port = port['port'].get('external_port')
-        if ext_port:
-            self.create_extport(context, port)
+        # ext_port = port['port'].get('external_port')
+        # if ext_port:
+        #     self.create_extport(context, port)
 
         try:
             self.mechanism_manager.create_port_postcommit(mech_context)
