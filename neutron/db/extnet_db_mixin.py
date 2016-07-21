@@ -266,7 +266,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         self._admin_check(context, 'UPDATE')
         segment = extsegment['extsegment']
         with context.session.begin(subtransactions=True):
-            segment_in_db = self._get_existing_extsegment(context, id)
+            segment_in_db = self._get_object_by_id(context, models.ExtSegment, id)
             segment_in_db.name = segment['name']
             segment_in_db.types_supported = segment['types_supported']
             segment_in_db.vlan_ids_available = segment['vlan_ids_available']
@@ -290,7 +290,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
     def delete_extsegment(self, context, id):
         self._admin_check(context, 'DELETE')
         with context.session.begin(subtransactions=True):
-            extsegment_db = self._get_existing_extsegment(context, id)
+            extsegment_db = self._get_object_by_id(context, models.ExtInterface, id)
             if self._get_object_by_id(context, models.ExtSegment, extsegment_db):
                 raise extnet_exceptions.ExtSegmentHasLinksInUse(id=id)
             context.session.delete(extsegment_db)
@@ -329,7 +329,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         self._admin_check(context, 'UPDATE')
         link = extlink['extlink']
         with context.session.begin(subtransactions=True):
-            link_in_db = self._get_existing_extlink(context, id)
+            link_in_db = self._get_object_by_id(context, models.ExtLink, id)
             link_in_db.name = link['name']
             link_in_db.type = link['type']
             link_in_db.segmentation_id = link['segmentation_id']
