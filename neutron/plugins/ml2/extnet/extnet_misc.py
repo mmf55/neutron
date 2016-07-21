@@ -210,12 +210,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         if ext_port:
             interface = self.get_extinterface(context, ext_port.get('extinterface_id'))
-            LOG.debug(interface)
             node = self.get_extnode(context, interface.get('extnode_id'))
 
             if interface.get('type') == 'l2':
-                LOG.debug(interface.get('extsegment_id'))
-                LOG.debug(port.get('network_id'))
                 links = self._get_all_links_on_extsegment_by_type(context,
                                                                   interface.get('extsegment_id'),
                                                                   const.VLAN,
