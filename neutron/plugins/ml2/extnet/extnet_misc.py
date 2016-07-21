@@ -192,6 +192,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             raise extnet_exceptions.ExtSegmentHasNoLinks()
 
         if len(interface_extports) == 1:
+            LOG.debug(interface)
             if self.deploy_port(interface,
                                 node,
                                 segmentation_id,
