@@ -180,7 +180,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         if links:
             if interface.get('type') == 'l2':
                 node_interfaces = self._get_node_interfaces(context, interface.get('id'), 'l2')
-                node_interfaces = [x.segmentation_id for x in node_interfaces]
+                node_interfaces = [x.id for x in node_interfaces]
                 segmentation_id = next((x.segmentation_id for x in links
                                         if (x.extinterface1_id in node_interfaces or
                                         x.extinterface2_id in node_interfaces) and x.type == const.VLAN), None)
