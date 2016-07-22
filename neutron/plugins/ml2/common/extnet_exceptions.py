@@ -77,3 +77,7 @@ class ExtSegmentHasNoLinks(exceptions.Invalid):
 
 class ExtNodeErrorOnTopologyDiscover(exceptions.NotAuthorized):
     message = _("Error when discovering the network topology.")
+
+
+class ExtLinkErrorObtainingSegmentationID(exceptions.NetworkNotFound):
+    message = _("Error when getting the segmentation ID.")

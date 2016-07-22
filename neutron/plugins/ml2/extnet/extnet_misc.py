@@ -292,6 +292,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         else:
             ids_avail = segment.tun_ids_available
 
+        if not ids_avail:
+            raise extnet_exceptions.ExtLinkErrorObtainingSegmentationID()
+
         # [(123, 130), (1000, 2000)]
         l = [[int(ids.split(':')[0]), int(ids.split(':')[1])]
              if len(ids.split(':')) > 1 else [int(ids)] for ids in ids_avail.split(',')]
