@@ -29,7 +29,7 @@ class SnmpCisco(topology_discovery_api.TopoDiscMechanismApi):
         p2 = re.compile("^Vlan")
         fe_ints_list = [x for x in self.session.walk(OID_NODE_IFDESCR)
                         if (p1.match(x.value) or p2.match(x.value)) and
-                        self.session.get(OID_NODE_IFOPERSTATUS+x.oid_index) == '1']
+                        self.session.get(OID_NODE_IFOPERSTATUS+x.oid_index).value == '1']
 
         ips_list = [(x.value, x.oid_index) for x in self.session.walk(OID_NODE_IPADDRESS)]
         # print ips_list
