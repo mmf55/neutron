@@ -25,9 +25,9 @@ RESOURCE_ATTRIBUTE_MAP = {
                               'required_by_policy': True,
                               'validate': {'type:boolean': None},
                               'is_visible': True, 'default': False},
-        'info': {'allow_post': False, 'allow_put': False,
-                 'validate': {'type:string': None},
-                 'is_visible': True, 'default': 'no_info'},
+        'topology_discover_info': {'allow_post': False, 'allow_put': False,
+                                   'validate': {'type:string': None},
+                                   'is_visible': True, 'default': 'Nothing added.'},
 
         'tenant_id': {'allow_post': True, 'allow_put': False,
                       'required_by_policy': True,

@@ -89,7 +89,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                             interface_created = super(ExtNetControllerMixin, self).create_extinterface(context, interface_dict)
                             interfaces_created.append(interface_created)
 
-            in_node['info'] = "Add %s new nodes, and %s new interfaces." % (len(nodes_created), len(interfaces_created))
+            in_node['topology_discover_info'] = "Add %s new nodes, and %s new interfaces." \
+                                                % (len(nodes_created), len(interfaces_created))
             return in_node
         else:
             return super(ExtNetControllerMixin, self).create_extnode(context, extnode)
