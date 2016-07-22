@@ -48,6 +48,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         if in_node.get('topology_discover'):
             td = topo_discovery.TopologyDiscovery()
             topo_dict = td.get_devices_info(in_node.get('ip_address'))
+
+            LOG.debug(topo_dict)
+
             if not topo_dict:
                 raise extnet_exceptions.ExtNodeErrorOnTopologyDiscover()
             nodes_created = []
