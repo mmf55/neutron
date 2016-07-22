@@ -54,6 +54,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             interfaces_created = []
             for node, node_info_dict in topo_dict.items():
 
+                node_id = None
                 existing_node = self.get_extnode_by_name(context, node)
                 if not existing_node:
                     node_dict = dict(name=node,
@@ -61,6 +62,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                     node_dict = {'extnode': node_dict}
                     node_created = super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
                     nodes_created.append(node_created)
+                    node_id = node_created.get('id')
+                else:
+                    node_id = existing_node.id
 
                 for interface in node_info_dict.get('interfaces'):
                     interface_exists = None
@@ -77,7 +81,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                             interface_dict = dict(name=interface.get('name'),
                                                   ip_address=interface.get('ip_address'),
                                                   type=net_type,
-                                                  extnode_id=node_created.get('id')
+                                                  extnode_id=node_id
                                                   )
                             interface_dict = {'extinterface': interface_dict}
                             interface_created = super(ExtNetControllerMixin, self).create_extinterface(context, interface_dict)
