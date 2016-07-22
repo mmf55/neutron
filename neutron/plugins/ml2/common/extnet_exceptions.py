@@ -44,7 +44,7 @@ class ExtLinkErrorApplyingConfigs(exceptions.BadRequest):
 
 
 class ExtLinkSegmentationIdNotAvailable(exceptions.InvalidConfigurationOption):
-    message = _("The segmentation id %(segmentation_id) is not available on connection %(connection_id).")
+    message = _("The segmentation id is not available on connection.")
 
 
 class ExtInterfacesNotInSameSegment(exceptions.BadRequest):
