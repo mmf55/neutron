@@ -45,6 +45,11 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
     def create_extnode(self, context, extnode):
         in_node = extnode['extnode']
 
+        # if not self.get_extnode_by_name(context, 'OVS'):
+        #     node_dict = dict(name='OVS')
+        #     node_dict = {'extnode': node_dict}
+        #     super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
+
         if in_node.get('topology_discover'):
             td = topo_discovery.TopologyDiscovery()
             topo_dict = td.get_devices_info(in_node.get('ip_address'))
