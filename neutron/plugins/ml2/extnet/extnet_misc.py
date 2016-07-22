@@ -464,8 +464,9 @@ class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
 
         elif network_type == const.GRE:
             remote_ip = kwargs.get('remote_ip')
+            td = network_type+network_id[:4]
             port_name = self.get_tunnel_name(
-                network_type, self.local_ip, remote_ip)
+                td, self.local_ip, remote_ip)
             self.int_br.add_external_tunnel_port(port_name,
                                                  remote_ip,
                                                  self.local_ip,
@@ -485,8 +486,9 @@ class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
 
         elif network_type == const.GRE:
             remote_ip = kwargs.get('remote_ip')
+            td = network_type + network_id[:4]
             port_name = self.get_tunnel_name(
-                network_type, self.local_ip, remote_ip)
+                td, self.local_ip, remote_ip)
             self.int_br.delete_external_tunnel_port(port_name,
                                                     lvid=lvid)
         return const.OK
