@@ -51,33 +51,40 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             if not topo_dict:
                 raise extnet_exceptions.ExtNodeErrorOnTopologyDiscover()
             nodes_created = []
+            interfaces_created = []
             for node, node_info_dict in topo_dict.items():
-                if self.get_extnode_by_name(context, node):
-                    continue
-                node_dict = dict(name=node,
-                                 ip_address=node_info_dict.get('ip_address'))
-                node_dict = {'extnode': node_dict}
-                node_created = super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
-                nodes_created.append(node_created)
+
+                existing_node = self.get_extnode_by_name(context, node)
+                if not existing_node:
+                    node_dict = dict(name=node,
+                                     ip_address=node_info_dict.get('ip_address'))
+                    node_dict = {'extnode': node_dict}
+                    node_created = super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
+                    nodes_created.append(node_created)
 
                 for interface in node_info_dict.get('interfaces'):
-                    p = re.compile("^FastEthernet")
-                    if p.match(interface.get('name')):
-                        if interface.get('ip_address') is not None:
-                            net_type = 'l3'
-                        else:
-                            net_type = 'l2'
-                        interface_dict = dict(name=interface.get('name'),
-                                              ip_address=interface.get('ip_address'),
-                                              type=net_type,
-                                              extnode_id=node_created.get('id')
-                                              )
-                        interface_dict = {'extinterface': interface_dict}
-                        super(ExtNetControllerMixin, self).create_extinterface(context, interface_dict)
-            if nodes_created:
-                return nodes_created[-1]
-            else:
-                raise extnet_exceptions.ExtNetNodeAlreadyExist()
+                    interface_exists = None
+                    if existing_node:
+                        interfaces = existing_node.extinterfaces
+                        interface_exists = next((x for x in interfaces if x.name == interface.get('name')), None)
+                    if not existing_node or not interface_exists:
+                        p = re.compile("^FastEthernet")
+                        if p.match(interface.get('name')):
+                            if interface.get('ip_address') is not None:
+                                net_type = 'l3'
+                            else:
+                                net_type = 'l2'
+                            interface_dict = dict(name=interface.get('name'),
+                                                  ip_address=interface.get('ip_address'),
+                                                  type=net_type,
+                                                  extnode_id=node_created.get('id')
+                                                  )
+                            interface_dict = {'extinterface': interface_dict}
+                            interface_created = super(ExtNetControllerMixin, self).create_extinterface(context, interface_dict)
+                            interfaces_created.append(interface_created)
+
+            node['info'] = "Add %s new nodes, and %s new interfaces." % (len(nodes_created), len(interfaces_created))
+            return node
         else:
             return super(ExtNetControllerMixin, self).create_extnode(context, extnode)
 

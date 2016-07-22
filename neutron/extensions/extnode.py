@@ -14,6 +14,7 @@ RESOURCE_ATTRIBUTE_MAP = {
                'validate': {'type:uuid': None},
                'is_visible': True},
         'name': {'allow_post': True, 'allow_put': True,
+                 'required_by_policy': False,
                  'validate': {'type:string': None},
                  'is_visible': True, 'default': 'no_name'},
         'ip_address': {'allow_post': True, 'allow_put': True,
