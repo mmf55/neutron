@@ -238,6 +238,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         with context.session.begin(subtransactions=True):
             interface_in_db = self._get_object_by_id(context, models.ExtInterface, id)
             interface_in_db.extsegment_id = interface['extsegment_id']
+            interface_in_db.ip_address = interface['ip_address']
         return self._make_extinterface_dict(interface_in_db)
 
     def get_extinterfaces(self, context, filters=None, fields=None):
