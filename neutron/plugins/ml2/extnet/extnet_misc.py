@@ -43,11 +43,11 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         super(ExtNetControllerMixin, self).__init__(device_ctrl_mgr)
 
     def create_extnode(self, context, extnode):
-        node = extnode['extnode']
+        in_node = extnode['extnode']
 
-        if node.get('topology_discover'):
+        if in_node.get('topology_discover'):
             td = topo_discovery.TopologyDiscovery()
-            topo_dict = td.get_devices_info(node.get('ip_address'))
+            topo_dict = td.get_devices_info(in_node.get('ip_address'))
             if not topo_dict:
                 raise extnet_exceptions.ExtNodeErrorOnTopologyDiscover()
             nodes_created = []
@@ -83,8 +83,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                             interface_created = super(ExtNetControllerMixin, self).create_extinterface(context, interface_dict)
                             interfaces_created.append(interface_created)
 
-            node['info'] = "Add %s new nodes, and %s new interfaces." % (str(len(nodes_created)), str(len(interfaces_created)))
-            return node
+            in_node['info'] = "Add %s new nodes, and %s new interfaces." % (len(nodes_created), len(interfaces_created))
+            return in_node
         else:
             return super(ExtNetControllerMixin, self).create_extnode(context, extnode)
 
