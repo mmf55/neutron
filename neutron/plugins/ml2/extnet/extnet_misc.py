@@ -54,7 +54,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             interfaces_created = []
             for node, node_info_dict in topo_dict.items():
 
-                node_id = None
                 existing_node = self.get_extnode_by_name(context, node)
                 if not existing_node:
                     node_dict = dict(name=node,
