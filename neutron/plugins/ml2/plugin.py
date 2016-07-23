@@ -1127,7 +1127,7 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
 
         extinterface_id = port['port'].get('extinterface_id')
         if extinterface_id:
-            self.create_extport(context, port)
+            self.create_extport(context, port['port'])
 
         try:
             self.mechanism_manager.create_port_postcommit(mech_context)
