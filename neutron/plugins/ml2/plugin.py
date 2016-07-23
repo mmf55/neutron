@@ -1432,7 +1432,7 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
                 return
             port = self._make_port_dict(port_db)
 
-            LOG.debug(port)
+            # LOG.debug(port)
 
             network = self.get_network(context, port['network_id'])
             bound_mech_contexts = []
