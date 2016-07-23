@@ -30,6 +30,7 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
     def extend_port_dict(self, session, base_model, result):
         LOG.debug('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         LOG.debug(base_model)
+        LOG.debuf(result)
         # if session.query(models.ExtPort).get(extport_id)
         if result.get(extport.EXT_INTERFACE_ID) is None:
             result[extport.EXT_INTERFACE_ID] = (extport.EXTENDED_ATTRIBUTES_2_0['ports']
