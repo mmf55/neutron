@@ -129,6 +129,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         # Call create link to make the changes on the network.
         if self.deploy_link(link,
+                            segment.get('type_supported'),
                             interface1,
                             interface2,
                             node1,
@@ -152,6 +153,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         segment = self.get_extsegment(context, interface1.get('extsegment_id'))
 
         if self.undeploy_link(link,
+                              segment.get('type_supported'),
                               interface1,
                               interface2,
                               node1,
