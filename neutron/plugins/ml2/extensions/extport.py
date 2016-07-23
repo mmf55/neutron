@@ -5,6 +5,8 @@ from neutron.db import extport_db_mixin as extport_db
 from neutron.extensions import extport
 from neutron.plugins.ml2 import driver_api as api
 
+from neutron.db import extnet_db as models
+
 LOG = logging.getLogger(__name__)
 
 
@@ -32,7 +34,7 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
         LOG.debug(base_model)
         LOG.debug(session)
 
-        extport = session.query(self.models.ExtPort).get(result.get('id'))
+        extport = session.query(models.ExtPort).get(result.get('id'))
         if extport:
             result[extport.EXT_INTERFACE_ID] = extport.id
         elif result.get(extport.EXT_INTERFACE_ID) is None:
