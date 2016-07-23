@@ -1126,8 +1126,15 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
         registry.notify(resources.PORT, events.AFTER_CREATE, self, **kwargs)
 
         extinterface_id = port['port'].get('extinterface_id')
+        # Called if the port contains the attribute "extinterface_id" which means that this port is associated with
+        # an external interface.
         if extinterface_id:
-            self.create_extport(context, port['port'])
+            try:
+                self.create_extport(context, port['port'])
+            except Exception:
+                with excutils.save_and_reraise_exception():
+                    LOG.error(_LE("Association with external interface failed."))
+                    self.delete_port(context, result['id'])
 
         try:
             self.mechanism_manager.create_port_postcommit(mech_context)
@@ -1432,11 +1439,11 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
                 return
             port = self._make_port_dict(port_db)
 
+            # External network delete port called if this por is associated with an external interface.
             extport = self.get_extport(context, port.get('id'))
             if extport:
                 self.delete_extport(context, port)
 
-            LOG.debug(port)
 
             network = self.get_network(context, port['network_id'])
             bound_mech_contexts = []
