@@ -18,7 +18,7 @@ class ExtPort(model_base.BASEV2):
 
     port = orm.relationship(
         models_v2.Port,
-        backref=orm.backref("extport", uselist=False,
+        backref=orm.backref("extinterface_id", uselist=False,
                             cascade='delete', lazy='joined'))
 
 
