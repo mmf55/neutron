@@ -275,7 +275,6 @@ class CommonDbMixin(object):
                                      response, db_object):
         for func in self._dict_extend_functions.get(
             resource_type, []):
-            LOG.debug(func)
             args = (response, db_object)
             if isinstance(func, six.string_types):
                 func = getattr(self, func, None)
