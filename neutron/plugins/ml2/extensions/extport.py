@@ -33,6 +33,7 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
         LOG.debug('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         LOG.debug(base_model)
         LOG.debug(session)
+        LOG.debug(result.get('id'))
 
         extport = session.query(models.ExtPort).get(result.get('id'))
         if extport:
