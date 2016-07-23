@@ -28,7 +28,7 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
             self._process_update_port(plugin_context, data, result)
 
     def extend_port_dict(self, session, base_model, result):
-        LOG.debug('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1')
+        LOG.debug('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         if result.get(extport.EXT_INTERFACE_ID) is None:
             result[extport.EXT_INTERFACE_ID] = (extport.EXTENDED_ATTRIBUTES_2_0['ports']
                                                 [extport.EXT_INTERFACE_ID]['default'])
