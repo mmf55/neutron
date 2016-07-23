@@ -30,7 +30,7 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
     def extend_port_dict(self, session, base_model, result):
         LOG.debug('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         LOG.debug(base_model)
-        LOG.debug(result)
+        LOG.debug(session)
 
         extport = session.query(self.models.ExtPort).get(result.get('id'))
         if extport:
