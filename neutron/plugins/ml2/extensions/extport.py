@@ -32,7 +32,7 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
     def extend_port_dict(self, session, base_model, result):
         LOG.debug('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         LOG.debug(base_model)
-        LOG.debug(session)
+        LOG.debug(hasattr(session, 'query'))
         LOG.debug(result.get('id'))
 
         extport = session.query(models.ExtPort).get(result.get('id'))
