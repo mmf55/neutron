@@ -87,7 +87,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                                   extnode_id=node_id
                                                   )
                             interface_dict = {'extinterface': interface_dict}
-                            interface_created = super(ExtNetControllerMixin, self).create_extinterface(context, interface_dict)
+                            interface_created = super(ExtNetControllerMixin, self).create_extinterface(context,
+                                                                                                       interface_dict)
                             interfaces_created.append(interface_created)
 
             in_node['topology_discover_info'] = "Add %s new nodes, and %s new interfaces." \
@@ -106,6 +107,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         node1 = self.get_extnode(context, interface1.get('extnode_id'))
         node2 = self.get_extnode(context, interface2.get('extnode_id'))
 
+        segment = self.get_extsegment(context, interface1.get('extsegment_id'))
+
         if self._extinterface_has_extports(context, interface1.get('id')) \
                 or self._extinterface_has_extports(context, interface2.get('id')):
             raise extnet_exceptions.ExtInterfaceHasPortsInUse()
@@ -113,20 +116,15 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         if interface1.get('extsegment_id') != interface2.get('extsegment_id'):
             raise extnet_exceptions.ExtInterfacesNotInSameSegment()
 
-        segment = self.get_extsegment(context, interface1.get('extsegment_id'))
-
-        if link.get('type') != segment.get('type_supported'):
-            raise extnet_exceptions.ExtLinkTypeNotSupportedOnSegment()
-
-        if (link.get('type') == const.GRE and not (interface1.get('type') == 'l3' and
-                                                           interface2.get('type') == 'l3')) or \
-                (link.get('type') == const.VLAN and not (interface1.get('type') == 'l2' and
-                                                                 interface2.get('type') == 'l2')):
+        if (segment.get('type_supported') == const.GRE and not (interface1.get('type') == 'l3' and
+                                                                        interface2.get('type') == 'l3')) or \
+                (segment.get('type_supported') == const.VLAN and not (interface1.get('type') == 'l2' and
+                                                                              interface2.get('type') == 'l2')):
             raise extnet_exceptions.ExtLinkTypeNotSupportedByInterfaces()
 
         link['segmentation_id'] = self._get_segmentation_id(context,
                                                             segment.get('id'),
-                                                            link.get('type'),
+                                                            segment.get('type_supported'),
                                                             link.get('network_id'))
 
         # Call create link to make the changes on the network.
@@ -165,7 +163,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         if self._set_segmentation_id(context,
                                      link.get('segmentation_id'),
                                      segment.get('id'),
-                                     link.get('type'),
+                                     segment.get('type_supported'),
                                      link.get('network_id')) != const.OK:
             raise extnet_exceptions.ExtLinkErrorInSetSegID()
 
@@ -188,17 +186,16 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             if port_on_db.get('network_id') != port.get('network_id'):
                 raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
-        links = self._get_all_links_on_extsegment_by_type(context,
-                                                          interface.get('extsegment_id'),
-                                                          const.VLAN,
-                                                          port.get('network_id'))
+        links = self._get_all_links_on_extsegment(context,
+                                                  interface.get('extsegment_id'),
+                                                  port.get('network_id'))
         if links:
             if interface.get('type') == 'l2':
                 node_interfaces = self._get_node_interfaces(context, interface.get('id'), 'l2')
                 node_interfaces = [x.id for x in node_interfaces]
                 segmentation_id = next((x.segmentation_id for x in links
                                         if (x.extinterface1_id in node_interfaces or
-                                        x.extinterface2_id in node_interfaces) and x.type == const.VLAN), None)
+                                            x.extinterface2_id in node_interfaces)), None)
                 if not segmentation_id:
                     raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
         else:
@@ -223,10 +220,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             node = self.get_extnode(context, interface.get('extnode_id'))
 
             if interface.get('type') == 'l2':
-                links = self._get_all_links_on_extsegment_by_type(context,
-                                                                  interface.get('extsegment_id'),
-                                                                  const.VLAN,
-                                                                  port.get('network_id'))
+                links = self._get_all_links_on_extsegment(context,
+                                                          interface.get('extsegment_id'),
+                                                          port.get('network_id'))
                 if links:
                     segmentation_id = links[0].segmentation_id
                 else:
@@ -245,9 +241,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
     def _get_node_interfaces(self, context, interface_id, type=None):
         if type:
-            interface = context.session.query(models.ExtInterface)\
-                .filter_by(id=interface_id)\
-                .filter_by(type=type)\
+            interface = context.session.query(models.ExtInterface) \
+                .filter_by(id=interface_id) \
+                .filter_by(type=type) \
                 .first()
         else:
             interface = context.session.query(models.ExtInterface).filter_by(id=interface_id).first()
@@ -258,14 +254,13 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         interface = context.session.query(models.ExtInterface).filter_by(id=interface_id).first()
         return interface.extports
 
-    def _get_all_links_on_extsegment_by_type(self, context, segment_id, conn_type, network_id):
+    def _get_all_links_on_extsegment(self, context, segment_id, network_id):
         interfaces = context.session.query(models.ExtInterface).filter_by(extsegment_id=segment_id).all()
         links = []
         for interface in interfaces:
             links += context.session.query(models.ExtLink) \
                 .filter(or_(models.ExtLink.extinterface1_id == interface.id,
                             models.ExtLink.extinterface2_id == interface.id)) \
-                .filter(models.ExtLink.type == conn_type) \
                 .filter(models.ExtLink.network_id == network_id) \
                 .all()
             links = list(set(links))
@@ -275,7 +270,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         segment = context.session.query(models.ExtSegment).filter_by(id=segment_id).first()
 
         if conn_type == const.VLAN:
-            links = self._get_all_links_on_extsegment_by_type(context, segment_id, const.VLAN, network_id)
+            links = self._get_all_links_on_extsegment(context, segment_id, network_id)
             if links:
                 return links[0].segmentation_id
 
@@ -311,13 +306,12 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         segment = context.session.query(models.ExtSegment).filter_by(id=segment_id).first()
 
         if conn_type == const.VLAN:
-            links = self._get_all_links_on_extsegment_by_type(context, segment_id, const.VLAN, network_id)
+            links = self._get_all_links_on_extsegment(context, segment_id, network_id)
             links = {x for x in links if x['segmentation_id'] != id_to_set}
             if links:
                 return const.OK
 
         ids_avail = segment.ids_available
-
 
         # [(123, 130), (1000, 2000)]
         l = [[int(ids.split(':')[0]), int(ids.split(':')[1])]
@@ -450,7 +444,7 @@ class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
 
         elif network_type == const.GRE:
             remote_ip = kwargs.get('remote_ip')
-            td = network_type+network_id[:4]
+            td = network_type + network_id[:4]
             port_name = self.get_tunnel_name(
                 td, self.local_ip, remote_ip)
             self.int_br.add_external_tunnel_port(port_name,

@@ -71,7 +71,6 @@ def upgrade():
     op.create_table('extlinks',
     sa.Column('id', sa.String(length=36), nullable=False),
     sa.Column('name', sa.String(length=36), nullable=True),
-    sa.Column('type', sa.String(length=36), nullable=True),
     sa.Column('segmentation_id', sa.String(length=36), nullable=True),
     sa.Column('extinterface1_id', sa.String(length=36), nullable=True),
     sa.Column('extinterface2_id', sa.String(length=36), nullable=True),

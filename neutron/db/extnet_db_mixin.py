@@ -99,7 +99,6 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         """Creates a dictionary to be sent to client API"""
         link_created = {
             'id': extlink.id,
-            'type': extlink.type,
             'name': extlink.name,
             'segmentation_id': extlink.segmentation_id,
             'extinterface1_id': extlink.extinterface1_id,
@@ -324,7 +323,6 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
             link_db = models.ExtLink(
                 id=uuidutils.generate_uuid(),
                 name=link['name'],
-                type=link['type'],
                 segmentation_id=link['segmentation_id'],
                 extinterface1_id=link['extinterface1_id'],
                 extinterface2_id=link['extinterface2_id'],
@@ -346,7 +344,6 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         with context.session.begin(subtransactions=True):
             link_in_db = self._get_object_by_id(context, models.ExtLink, id)
             link_in_db.name = link['name']
-            link_in_db.type = link['type']
             link_in_db.segmentation_id = link['segmentation_id']
             link_in_db.extinterface1_id = link['extinterface1_id']
             link_in_db.extinterface2_id = link['extinterface2_id']

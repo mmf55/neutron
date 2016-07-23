@@ -72,8 +72,6 @@ class ExtLink(model_base.BASEV2, models_v2.HasId):
     __tablename__ = "extlinks"
 
     name = sa.Column(sa.String(36))
-    # Tells the type of the links created e.g. VLAN, GRE, VXLAN
-    type = sa.Column(sa.String(36))
     segmentation_id = sa.Column(sa.String(36))
 
     extinterface1_id = sa.Column(sa.String(36), sa.ForeignKey("extinterfaces.id"))
