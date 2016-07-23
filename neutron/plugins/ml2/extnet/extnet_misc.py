@@ -175,9 +175,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         return super(ExtNetControllerMixin, self).delete_extlink(context, id)
 
-    def create_extport(self, resource, event, plugin, **kwargs):
-        port = kwargs.get('port')
-        context = kwargs.get('context')
+    def create_extport(self, context, port):
+
         interface = self.get_extinterface(context, port.get('extinterface_id'))
 
         node = self.get_extnode(context, interface.get('extnode_id'))
@@ -217,12 +216,11 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                 context=context) != const.OK:
                 raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
-    def delete_extport(self, resource, event, plugin, **kwargs):
-        context = kwargs['context']
-        port_id = kwargs['port_id']
+    def delete_extport(self, context, port):
+        port_id = port.get('port_id')
 
         ext_port = self.get_extport(context, port_id)
-        port = self.get_port(context, port_id)
+        # port = self.get_port(context, port_id)
 
         segmentation_id = None
 

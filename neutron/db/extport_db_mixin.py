@@ -49,7 +49,6 @@ class ExtPortDBMixin(object):
         return self._make_extport_dict(extport_db)
 
     def _process_update_port(self, context, data, result):
-        LOG.debug('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         extport_db = self._get_existing_extport(context, data['id'])
         with context.session.begin(subtransactions=True):
             extport_db.extinterface_id = data[extport_dict_ext.EXT_INTERFACE_ID]

@@ -1125,9 +1125,9 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
         kwargs = {'context': context, 'port': result}
         registry.notify(resources.PORT, events.AFTER_CREATE, self, **kwargs)
 
-        # ext_port = port['port'].get('external_port')
-        # if ext_port:
-        #     self.create_extport(context, port)
+        extinterface_id = port['port'].get('extinterface_id')
+        if extinterface_id:
+            self.create_extport(context, port)
 
         try:
             self.mechanism_manager.create_port_postcommit(mech_context)
@@ -1431,6 +1431,10 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
                 LOG.debug("The port '%s' was deleted", id)
                 return
             port = self._make_port_dict(port_db)
+
+            extport = self.get_extport(context, port.get('id'))
+            if extport:
+                self.delete_extport(context, port)
 
             LOG.debug(port)
 
