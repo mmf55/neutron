@@ -33,6 +33,6 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
         extport_db = session.query(models.ExtPort).filter_by(id=result.get('id')).first()
         if extport_db:
             result[extport.EXT_INTERFACE_ID] = extport_db.interface_id
-        if result.get(extport.EXT_INTERFACE_ID) is None:
+        elif result.get(extport.EXT_INTERFACE_ID) is None:
             result[extport.EXT_INTERFACE_ID] = (extport.EXTENDED_ATTRIBUTES_2_0['ports']
                                                 [extport.EXT_INTERFACE_ID]['default'])
