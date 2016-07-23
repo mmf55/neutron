@@ -5,7 +5,7 @@ from neutron.plugins.common import extnet_constants
 from neutron._i18n import _
 
 
-def validate_types_supported(data, valid_values=None):
+def validate_type_supported(data, valid_values=None):
     if data != extnet_constants.SEG_TYPE_VLAN and \
                     data != extnet_constants.SEG_TYPE_VXLAN and \
                     data != extnet_constants.SEG_TYPE_GRE:

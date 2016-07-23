@@ -28,18 +28,14 @@ RESOURCE_ATTRIBUTE_MAP = {
                  'required_by_policy': True,
                  'validate': {'type:string': None},
                  'is_visible': True},
-        'types_supported': {'allow_post': True, 'allow_put': True,
-                            'required_by_policy': True,
-                            'validate': {'type:extnet_overlay_types': None},
-                            'is_visible': True},
-        'vlan_ids_available': {'allow_post': True, 'allow_put': True,
-                               'required_by_policy': False,
-                               'validate': {'type:extnet_ids_pool': None},
-                               'is_visible': True},
-        'tun_ids_available': {'allow_post': True, 'allow_put': True,
-                              'required_by_policy': False,
-                              'validate': {'type:extnet_ids_pool': None},
-                              'is_visible': True},
+        'type_supported': {'allow_post': True, 'allow_put': True,
+                           'required_by_policy': True,
+                           'validate': {'type:extnet_overlay_types': None},
+                           'is_visible': True},
+        'ids_available': {'allow_post': True, 'allow_put': True,
+                          'required_by_policy': False,
+                          'validate': {'type:extnet_ids_pool': None},
+                          'is_visible': True},
         'tenant_id': {'allow_post': True, 'allow_put': False,
                       'required_by_policy': True,
                       'validate': {'type:uuid': None},
@@ -47,7 +43,7 @@ RESOURCE_ATTRIBUTE_MAP = {
     }
 }
 
-validator_func_types = extnet_validators.validate_types_supported
+validator_func_types = extnet_validators.validate_type_supported
 validator_func_ids_pool = extnet_validators.validate_ids_pool
 attributes.validators['type:extnet_overlay_types'] = validator_func_types
 attributes.validators['type:extnet_ids_pool'] = validator_func_ids_pool

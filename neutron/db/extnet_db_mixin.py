@@ -85,10 +85,9 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
     def _make_extsegment_dict(self, extsegment, fields=None):
         extsegment_dict = {
             'id': extsegment.id,
-            'types_supported': extsegment.types_supported,
+            'type_supported': extsegment.type_supported,
             'name': extsegment.name,
-            'vlan_ids_available': extsegment.vlan_ids_available,
-            'tun_ids_available': extsegment.tun_ids_available,
+            'ids_available': extsegment.ids_available,
         }
         return self._fields(extsegment_dict, fields)
 
@@ -273,9 +272,8 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
             segment_db = models.ExtSegment(
                 id=uuidutils.generate_uuid(),
                 name=segment.get('name'),
-                types_supported=segment.get('types_supported'),
-                vlan_ids_available=segment.get('vlan_ids_available'),
-                tun_ids_available=segment.get('tun_ids_available'))
+                type_supported=segment.get('type_supported'),
+                ids_available=segment.get('ids_available'))
             context.session.add(segment_db)
         return self._make_extsegment_dict(segment_db)
 
@@ -285,9 +283,8 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         with context.session.begin(subtransactions=True):
             segment_in_db = self._get_object_by_id(context, models.ExtSegment, id)
             segment_in_db.name = segment['name']
-            segment_in_db.types_supported = segment['types_supported']
-            segment_in_db.vlan_ids_available = segment['vlan_ids_available']
-            segment_in_db.tun_ids_available = segment['tun_ids_available']
+            segment_in_db.type_supported = segment['type_supported']
+            segment_in_db.ids_available = segment['ids_available']
         return self._make_extsegment_dict(segment_in_db)
 
     def get_extsegments(self, context, filters=None, fields=None):

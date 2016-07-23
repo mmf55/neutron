@@ -35,9 +35,8 @@ def upgrade():
     op.create_table('extsegments',
     sa.Column('id', sa.String(length=36), nullable=False),
     sa.Column('name', sa.String(length=36), nullable=True),
-    sa.Column('types_supported', sa.String(length=36), nullable=True),
-    sa.Column('vlan_ids_available', sa.String(length=36), nullable=True),
-    sa.Column('tun_ids_available', sa.String(length=36), nullable=True),
+    sa.Column('type_supported', sa.String(length=36), nullable=True),
+    sa.Column('ids_available', sa.String(length=36), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     mysql_engine='InnoDB'
     )

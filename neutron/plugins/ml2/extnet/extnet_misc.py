@@ -115,7 +115,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         segment = self.get_extsegment(context, interface1.get('extsegment_id'))
 
-        if link.get('type') not in segment.get('types_supported').split(','):
+        if link.get('type') != segment.get('type_supported'):
             raise extnet_exceptions.ExtLinkTypeNotSupportedOnSegment()
 
         if (link.get('type') == const.GRE and not (interface1.get('type') == 'l3' and
@@ -279,9 +279,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             if links:
                 return links[0].segmentation_id
 
-            ids_avail = segment.vlan_ids_available
-        else:
-            ids_avail = segment.tun_ids_available
+        ids_avail = segment.ids_available
 
         if not ids_avail:
             raise extnet_exceptions.ExtLinkErrorObtainingSegmentationID()
@@ -304,10 +302,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         l2 = [':'.join([str(t[0][1]), str(t[-1][1])]) if t[0][1] - t[-1][1] != 0 else str(t[0][1]) for t in
               (tuple(g[1]) for g in itertools.groupby(enumerate(num_list), lambda (i, x): i - x))]
 
-        if conn_type == const.VLAN:
-            segment.vlan_ids_available = ','.join(l2)
-        else:
-            segment.tun_ids_available = ','.join(l2)
+        segment.ids_available = ','.join(l2)
 
         return seg_id
 
@@ -320,9 +315,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             links = {x for x in links if x['segmentation_id'] != id_to_set}
             if links:
                 return const.OK
-            ids_avail = segment.vlan_ids_available
-        else:
-            ids_avail = segment.tun_ids_available
+
+        ids_avail = segment.ids_available
+
 
         # [(123, 130), (1000, 2000)]
         l = [[int(ids.split(':')[0]), int(ids.split(':')[1])]
@@ -341,10 +336,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         l2 = [':'.join([str(t[0][1]), str(t[-1][1])]) if t[0][1] - t[-1][1] != 0 else str(t[0][1]) for t in
               (tuple(g[1]) for g in itertools.groupby(enumerate(num_list), lambda (i, x): i - x))]
 
-        if conn_type == const.VLAN:
-            segment.vlan_ids_available = ','.join(l2)
-        else:
-            segment.tun_ids_available = ','.join(l2)
+        segment.ids_available = ','.join(l2)
 
         return const.OK
 
