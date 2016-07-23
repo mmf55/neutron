@@ -1,13 +1,13 @@
 from neutron.api import extensions
 from neutron.api.v2 import attributes
 
-EXTPORT = 'external_port'
+EXT_INTERFACE_ID = 'extinterface_id'
 EXTENDED_ATTRIBUTES_2_0 = {
     'ports': {
-        EXTPORT: {'allow_post': True, 'allow_put': True,
-                  'default': [],
-                  'enforce_policy': True,
-                  'is_visible': True},
+        EXT_INTERFACE_ID: {'allow_post': True, 'allow_put': True,
+                           'default': None,
+                           'enforce_policy': True,
+                           'is_visible': True},
     }
 }
 

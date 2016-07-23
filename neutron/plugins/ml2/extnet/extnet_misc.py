@@ -178,8 +178,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
     def create_extport(self, resource, event, plugin, **kwargs):
         port = kwargs.get('port')
         context = kwargs.get('context')
-        ext_port = port.get('external_port')[0]
-        interface = self.get_extinterface(context, ext_port.get('extinterface_id'))
+        interface = self.get_extinterface(context, port.get('extinterface_id'))
 
         node = self.get_extnode(context, interface.get('extnode_id'))
 
