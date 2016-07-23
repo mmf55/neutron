@@ -226,28 +226,28 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         segmentation_id = None
 
-        if ext_port:
-            interface = self.get_extinterface(context, ext_port.get('extinterface_id'))
-            node = self.get_extnode(context, interface.get('extnode_id'))
-
-            if interface.get('type') == 'l2':
-                links = self._get_all_links_on_extsegment_by_type(context,
-                                                                  interface.get('extsegment_id'),
-                                                                  const.VLAN,
-                                                                  port.get('network_id'))
-                if links:
-                    segmentation_id = links[0].segmentation_id
-                else:
-                    raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
-
-            interface_extports = self._extinterface_has_extports(context, interface.get('id'))
-
-            if len(interface_extports) == 1:
-                if self.undeploy_port(interface,
-                                      node,
-                                      segmentation_id,
-                                      context=context) != const.OK:
-                    raise extnet_exceptions.ExtPortErrorApplyingConfigs()
+        # if ext_port:
+        #     interface = self.get_extinterface(context, ext_port.get('extinterface_id'))
+        #     node = self.get_extnode(context, interface.get('extnode_id'))
+        #
+        #     if interface.get('type') == 'l2':
+        #         links = self._get_all_links_on_extsegment_by_type(context,
+        #                                                           interface.get('extsegment_id'),
+        #                                                           const.VLAN,
+        #                                                           port.get('network_id'))
+        #         if links:
+        #             segmentation_id = links[0].segmentation_id
+        #         else:
+        #             raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
+        #
+        #     interface_extports = self._extinterface_has_extports(context, interface.get('id'))
+        #
+        #     if len(interface_extports) == 1:
+        #         if self.undeploy_port(interface,
+        #                               node,
+        #                               segmentation_id,
+        #                               context=context) != const.OK:
+        #             raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
     # ------------------------------------ Auxiliary functions ---------------------------------------
 
