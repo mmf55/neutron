@@ -178,9 +178,11 @@ class DbBasePluginCommon(common_db_mixin.CommonDbMixin):
                                       "fqdn": a["fqdn"]}
                                      for a in port["dns_assignment"]]
         # Call auxiliary extend functions, if any
+        LOG.debug(res)
         if process_extensions:
             self._apply_dict_extend_functions(
                 attributes.PORTS, res, port)
+        LOG.debug(res)
         return self._fields(res, fields)
 
     def _get_network(self, context, id):
