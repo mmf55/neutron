@@ -32,8 +32,8 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
     def extend_port_dict(self, session, base_model, result):
         extport_db = session.query(models.ExtPort).filter_by(id=result.get('id')).first()
         LOG.debug(extport_db)
-        if extport_db:
-            result[extport.EXT_INTERFACE_ID] = extport_db.interface_id
-        elif result.get(extport.EXT_INTERFACE_ID) is None:
+        # if extport_db:
+        #     result[extport.EXT_INTERFACE_ID] = extport_db.interface_id
+        if result.get(extport.EXT_INTERFACE_ID) is None:
             result[extport.EXT_INTERFACE_ID] = (extport.EXTENDED_ATTRIBUTES_2_0['ports']
                                                 [extport.EXT_INTERFACE_ID]['default'])
