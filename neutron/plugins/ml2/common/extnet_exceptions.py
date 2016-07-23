@@ -71,7 +71,7 @@ class ExtLinkErrorInSetSegID(exceptions.Invalid):
     message = _("Error returning the segmentation ID to the available pool.")
 
 
-class ExtSegmentHasNoLinks(exceptions.Invalid):
+class ExtSegmentHasNoLinks(exceptions.NotFound):
     message = _("Segment has no links deployed.")
 
 

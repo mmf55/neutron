@@ -202,7 +202,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 if not segmentation_id:
                     raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
         else:
-            raise extnet_exceptions.ExtSegmentHasNoLinks
+            raise extnet_exceptions.ExtSegmentHasNoLinks()
 
         if len(interface_extports) == 1:
             LOG.debug(interface)
