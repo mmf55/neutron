@@ -36,10 +36,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         device_ctrl_mgr = ExtNetDeviceCtrlManager(config_dict)
 
-        registry.subscribe(self.delete_extport, resources.PORT, events.BEFORE_DELETE)
-
-        registry.subscribe(self.create_extport, resources.PORT, events.AFTER_CREATE)
-
         super(ExtNetControllerMixin, self).__init__(device_ctrl_mgr)
 
     def create_extnode(self, context, extnode):
