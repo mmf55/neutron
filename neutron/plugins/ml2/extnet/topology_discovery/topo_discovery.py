@@ -8,7 +8,6 @@ class TopologyDiscovery(snmp.SnmpCisco,
 
     def __init__(self):
         self.nodes_info = {}
-        self.visited_nodes = []
 
     def get_devices_info(self, ip_address, **kwargs):
             self.connect(ip_address, community='public', version=2)
