@@ -7,7 +7,7 @@ class TopologyDiscovery(snmp.SnmpCisco,
                         topology_discovery_api.TopologyDicoveryApi):
 
     def __init__(self):
-        self.dev_dict = {}
+        self.dev_list = []
 
     def get_devices_info(self, ip_address, **kwargs):
         self.connect(ip_address, community='public', version=2)
@@ -15,7 +15,7 @@ class TopologyDiscovery(snmp.SnmpCisco,
         if node_info:
             node, node_dict = node_info.items()[0]
             if not self._host_already_checked(node):
-                self.dev_dict[node_info.keys()[0]] = node_info.values()[0]
+                self.dev_list.append(node)
                 for interface in node_dict['interfaces']:
                     n_hops_list = interface['next_hops']
                     if n_hops_list:
@@ -31,7 +31,7 @@ class TopologyDiscovery(snmp.SnmpCisco,
             # self.dev_list.append()
 
     def _host_already_checked(self, node_to_check):
-        return next((x for x in self.dev_dict.items() if x[0] == node_to_check), None)
+        return node_to_check in self.dev_list
         for node, node_info in self.dev_dict.items():
             interfaces_list = node_info['interfaces']
             return next((x for x in interfaces_list
