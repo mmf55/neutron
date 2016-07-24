@@ -21,7 +21,11 @@ class SnmpCisco(topology_discovery_api.TopoDiscMechanismApi):
                                version=kwargs['version'])
 
     def get_node_name(self):
-        return self.session.get(OID_NODE_NAME).value
+        try:
+            return self.session.get(OID_NODE_NAME).value
+
+        except exceptions.EasySNMPTimeoutError:
+            return None
 
     def get_node_interfaces_up(self):
         int_list = []
