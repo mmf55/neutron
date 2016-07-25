@@ -99,7 +99,7 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
         if interface_type == const.L3:
 
-            bridge_group = self._get_bridge_group(kwargs.get('vnetwork'))
+            bridge_group = self._get_new_bridge_group(kwargs.get('vnetwork'))
 
             self._send_command('bridge-group %s' % bridge_group)
 
@@ -133,7 +133,7 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
         if interface_type == const.L3:
 
-            bridge_group = self._get_bridge_group(kwargs.get('vnetwork'))
+            bridge_group = self._get_new_bridge_group(kwargs.get('vnetwork'))
 
             self._send_command('no bridge-group %s' % bridge_group)
 
