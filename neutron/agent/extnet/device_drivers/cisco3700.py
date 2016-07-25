@@ -139,6 +139,8 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
             self._send_command('no bridge-group %s' % bridge_group)
 
+            self._send_command('shutdown')
+
             msg = const.OK
 
         elif interface_type == const.L2 and link_segmentation_id:
