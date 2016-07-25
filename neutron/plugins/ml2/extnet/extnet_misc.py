@@ -249,7 +249,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         return interface.extports
 
     def _get_all_links_on_extnode(self, context, extnode_id, network_id):
-        node = context.session.query(models.ExtInterface).filter_by(id=extnode_id).first()
+        node = context.session.query(models.ExtNode).filter_by(id=extnode_id).first()
         links = []
         for interface in node.extinterfaces:
             links += context.session.query(models.ExtLink) \
