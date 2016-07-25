@@ -125,6 +125,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
     def _make_extport_dict(self, port, fields=None):
         port_created = {
             'id': port.id,
+            'segmentation_id': port.segmentation_id,
             'extinterface_id': port.extinterface_id,
         }
         return self._fields(port_created, fields)
@@ -153,6 +154,13 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
             return self._make_extport_dict(port, fields=fields)
         else:
             return None
+
+    def set_seg_id_extport(self, context, id, seg_id):
+        self._admin_check(context, 'UPDATE')
+        with context.session.begin(subtransactions=True):
+            port_in_db = self._get_object_by_id(context, models.ExtPort, id)
+            port_in_db.segmenttion_id = seg_id
+        return seg_id
 
     # --------------------- Database operations related with the external nodes. --------------------------------------
 
