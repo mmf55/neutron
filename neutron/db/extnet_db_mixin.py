@@ -158,7 +158,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
     def set_seg_id_extport(self, context, id, seg_id):
         self._admin_check(context, 'UPDATE')
         with context.session.begin(subtransactions=True):
-            port_in_db = self._get_object_by_id(context, models.ExtPort, id)
+            port_in_db = context.session.query(models.ExtPort).filter_by(id=id).first()
             port_in_db.segmentation_id = seg_id
         return seg_id
 
