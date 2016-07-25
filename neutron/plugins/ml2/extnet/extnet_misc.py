@@ -204,7 +204,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 else:
                     self.set_seg_id_extport(context, port.get('id'), segmentation_id)
         else:
-            raise extnet_exceptions.ExtSegmentHasNoLinks()
+            raise extnet_exceptions.ExtNodeHasNoLinks()
 
         if len(interface_extports) == 1:
             LOG.debug(interface)

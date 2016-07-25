@@ -71,8 +71,8 @@ class ExtLinkErrorInSetSegID(exceptions.NotFound):
     message = _("Error returning the segmentation ID to the available pool.")
 
 
-class ExtSegmentHasNoLinks(exceptions.NotFound):
-    message = _("Segment has no links deployed.")
+class ExtNodeHasNoLinks(exceptions.NotFound):
+    message = _("Node has no links deployed on that network.")
 
 
 class ExtNodeErrorOnTopologyDiscover(exceptions.NotAuthorized):
