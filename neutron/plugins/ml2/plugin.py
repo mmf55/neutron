@@ -1130,8 +1130,7 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
         # an external interface.
         if extinterface_id:
             try:
-                LOG.debug(result)
-                self.create_extport(context, port['port'])
+                self.create_extport(context, result)
             except Exception:
                 with excutils.save_and_reraise_exception():
                     LOG.error(_LE("Association with external interface failed."))
