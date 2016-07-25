@@ -228,17 +228,20 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                                           port.get('network_id'))
                 if links:
                     segmentation_id = links[0].segmentation_id
+
+                    interface_extports = self._extinterface_has_extports(context, interface.get('id'))
+
+                    if len(interface_extports) == 1:
+                        if self.undeploy_port(interface,
+                                              node,
+                                              segmentation_id,
+                                              context=context) != const.OK:
+                            raise extnet_exceptions.ExtPortErrorApplyingConfigs()
                 else:
-                    raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
+                    # raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
+                    LOG.info("No link available in segment.")
 
-            interface_extports = self._extinterface_has_extports(context, interface.get('id'))
 
-            if len(interface_extports) == 1:
-                if self.undeploy_port(interface,
-                                      node,
-                                      segmentation_id,
-                                      context=context) != const.OK:
-                    raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
     # ------------------------------------ Auxiliary functions ---------------------------------------
 
