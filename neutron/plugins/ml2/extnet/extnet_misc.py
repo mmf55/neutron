@@ -11,7 +11,8 @@ from neutron.callbacks import registry, resources, events
 
 from neutron.plugins.ml2.common import extnet_exceptions
 from neutron.plugins.ml2.extnet import config
-from neutron.plugins.ml2.extnet.topology_discovery import topo_discovery
+from extnet_networkcontroller.topology_discovery import topo_discovery
+from neutron.plugins.ml2.extnet.topology_discovery import snmp
 
 from neutron.db import extnet_db_mixin
 from neutron.db import extnet_db as models
@@ -47,7 +48,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         #     super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
 
         if in_node.get('topology_discovery'):
-            td = topo_discovery.TopologyDiscovery()
+            td = topo_discovery.TopologyDiscovery(snmp.SnmpCisco())
             topo_dict = td.get_devices_info(in_node.get('ip_address'))
 
             LOG.debug(topo_dict)

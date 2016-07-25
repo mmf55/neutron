@@ -2,7 +2,7 @@ import re
 from easysnmp import Session
 from easysnmp import exceptions
 
-import topology_discovery_api
+from extnet_networkcontroller.topology_discovery import topology_discovery_api
 
 
 OID_NODE_NAME = 'iso.3.6.1.2.1.1.5.0.'
@@ -58,7 +58,7 @@ class SnmpCisco(topology_discovery_api.TopoDiscMechanismApi):
         except exceptions.EasySNMPTimeoutError:
             return None
 
-if __name__ == '__main__':
-    obj = SnmpCisco()
-    obj.connect('192.168.2.1', community='public', version=2)
-    print obj.get_node_info_dict()
+# if __name__ == '__main__':
+#     obj = SnmpCisco()
+#     obj.connect('192.168.2.1', community='public', version=2)
+#     print obj.get_node_info_dict()
