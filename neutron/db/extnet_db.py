@@ -4,7 +4,7 @@ from neutron.db import models_v2
 from sqlalchemy import orm
 
 
-class ExtPort(model_base.BASEV2):
+class ExtPort(object, model_base.BASEV2):
     __tablename__ = "extports"
 
     id = sa.Column(sa.String(36),
