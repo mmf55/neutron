@@ -211,6 +211,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             if self.deploy_port(interface,
                                 node,
                                 segmentation_id,
+                                vnetwork=port.get('network_id'),
                                 context=context) != const.OK:
                 raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
@@ -228,6 +229,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 if self.undeploy_port(interface,
                                       node,
                                       ext_port.get('segmentation_id'),
+                                      vnetwork=port.get('network_id'),
                                       context=context) != const.OK:
                     raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
