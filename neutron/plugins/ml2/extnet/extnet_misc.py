@@ -189,9 +189,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             if port_on_db.get('network_id') != port.get('network_id'):
                 raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
-        links = self._get_all_links_on_extsegment(context,
-                                                  interface.get('extsegment_id'),
-                                                  port.get('network_id'))
+        links = self._get_all_links_on_extnode(context,
+                                               node.get('id'),
+                                               port.get('network_id'))
         if links:
             if interface.get('type') == 'l2':
                 node_interfaces = self._get_node_interfaces(context, interface.get('id'), 'l2')
@@ -247,6 +247,18 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
     def _extinterface_has_extports(self, context, interface_id):
         interface = context.session.query(models.ExtInterface).filter_by(id=interface_id).first()
         return interface.extports
+
+    def _get_all_links_on_extnode(self, context, extnode_id, network_id):
+        node = context.session.query(models.ExtInterface).filter_by(id=extnode_id).first()
+        links = []
+        for interface in node.extinterfaces:
+            links += context.session.query(models.ExtLink) \
+                .filter(or_(models.ExtLink.extinterface1_id == interface.id,
+                            models.ExtLink.extinterface2_id == interface.id)) \
+                .filter(models.ExtLink.network_id == network_id) \
+                .all()
+            links = list(set(links))
+        return links
 
     def _get_all_links_on_extsegment(self, context, segment_id, network_id):
         interfaces = context.session.query(models.ExtInterface).filter_by(extsegment_id=segment_id).all()
