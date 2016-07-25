@@ -103,6 +103,8 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
             self._send_command('bridge-group %s' % bridge_group)
 
+            self._send_command('no shutdown')
+
             msg = const.OK
 
         # self.spawn.sendline('bridge-group %s' % bridge_group)
