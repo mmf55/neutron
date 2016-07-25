@@ -159,7 +159,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         self._admin_check(context, 'UPDATE')
         with context.session.begin(subtransactions=True):
             port_in_db = self._get_object_by_id(context, models.ExtPort, id)
-            port_in_db.segmenttion_id = seg_id
+            port_in_db.segmentation_id = seg_id
         return seg_id
 
     # --------------------- Database operations related with the external nodes. --------------------------------------
