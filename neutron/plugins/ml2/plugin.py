@@ -1130,7 +1130,7 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
         # an external interface.
         if extinterface_id:
             try:
-                LOG.debug(port)
+                LOG.debug(result)
                 self.create_extport(context, port['port'])
             except Exception:
                 with excutils.save_and_reraise_exception():
