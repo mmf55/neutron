@@ -164,9 +164,6 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
     def driver_overlay_types(self):
         return ['vlan', 'gre']
 
-    def delete_port(self, port):
-        self._close_telnet_session()
-
     def driver_protocol(self):
         return 'telnet'
 
