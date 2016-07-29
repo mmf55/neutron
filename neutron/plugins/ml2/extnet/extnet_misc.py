@@ -12,7 +12,7 @@ from neutron.callbacks import registry, resources, events
 from neutron.plugins.ml2.common import extnet_exceptions
 from neutron.plugins.ml2.extnet import config
 from extnet_networkcontroller.topology_discovery import topo_discovery
-from neutron.plugins.ml2.extnet.topology_discovery import snmp
+from neutron.plugins.ml2.extnet.topology_discovery import snmp_bash
 
 from neutron.db import extnet_db_mixin
 from neutron.db import extnet_db as models
@@ -48,7 +48,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         #     super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
 
         if in_node.get('topology_discovery'):
-            td = topo_discovery.TopologyDiscovery(snmp.SnmpCisco())
+            td = topo_discovery.TopologyDiscovery(snmp_bash.SnmpCisco())
             topo_dict = td.get_devices_info(in_node.get('ip_address'))
 
             LOG.debug(topo_dict)
@@ -70,7 +70,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 else:
                     node_id = existing_node.id
 
-                for interface in node_info_dict.get('interfaces'):
+                node_interfaces_list = node_info_dict.get('interfaces')
+                for interface in node_interfaces_list:
                     interface_exists = None
                     if existing_node:
                         interfaces = existing_node.extinterfaces
@@ -82,10 +83,18 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                 net_type = 'l3'
                             else:
                                 net_type = 'l2'
+
+                            # handle the external segment creation or get.
+                            extsegment_id = self.handle_extsegment(context,
+                                                                   interface,
+                                                                   node_info_dict.get('ip_address'),
+                                                                   node_interfaces_list)
+
                             interface_dict = dict(name=interface.get('name'),
                                                   ip_address=interface.get('ip_address'),
                                                   type=net_type,
-                                                  extnode_id=node_id
+                                                  extnode_id=node_id,
+                                                  extsegment_id=extsegment_id
                                                   )
                             interface_dict = {'extinterface': interface_dict}
                             interface_created = super(ExtNetControllerMixin, self).create_extinterface(context,
@@ -234,6 +243,38 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                     raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
     # ------------------------------------ Auxiliary functions ---------------------------------------
+
+    def handle_extsegment(self, context, interface, node_ip, interfaces_list):
+
+        ip_address = interface.get('ip_address')
+        if ip_address:
+            # l3
+            netmask = interface.get('netmask')
+            subnet = self._get_subnet(ip_address, netmask)
+
+            extsegment_dict = dict(name='l3' + reduce(lambda x, y: x + y, subnet),
+                                   type_supported=const.GRE,
+                                   ids_available='0:10'
+                                   )
+
+            extsegment_dict = {'extsegment': extsegment_dict}
+            extsegment_db_dict = super(ExtNetControllerMixin, self).create_extsegment(context,
+                                                                                      extsegment_dict)
+            return extsegment_db_dict['id']
+        else:
+            # l2
+            trunks = snmp_bash.BashCisco(interface.get('name'),
+                                         node_ip,
+                                         23,
+                                         'pass').get_interface_trunks()
+            pass
+
+    def _get_subnet(self, ip_address, netmask):
+        l_netmask = [int(x) for x in netmask.split('.')]
+        l_ip = [int(x) for x in ip_address.split('.')]
+        subnet = map(lambda x, y: x & y, l_netmask, l_ip)
+        subnet = [str(x) for x in subnet]
+        return '.'.join(subnet)
 
     def _get_node_interfaces(self, context, interface_id, type=None):
         if type:
