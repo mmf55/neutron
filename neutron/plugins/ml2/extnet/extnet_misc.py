@@ -43,10 +43,33 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
     def create_extnode(self, context, extnode):
         in_node = extnode['extnode']
 
-        # if not self.get_extnode_by_name(context, 'OVS'):
-        #     node_dict = dict(name='OVS')
-        #     node_dict = {'extnode': node_dict}
-        #     super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
+        if not self.get_extnode_by_name(context, 'OVS'):
+            node_dict = dict(name='OVS')
+            node_dict = {'extnode': node_dict}
+            ovs_node = super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
+
+            ovs_interface = dict(name='e1',
+                                 ip_address='192.168.2.1',
+                                 netmask='255.255.255.0',
+                                 next_hops='192.168.2.2',
+                                 dev_connected=None,
+                                 ids_available=None
+                                 )
+
+            extsegment_id = self.handle_extsegment(context,
+                                                   ovs_node.get('name'),
+                                                   ovs_interface,
+                                                   )
+
+            interface_dict = dict(name=ovs_interface.get('name'),
+                                  ip_address=ovs_interface.get('ip_address'),
+                                  type=const.L3 if ovs_interface.get('ip_address') else const.L2,
+                                  extnode_id=ovs_node.get('id'),
+                                  extsegment_id=extsegment_id
+                                  )
+            interface_dict = {'extinterface': interface_dict}
+            super(ExtNetControllerMixin, self).create_extinterface(context,
+                                                                   interface_dict)
 
         if in_node.get('topology_discovery'):
             td = topo_discovery.TopologyDiscovery(snmp_bash.SnmpCisco())
@@ -248,7 +271,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
     # ------------------------------------ Auxiliary functions ---------------------------------------
 
-    def handle_extsegment(self, context, node, interface, topo_dict):
+    def handle_extsegment(self, context, node_name, interface, topo_dict=None):
 
         ip_address = interface.get('ip_address')
         if ip_address:
@@ -269,7 +292,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             # l2
             dev_connected = interface.get('dev_connected')
 
-            if dev_connected and topo_dict.get(dev_connected[0]):
+            if dev_connected and topo_dict and topo_dict.get(dev_connected[0]):
 
                 interface_conn = topo_dict[dev_connected[0]]['interfaces']
                 interface_next = next((x for x in interface_conn if x.get('name') == dev_connected[1]))
@@ -277,10 +300,11 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 va_interface = interface['ids_available']
                 va_interface_next = interface_next['ids_available']
 
-                ids_avail_list = list(set(utils.shrink_ids(va_interface)).intersection(utils.shrink_ids(va_interface_next)))
+                ids_avail_list = list(
+                    set(utils.shrink_ids(va_interface)).intersection(utils.shrink_ids(va_interface_next)))
                 ids_avail_str = utils.stretch_ids(ids_avail_list)
 
-                extsegment_dict = dict(name='l2' + node + dev_connected[0],
+                extsegment_dict = dict(name='l2' + node_name + dev_connected[0],
                                        type_supported=const.VLAN,
                                        ids_available=ids_avail_str
                                        )
