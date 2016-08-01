@@ -254,7 +254,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         if ip_address:
             # l3
             netmask = interface.get('netmask')
-            subnet = self._get_subnet(ip_address, netmask)
+            subnet = self._get_extnet_subnet(ip_address, netmask)
 
             extsegment_dict = dict(name='l3' + re.sub('[.]', '', subnet),
                                    type_supported=const.GRE,
@@ -294,7 +294,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             else:
                 return None
 
-    def _get_subnet(self, ip_address, netmask):
+    def _get_extnet_subnet(self, ip_address, netmask):
         l_netmask = [int(x) for x in netmask.split('.')]
         l_ip = [int(x) for x in ip_address.split('.')]
         subnet = map(lambda x, y: x & y, l_netmask, l_ip)
