@@ -209,6 +209,13 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
             .first()
         return node
 
+    def get_extsegment_by_name(self, context, name, fields=None):
+        self._admin_check(context, 'GET')
+        node = context.session.query(models.ExtSegment) \
+            .filter_by(name=name) \
+            .first()
+        return node
+
     def delete_extnode(self, context, id):
         self._admin_check(context, 'DELETE')
         with context.session.begin(subtransactions=True):
