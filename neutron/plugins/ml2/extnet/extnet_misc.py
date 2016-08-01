@@ -292,7 +292,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
             if not extsegment_in_db:
 
-                extsegment_dict = dict(name='l3' + re.sub('[.]', '', subnet),
+                extsegment_dict = dict(name=extsegment_name,
                                        type_supported=const.GRE,
                                        ids_available='0:10'
                                        )

@@ -1,8 +1,6 @@
 import re
 import binascii
-import base64
 
-import pexpect
 from easysnmp import Session
 from easysnmp import exceptions
 
@@ -42,9 +40,12 @@ class SnmpCisco(topology_discovery_api.TopoDiscMechanismApi):
         int_list = []
         p1 = re.compile("^FastEthernet")
         p2 = re.compile("^Vlan")
-        fe_ints_list = [x for x in self.session.walk(OID_NODE_IFDESCR)
-                        if (p1.match(x.value) or p2.match(x.value)) and
-                        self.session.get(OID_NODE_IFOPERSTATUS + x.oid_index).value == '1']
+        all_ints_list = [x for x in self.session.walk(OID_NODE_IFDESCR)
+                         if (p1.match(x.value) or p2.match(x.value)) and
+                         self.session.get(OID_NODE_IFOPERSTATUS + x.oid_index).value == '1']
+
+        vlan_ints_list = [x for x in self.session.walk(OID_NODE_IFDESCR)
+                          if p2.match(x.value) and self.session.get(OID_NODE_IFOPERSTATUS + x.oid_index).value == '1']
 
         ips_list = [(x.value, x.oid_index) for x in self.session.walk(OID_NODE_IPADDRESS)]
         netmasks_list = [(x.value, x.oid_index) for x in self.session.walk(OID_NODE_NETMASKS)]
@@ -64,7 +65,7 @@ class SnmpCisco(topology_discovery_api.TopoDiscMechanismApi):
         print self.session.walk(OID_NODE_INTS_TRUNKS)
 
         # print ips_list
-        for interface in fe_ints_list:
+        for interface in all_ints_list:
             # print interface
             ip_address = next((x[1] for x in ips_list if x[0] == interface.oid_index), None)
             netmask = next((x[0] for x in netmasks_list if x[1] == ip_address), None)
@@ -76,7 +77,7 @@ class SnmpCisco(topology_discovery_api.TopoDiscMechanismApi):
             ids_available = None
             if trunking == '1':
                 trunks = next((x[0] for x in ints_trunks_list if x[1] == interface.oid_index), None)
-                ids_available = self._get_trunk_ids_available(trunks)
+                ids_available = self._get_trunk_ids_available(trunks, vlan_ints_list)
 
             dev_connected = self._get_devs_connected(interface.oid_index,
                                                      connected_node_names_list,
@@ -108,13 +109,13 @@ class SnmpCisco(topology_discovery_api.TopoDiscMechanismApi):
         else:
             return None
 
-    def _get_trunk_ids_available(self, trunks_map_bin):
+    def _get_trunk_ids_available(self, trunks_map_bin, vlan_ints_list):
 
         bin_list = ["{0:04b}".format(int(x, 16)) for x in binascii.b2a_hex(trunks_map_bin)]
         bin_str = ''.join(bin_list)
-
+        vlan_ints_name_list = [x.value for x in vlan_ints_list]
         avail_list = [index for index, value in enumerate(bin_str) if value == '0' and
-                      index != 0]
+                      index != 0 and 'Vlan'+str(index) not in vlan_ints_name_list]
         return utils.stretch_ids(avail_list)
 
 
