@@ -268,7 +268,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             # l2
             dev_connected = interface.get('dev_connected')
 
-            if dev_connected:
+            if dev_connected and topo_dict.get(dev_connected[0]):
 
                 interface_conn = topo_dict[dev_connected[0]]['interfaces']
                 interface_next = next((x for x in interface_conn if x.get('name') == dev_connected[1]))
