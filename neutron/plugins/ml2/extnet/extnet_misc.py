@@ -284,12 +284,11 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                        ids_available=ids_avail_str
                                        )
 
-                interface_next['extsegment_id'] = extsegment_dict['id']
-
-
                 extsegment_dict = {'extsegment': extsegment_dict}
                 extsegment_db_dict = super(ExtNetControllerMixin, self).create_extsegment(context,
                                                                                           extsegment_dict)
+
+                interface_next['extsegment_id'] = extsegment_db_dict['id']
 
                 return extsegment_db_dict['id']
             else:
