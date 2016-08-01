@@ -264,6 +264,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             extsegment_dict = {'extsegment': extsegment_dict}
             extsegment_db_dict = super(ExtNetControllerMixin, self).create_extsegment(context,
                                                                                       extsegment_dict)
+            return extsegment_dict['id']
         else:
             # l2
             dev_connected = interface.get('dev_connected')
