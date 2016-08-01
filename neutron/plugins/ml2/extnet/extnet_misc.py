@@ -43,10 +43,15 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
     def create_extnode(self, context, extnode):
         in_node = extnode['extnode']
 
+        nodes_created = []
+        interfaces_created = []
+
         if not self.get_extnode_by_name(context, 'OVS'):
             node_dict = dict(name='OVS')
             node_dict = {'extnode': node_dict}
             ovs_node = super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
+
+            nodes_created.append(ovs_node)
 
             ovs_interface = dict(name='e1',
                                  ip_address='192.168.2.2',
@@ -68,8 +73,11 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                   extsegment_id=extsegment_id
                                   )
             interface_dict = {'extinterface': interface_dict}
-            super(ExtNetControllerMixin, self).create_extinterface(context,
-                                                                   interface_dict)
+
+            ovs_interface = super(ExtNetControllerMixin, self).create_extinterface(context,
+                                                                                   interface_dict)
+
+            interfaces_created.append(ovs_interface)
 
         if in_node.get('topology_discovery'):
             td = topo_discovery.TopologyDiscovery(snmp_bash.SnmpCisco())
@@ -79,8 +87,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
             if not topo_dict:
                 raise extnet_exceptions.ExtNodeErrorOnTopologyDiscover()
-            nodes_created = []
-            interfaces_created = []
+
             for node, node_info_dict in topo_dict.items():
 
                 existing_node = self.get_extnode_by_name(context, node)
@@ -335,7 +342,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 return extsegment_db_dict['id']
             else:
                 return None
-
 
     def _get_extnet_subnet(self, ip_address, netmask):
         l_netmask = [int(x) for x in netmask.split('.')]
