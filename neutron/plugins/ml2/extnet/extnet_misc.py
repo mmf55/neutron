@@ -266,29 +266,34 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                                                                       extsegment_dict)
         else:
             # l2
-            dev_connected = interface['dev_connected']
+            dev_connected = interface.get('dev_connected')
 
-            interface_conn = topo_dict[dev_connected[0]]['interfaces']
-            interface_next = next((x for x in interface_conn if x.get('name') == dev_connected[1]))
+            if dev_connected:
 
-            va_interface = interface['ids_available']
-            va_interface_next = interface_next['ids_available']
+                interface_conn = topo_dict[dev_connected[0]]['interfaces']
+                interface_next = next((x for x in interface_conn if x.get('name') == dev_connected[1]))
 
-            ids_avail_list = list(set(utils.shrink_ids(va_interface)).intersection(utils.shrink_ids(va_interface_next)))
-            ids_avail_str = utils.stretch_ids(ids_avail_list)
+                va_interface = interface['ids_available']
+                va_interface_next = interface_next['ids_available']
 
-            extsegment_dict = dict(name='l2' + node + dev_connected[0],
-                                   type_supported=const.VLAN,
-                                   ids_available=ids_avail_str
-                                   )
+                ids_avail_list = list(set(utils.shrink_ids(va_interface)).intersection(utils.shrink_ids(va_interface_next)))
+                ids_avail_str = utils.stretch_ids(ids_avail_list)
 
-            interface_next['extsegment_id'] = extsegment_dict['id']
+                extsegment_dict = dict(name='l2' + node + dev_connected[0],
+                                       type_supported=const.VLAN,
+                                       ids_available=ids_avail_str
+                                       )
 
-            extsegment_dict = {'extsegment': extsegment_dict}
-            extsegment_db_dict = super(ExtNetControllerMixin, self).create_extsegment(context,
-                                                                                      extsegment_dict)
+                interface_next['extsegment_id'] = extsegment_dict['id']
 
-        return extsegment_db_dict['id']
+
+                extsegment_dict = {'extsegment': extsegment_dict}
+                extsegment_db_dict = super(ExtNetControllerMixin, self).create_extsegment(context,
+                                                                                          extsegment_dict)
+
+                return extsegment_db_dict['id']
+            else:
+                return None
 
     def _get_subnet(self, ip_address, netmask):
         l_netmask = [int(x) for x in netmask.split('.')]
