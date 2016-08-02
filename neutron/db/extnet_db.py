@@ -3,6 +3,11 @@ from neutron.db import model_base
 from neutron.db import models_v2
 from sqlalchemy import orm
 
+association_table = sa.Table('ports_links', model_base.BASEV2,
+                             sa.Column('extport_id', sa.String(36), sa.ForeignKey('extports.id')),
+                             sa.Column('extlink_id', sa.String(36), sa.ForeignKey('extlinks.id'))
+                             )
+
 
 class ExtPort(model_base.BASEV2):
     __tablename__ = "extports"
@@ -89,8 +94,3 @@ class ExtLink(model_base.BASEV2, models_v2.HasId):
         "ExtPort",
         secondary=association_table,
         back_populates="extlinks")
-
-association_table = sa.Table('ports_links', model_base.BASEV2,
-                             sa.Column('extport_id', sa.String(36), sa.ForeignKey('extports.id')),
-                             sa.Column('extlink_id', sa.String(36), sa.ForeignKey('extlinks.id'))
-                             )
