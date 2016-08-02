@@ -27,7 +27,7 @@ class ExtPort(model_base.BASEV2):
         backref=orm.backref("extport", uselist=False,
                             cascade='delete', lazy='joined'))
 
-    extLinks = orm.relationship(
+    extlinks = orm.relationship(
         "ExtLink",
         secondary=association_table,
         back_populates="extports")
