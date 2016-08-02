@@ -13,6 +13,7 @@ from neutron.plugins.ml2.common import extnet_exceptions
 from neutron.plugins.ml2.extnet import config
 from extnet_networkcontroller.topology_discovery import topo_discovery
 from neutron.plugins.ml2.extnet.topology_discovery import snmp_bash
+from neutron.plugins.ml2.extnet.network_mapper import extnet_nm
 
 from neutron.db import extnet_db_mixin
 from neutron.db import extnet_db as models
@@ -38,7 +39,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         device_ctrl_mgr = ExtNetDeviceCtrlManager(config_dict)
 
-        super(ExtNetControllerMixin, self).__init__(device_ctrl_mgr)
+        nm = extnet_nm.ExtNetNetworkMapperSP()
+        super(ExtNetControllerMixin, self).__init__(device_ctrl_mgr, mapper=nm)
 
     def create_extnode(self, context, extnode):
         in_node = extnode['extnode']
@@ -61,7 +63,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                  ids_available=None
                                  )
 
-            extsegment_id = self.handle_extsegment(context,
+            extsegment_id = self._handle_extsegment(context,
                                                    ovs_node.get('name'),
                                                    ovs_interface,
                                                    )
@@ -119,7 +121,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                             extsegment_id = interface.get('extsegment_id')
 
                             if not extsegment_id:
-                                extsegment_id = self.handle_extsegment(context,
+                                extsegment_id = self._handle_extsegment(context,
                                                                        node,
                                                                        interface,
                                                                        topo_dict)
@@ -247,16 +249,29 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 else:
                     self.set_seg_id_extport(context, port.get('id'), segmentation_id)
         else:
-            raise extnet_exceptions.ExtNodeHasNoLinks()
 
-        if len(interface_extports) == 1:
-            LOG.debug(interface)
-            if self.deploy_port(interface,
-                                node,
-                                segmentation_id,
-                                vnetwork=port.get('network_id'),
-                                context=context) != const.OK:
-                raise extnet_exceptions.ExtPortErrorApplyingConfigs()
+            # Build network graph
+            net_graph = self._build_net_graph(context)
+
+            # Apply links to the best path found.
+            path = self.build_virtual_network_path(graph=net_graph,
+                                                   first=cfg.CONF.EXTNET_CONTROLLER.net_ctrl_node_name,
+                                                   end=node.get('id'))
+            LOG.debug(path)
+        #     if not path:
+        #         raise extnet_exceptions.ExtNodeHasNoLinks()
+        #
+        #     if self._apply_virtual_network_path(context, port, path) != const.OK:
+        #         raise extnet_exceptions.ExtNodeHasNoLinks()
+        #
+        # if len(interface_extports) == 1:
+        #     LOG.debug(interface)
+        #     if self.deploy_port(interface,
+        #                         node,
+        #                         segmentation_id,
+        #                         vnetwork=port.get('network_id'),
+        #                         context=context) != const.OK:
+        #         raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
     def delete_extport(self, context, port):
         port_id = port.get('id')
@@ -267,6 +282,10 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             node = self.get_extnode(context, interface.get('extnode_id'))
 
             interface_extports = self._extinterface_has_extports(context, interface.get('id'))
+            extport_db = context.session.query(models.ExtPort).filter_by(id=port_id)
+            for link in extport_db.extlinks:
+                if len(link.extports) == 1:
+                    self.delete_extlink(context, link.id)
 
             if len(interface_extports) == 1:
                 if self.undeploy_port(interface,
@@ -278,7 +297,45 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
     # ------------------------------------ Auxiliary functions ---------------------------------------
 
-    def handle_extsegment(self, context, node_name, interface, topo_dict=None):
+    def _apply_virtual_network_path(self, context, port, path):
+        port_id = port.get('id')
+        network_id = port.get('network_id')
+        i = 0
+        extsegments = context.session.query(models.ExtSegment).all()
+        while i+1 != len(path):
+            node1 = context.session.query(models.ExtNode).filter_by(id=path[i]).first()
+            node2 = context.session.query(models.ExtNode).filter_by(id=path[i+1]).first()
+            for extsegment in extsegments:
+                if bool(set(node1.extinterfaces) & set(extsegment.extinterfaces)) and \
+                   bool(set(node2.extinterfaces) & set(extsegment.extinterfaces)):
+                    links_on_db = self._get_all_links_on_extsegment(context, extsegment.id, port.get)
+                    if links_on_db:
+                        link_on_db = links_on_db[0]
+                        link_on_db.extports.append(port_id)
+                    else:
+                        extlink = dict(name='link'+node1.name+node2.name,
+                                       extinterface1_id=extsegment.extinterfaces[0],
+                                       extinterface2_id=extsegment.extinterfaces[1],
+                                       network_id=network_id,
+                                       )
+                        extlink = {'extlink': extlink}
+                        self.create_extlink(context, extlink)
+            i += 1
+        return const.OK
+
+    def _build_net_graph(self, context):
+        all_nodes = context.session.query(models.ExtNode).all()
+        graph = {}
+        for node in all_nodes:
+            nodes_conn_list = []
+            for interface in node.extinterfaces:
+                if interface.extsegment:
+                    neigh_interface = next((x for x in interface.extsegment.extinterfaces if x == interface), None)
+                    nodes_conn_list.append(neigh_interface.extnode.id)
+            graph[node.id] = nodes_conn_list
+        return graph
+
+    def _handle_extsegment(self, context, node_name, interface, topo_dict=None):
 
         ip_address = interface.get('ip_address')
         if ip_address:

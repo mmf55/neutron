@@ -22,6 +22,11 @@ class ExtPort(model_base.BASEV2):
         backref=orm.backref("extport", uselist=False,
                             cascade='delete', lazy='joined'))
 
+    extLinks = orm.relationship(
+        "ExtLink",
+        secondary=association_table,
+        back_populates="extports")
+
 
 class ExtNode(model_base.BASEV2, models_v2.HasId):
     __tablename__ = "extnodes"
@@ -80,3 +85,12 @@ class ExtLink(model_base.BASEV2, models_v2.HasId):
 
     network_id = sa.Column(sa.String(36), sa.ForeignKey("networks.id"),
                            nullable=False)
+    extports = orm.relationship(
+        "ExtPort",
+        secondary=association_table,
+        back_populates="extlinks")
+
+association_table = sa.Table('ports_links', model_base.BASEV2,
+                             sa.Column('extport_id', sa.String(36), sa.ForeignKey('extports.id')),
+                             sa.Column('extlink_id', sa.String(36), sa.ForeignKey('extlinks.id'))
+                             )

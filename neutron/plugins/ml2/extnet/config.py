@@ -4,6 +4,11 @@ netctrl_group = cfg.OptGroup(name='EXTNET_CONTROLLER',
                              title='Network controller default options.')
 
 netctrl_opts = [
+    cfg.StrOpt('net_ctrl_node_name',
+               default='OVS',
+               required=False,
+               help='Network controller node name.'),
+
     cfg.DictOpt('device_controllers',
                 default="q-agent-notifier: OVS,extnet_agent: ESW1;ESW2",
                 required=False,

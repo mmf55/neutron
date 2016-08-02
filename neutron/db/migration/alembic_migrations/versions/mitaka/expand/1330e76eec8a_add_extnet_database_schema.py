@@ -82,4 +82,11 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     mysql_engine='InnoDB'
     )
+    op.create_table('ports_links',
+    sa.Column('extport_id', sa.String(length=36), nullable=False),
+    sa.Column('extlink_id', sa.String(length=36), nullable=False),
+    sa.ForeignKeyConstraint(['extport_id'], ['extports.id']),
+    sa.ForeignKeyConstraint(['extlink_id'], ['extlinks.id']),
+    mysql_engine='InnoDB'
+    )
     ### end Alembic commands ###
