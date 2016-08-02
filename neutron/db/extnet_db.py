@@ -3,7 +3,7 @@ from neutron.db import model_base
 from neutron.db import models_v2
 from sqlalchemy import orm
 
-association_table = sa.Table('ports_links', sa.MetaData(),
+association_table = sa.Table('ports_links', model_base.BASEV2.metadata,
                              sa.Column('extport_id', sa.String(36), sa.ForeignKey('extports.id')),
                              sa.Column('extlink_id', sa.String(36), sa.ForeignKey('extlinks.id'))
                              )

@@ -12,6 +12,7 @@ class ExtNetNetworkMapperSP(nm_api.ExtNetNetworkMapper):
         return find_shortest_path(graph, start, end)
 
 
+# From: https://www.python.org/doc/essays/graphs/
 def find_shortest_path(graph, start, end, path=[]):
     path = path + [start]
     if start == end:
