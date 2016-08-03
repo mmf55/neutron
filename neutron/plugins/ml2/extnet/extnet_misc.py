@@ -256,17 +256,16 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             LOG.debug(net_graph)
             # Apply links to the best path found.
             first_node = self.get_extnode_by_name(context, cfg.CONF.EXTNET_CONTROLLER.net_ctrl_node_name)
-            LOG.debug(first_node.id)
-            LOG.debug(node.get('id'))
+
             path = self.build_virtual_network_path(graph=net_graph,
                                                    start=first_node.id,
                                                    end=node.get('id'))
             LOG.debug(path)
-        #     if not path:
-        #         raise extnet_exceptions.ExtNodeHasNoLinks()
-        #
-        #     if self._apply_virtual_network_path(context, port, path) != const.OK:
-        #         raise extnet_exceptions.ExtNodeHasNoLinks()
+            if not path:
+                raise extnet_exceptions.ExtNodeHasNoLinks()
+
+            if self._apply_virtual_network_path(context, port, path) != const.OK:
+                raise extnet_exceptions.ExtNodeHasNoLinks()
         #
         # if len(interface_extports) == 1:
         #     LOG.debug(interface)
@@ -312,7 +311,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             for extsegment in extsegments:
                 if bool(set(node1.extinterfaces) & set(extsegment.extinterfaces)) and \
                    bool(set(node2.extinterfaces) & set(extsegment.extinterfaces)):
-                    links_on_db = self._get_all_links_on_extsegment(context, extsegment.id, port.get)
+                    links_on_db = self._get_all_links_on_extsegment(context, extsegment.id, network_id)
                     if links_on_db:
                         link_on_db = links_on_db[0]
                         link_on_db.extports.append(port_id)
