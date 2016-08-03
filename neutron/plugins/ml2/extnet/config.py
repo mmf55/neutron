@@ -9,7 +9,7 @@ netctrl_opts = [
                required=False,
                help='Network controller node name.'),
 
-    cfg.StrOpt('next_hop_ip',
+    cfg.StrOpt('nexthop_ip',
                default='192.168.2.1',
                required=False,
                help='Network controller next hop device.'),

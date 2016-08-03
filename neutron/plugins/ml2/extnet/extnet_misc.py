@@ -33,6 +33,8 @@ LOG = logging.getLogger(__name__)
 class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                             net_ctrl.ExtNetController):
     def initialize_extnetcontroller(self):
+        self.net_ctrl_name = cfg.CONF.EXTNET_CONTROLLER.net_ctrl_node_name
+        self.nexthop_ip = cfg.CONF.EXTNET_CONTROLLER.nexthop_ip
 
         config_dict = {device_ctrl: dev_name_list.split(';')
                        for device_ctrl, dev_name_list in cfg.CONF.EXTNET_CONTROLLER.device_controllers.items()}
@@ -186,7 +188,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
             LOG.debug(net_graph)
             # Apply links to the best path found.
-            first_node = self.get_extnode_by_name(context, cfg.CONF.EXTNET_CONTROLLER.net_ctrl_node_name)
+            first_node = self.get_extnode_by_name(context, self.net_ctrl_name)
 
             path = self.build_virtual_network_path(graph=net_graph,
                                                    start=first_node.id,
@@ -233,7 +235,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
     def discover_topology(self, context):
         td = topo_discovery.TopologyDiscovery(snmp_bash.SnmpCisco())
-        topo_dict = td.get_devices_info(cfg.CONF.EXTNET_CONTROLLER.device_controllers.next_hop_ip)
+        topo_dict = td.get_devices_info(self.nexthop_ip)
 
         LOG.debug(topo_dict)
 
@@ -286,8 +288,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                                                                                    interface_dict)
 
     def setup_controller_host(self, context):
-        if not self.get_extnode_by_name(context, 'OVS'):
-            node_dict = dict(name='OVS')
+        if not self.get_extnode_by_name(context, self.net_ctrl_name):
+            node_dict = dict(name=self.net_ctrl_name)
             node_dict = {'extnode': node_dict}
             ovs_node = super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
 
