@@ -316,9 +316,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                         link_on_db = links_on_db[0]
                         link_on_db.extports.append(port_id)
                     else:
-                        extlink = dict(name='link'+node1.name+node2.name,
-                                       extinterface1_id=extsegment.extinterfaces[0],
-                                       extinterface2_id=extsegment.extinterfaces[1],
+                        extlink = dict(name='link'+network_id,
+                                       extinterface1_id=extsegment.extinterfaces[0].id,
+                                       extinterface2_id=extsegment.extinterfaces[1].id,
                                        network_id=network_id,
                                        )
                         extlink = {'extlink': extlink}
