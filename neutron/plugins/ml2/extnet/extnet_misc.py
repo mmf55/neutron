@@ -296,7 +296,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             ovs_interface = dict(name='e1',
                                  ip_address='192.168.2.2',
                                  netmask='255.255.255.0',
-                                 next_hops='192.168.2.1',
                                  dev_connected=None,
                                  ids_available=None
                                  )
