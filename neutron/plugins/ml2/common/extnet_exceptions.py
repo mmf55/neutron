@@ -81,3 +81,15 @@ class ExtNodeErrorOnTopologyDiscover(exceptions.NotAuthorized):
 
 class ExtLinkErrorObtainingSegmentationID(exceptions.NetworkNotFound):
     message = _("Error when getting the segmentation ID.")
+
+
+class ExtInterfaceNotFound(exceptions.NotFound):
+    message = _("External interface requested not found.")
+
+
+class NoExtInterfacesAvailable(exceptions.NotFound):
+    message = _("No external interface available on the requested node.")
+
+
+class ExtNodeNotFound(exceptions.NotFound):
+    message = _("External node requested not found.")

@@ -42,107 +42,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         nm = extnet_nm.ExtNetNetworkMapperSP()
         super(ExtNetControllerMixin, self).__init__(device_ctrl_mgr, mapper=nm)
 
-    def create_extnode(self, context, extnode):
-        in_node = extnode['extnode']
-
-        nodes_created = []
-        interfaces_created = []
-
-        if not self.get_extnode_by_name(context, 'OVS'):
-            node_dict = dict(name='OVS')
-            node_dict = {'extnode': node_dict}
-            ovs_node = super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
-
-            nodes_created.append(ovs_node)
-
-            ovs_interface = dict(name='e1',
-                                 ip_address='192.168.2.2',
-                                 netmask='255.255.255.0',
-                                 next_hops='192.168.2.2',
-                                 dev_connected=None,
-                                 ids_available=None
-                                 )
-
-            extsegment_id = self._handle_extsegment(context,
-                                                   ovs_node.get('name'),
-                                                   ovs_interface,
-                                                   )
-
-            interface_dict = dict(name=ovs_interface.get('name'),
-                                  ip_address=ovs_interface.get('ip_address'),
-                                  type=const.L3 if ovs_interface.get('ip_address') else const.L2,
-                                  extnode_id=ovs_node.get('id'),
-                                  extsegment_id=extsegment_id
-                                  )
-            interface_dict = {'extinterface': interface_dict}
-
-            ovs_interface = super(ExtNetControllerMixin, self).create_extinterface(context,
-                                                                                   interface_dict)
-
-            interfaces_created.append(ovs_interface)
-
-        if in_node.get('topology_discovery'):
-            td = topo_discovery.TopologyDiscovery(snmp_bash.SnmpCisco())
-            topo_dict = td.get_devices_info(in_node.get('ip_address'))
-
-            LOG.debug(topo_dict)
-
-            if not topo_dict:
-                raise extnet_exceptions.ExtNodeErrorOnTopologyDiscover()
-
-            for node, node_info_dict in topo_dict.items():
-
-                existing_node = self.get_extnode_by_name(context, node)
-                if not existing_node:
-                    node_dict = dict(name=node,
-                                     ip_address=node_info_dict.get('ip_address'))
-                    node_dict = {'extnode': node_dict}
-                    node_created = super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
-                    nodes_created.append(node_created)
-                    node_id = node_created.get('id')
-                else:
-                    node_id = existing_node.id
-
-                node_interfaces_list = node_info_dict.get('interfaces')
-                for interface in node_interfaces_list:
-                    interface_exists = None
-                    if existing_node:
-                        interfaces = existing_node.extinterfaces
-                        interface_exists = next((x for x in interfaces if x.name == interface.get('name')), None)
-                    if not existing_node or not interface_exists:
-                        p = re.compile("^FastEthernet")
-                        if p.match(interface.get('name')):
-                            if interface.get('ip_address') is not None:
-                                net_type = 'l3'
-                            else:
-                                net_type = 'l2'
-
-                            # handle the external segment creation or get.
-                            extsegment_id = interface.get('extsegment_id')
-
-                            if not extsegment_id:
-                                extsegment_id = self._handle_extsegment(context,
-                                                                       node,
-                                                                       interface,
-                                                                       topo_dict)
-
-                            interface_dict = dict(name=interface.get('name'),
-                                                  ip_address=interface.get('ip_address'),
-                                                  type=net_type,
-                                                  extnode_id=node_id,
-                                                  extsegment_id=extsegment_id
-                                                  )
-                            interface_dict = {'extinterface': interface_dict}
-                            interface_created = super(ExtNetControllerMixin, self).create_extinterface(context,
-                                                                                                       interface_dict)
-                            interfaces_created.append(interface_created)
-
-            in_node['topology_discovery_info'] = "Add %s new nodes, and %s new interfaces." \
-                                                 % (len(nodes_created), len(interfaces_created))
-            return in_node
-        else:
-            return super(ExtNetControllerMixin, self).create_extnode(context, extnode)
-
     def create_extlink(self, context, extlink):
 
         # Get the necessary info
@@ -219,14 +118,46 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
     def create_extport(self, context, port):
 
-        interface = self.get_extinterface(context, port.get('extinterface_id'))
+        self.setup_controller_host(context)
 
-        node = self.get_extnode(context, interface.get('extnode_id'))
+        node = self.get_extnode_by_name(context, port.get('extnode_name'))
+
+        if not node:
+            self.discover_topology(context)
+
+        node = self.get_extnode_by_name(context, port.get('extnode_name'))
+
+        if not node:
+            raise extnet_exceptions.ExtNodeNotFound()
+
+        if port.get('extinterface_name'):
+            interface = self.get_extinterface_by_name(context,
+                                                      port.get('extinterface_name'),
+                                                      node.get('id'))
+
+            if not interface:
+                self.discover_topology(context)
+
+            interface = self.get_extinterface_by_name(context,
+                                                      port.get('extinterface_name'),
+                                                      node.get('id'))
+
+            if not interface:
+                raise extnet_exceptions.ExtInterfaceNotFound()
+
+            if self._extinterface_has_extlinks(context, interface.get('id')):
+                raise extnet_exceptions.ExtPortErrorApplyingConfigs()
+
+        else:
+            interface = None
+            interfaces = self._get_extnode_interfaces(context, node.get('id'))
+            if interfaces:
+                interface = next((x for x in interfaces if not self._extinterface_has_extlinks(context, x.get('id'))),
+                                 None)
+            if not interface:
+                raise extnet_exceptions.NoExtInterfacesAvailable()
 
         segmentation_id = None
-
-        if self._extinterface_has_extlinks(context, interface.get('id')):
-            raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
         interface_extports = self._extinterface_has_extports(context, interface.get('id'))
         if interface_extports:
@@ -239,7 +170,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                                port.get('network_id'))
         if links:
             if interface.get('type') == 'l2':
-                node_interfaces = self._get_node_interfaces(context, interface.get('id'), 'l2')
+                node_interfaces = self._get_extnode_interfaces_with_interface(context, interface.get('id'), 'l2')
                 node_interfaces = [x.id for x in node_interfaces]
                 segmentation_id = next((x.segmentation_id for x in links
                                         if (x.extinterface1_id in node_interfaces or
@@ -266,15 +197,15 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
             if self._apply_virtual_network_path(context, port, path) != const.OK:
                 raise extnet_exceptions.ExtNodeHasNoLinks()
-        #
-        # if len(interface_extports) == 1:
-        #     LOG.debug(interface)
-        #     if self.deploy_port(interface,
-        #                         node,
-        #                         segmentation_id,
-        #                         vnetwork=port.get('network_id'),
-        #                         context=context) != const.OK:
-        #         raise extnet_exceptions.ExtPortErrorApplyingConfigs()
+
+            if len(interface_extports) == 1:
+                LOG.debug(interface)
+                if self.deploy_port(interface,
+                                    node,
+                                    segmentation_id,
+                                    vnetwork=port.get('network_id'),
+                                    context=context) != const.OK:
+                    raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
     def delete_extport(self, context, port):
         port_id = port.get('id')
@@ -300,23 +231,107 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
     # ------------------------------------ Auxiliary functions ---------------------------------------
 
+    def discover_topology(self, context):
+        td = topo_discovery.TopologyDiscovery(snmp_bash.SnmpCisco())
+        topo_dict = td.get_devices_info(cfg.CONF.EXTNET_CONTROLLER.device_controllers.next_hop_ip)
+
+        LOG.debug(topo_dict)
+
+        if not topo_dict:
+            raise extnet_exceptions.ExtNodeErrorOnTopologyDiscover()
+
+        for node, node_info_dict in topo_dict.items():
+
+            existing_node = self.get_extnode_by_name(context, node)
+            if not existing_node:
+                node_dict = dict(name=node,
+                                 ip_address=node_info_dict.get('ip_address'))
+                node_dict = {'extnode': node_dict}
+                node_created = super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
+                node_id = node_created.get('id')
+            else:
+                node_id = existing_node.id
+
+            node_interfaces_list = node_info_dict.get('interfaces')
+            for interface in node_interfaces_list:
+                interface_exists = None
+                if existing_node:
+                    interfaces = existing_node.extinterfaces
+                    interface_exists = next((x for x in interfaces if x.name == interface.get('name')), None)
+                if not existing_node or not interface_exists:
+                    p = re.compile("^FastEthernet")
+                    if p.match(interface.get('name')):
+                        if interface.get('ip_address') is not None:
+                            net_type = 'l3'
+                        else:
+                            net_type = 'l2'
+
+                        # handle the external segment creation or get.
+                        extsegment_id = interface.get('extsegment_id')
+
+                        if not extsegment_id:
+                            extsegment_id = self._handle_extsegment(context,
+                                                                    node,
+                                                                    interface,
+                                                                    topo_dict)
+
+                        interface_dict = dict(name=interface.get('name'),
+                                              ip_address=interface.get('ip_address'),
+                                              type=net_type,
+                                              extnode_id=node_id,
+                                              extsegment_id=extsegment_id
+                                              )
+                        interface_dict = {'extinterface': interface_dict}
+                        interface_created = super(ExtNetControllerMixin, self).create_extinterface(context,
+                                                                                                   interface_dict)
+
+    def setup_controller_host(self, context):
+        if not self.get_extnode_by_name(context, 'OVS'):
+            node_dict = dict(name='OVS')
+            node_dict = {'extnode': node_dict}
+            ovs_node = super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
+
+            ovs_interface = dict(name='e1',
+                                 ip_address='192.168.2.2',
+                                 netmask='255.255.255.0',
+                                 next_hops='192.168.2.1',
+                                 dev_connected=None,
+                                 ids_available=None
+                                 )
+
+            extsegment_id = self._handle_extsegment(context,
+                                                    ovs_node.get('name'),
+                                                    ovs_interface,
+                                                    )
+
+            interface_dict = dict(name=ovs_interface.get('name'),
+                                  ip_address=ovs_interface.get('ip_address'),
+                                  type=const.L3 if ovs_interface.get('ip_address') else const.L2,
+                                  extnode_id=ovs_node.get('id'),
+                                  extsegment_id=extsegment_id
+                                  )
+            interface_dict = {'extinterface': interface_dict}
+
+            ovs_interface = super(ExtNetControllerMixin, self).create_extinterface(context,
+                                                                                   interface_dict)
+
     def _apply_virtual_network_path(self, context, port, path):
         port_id = port.get('id')
         network_id = port.get('network_id')
         i = 0
         extsegments = context.session.query(models.ExtSegment).all()
-        while i+1 != len(path):
+        while i + 1 != len(path):
             node1 = context.session.query(models.ExtNode).filter_by(id=path[i]).first()
-            node2 = context.session.query(models.ExtNode).filter_by(id=path[i+1]).first()
+            node2 = context.session.query(models.ExtNode).filter_by(id=path[i + 1]).first()
             for extsegment in extsegments:
                 if bool(set(node1.extinterfaces) & set(extsegment.extinterfaces)) and \
-                   bool(set(node2.extinterfaces) & set(extsegment.extinterfaces)):
+                        bool(set(node2.extinterfaces) & set(extsegment.extinterfaces)):
                     links_on_db = self._get_all_links_on_extsegment(context, extsegment.id, network_id)
                     if links_on_db:
                         link_on_db = links_on_db[0]
                         link_on_db.extports.append(port_id)
                     else:
-                        extlink = dict(name='link'+node1.name+node2.name,
+                        extlink = dict(name='link' + node1.name + node2.name,
                                        extinterface1_id=extsegment.extinterfaces[0].id,
                                        extinterface2_id=extsegment.extinterfaces[1].id,
                                        network_id=network_id,
@@ -413,7 +428,14 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         subnet = [str(x) for x in subnet]
         return '.'.join(subnet)
 
-    def _get_node_interfaces(self, context, interface_id, type=None):
+    def _get_extnode_interfaces(self, context, node_id):
+        node_interfaces = context.session.query(models.ExtNode).filter_by(id=node_id).first().extinterfaces
+        node_interfaces_list = []
+        for interface in node_interfaces:
+            node_interfaces_list.append(self._make_extinterface_dict(interface))
+        return node_interfaces_list
+
+    def _get_extnode_interfaces_with_interface(self, context, interface_id, type=None):
         if type:
             interface = context.session.query(models.ExtInterface) \
                 .filter_by(id=interface_id) \
@@ -465,25 +487,13 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         if not ids_avail:
             raise extnet_exceptions.ExtLinkErrorObtainingSegmentationID()
 
-        # [(123, 130), (1000, 2000)]
-        l = [[int(ids.split(':')[0]), int(ids.split(':')[1])]
-             if len(ids.split(':')) > 1 else [int(ids)] for ids in ids_avail.split(',')]
-
-        num_list = list()
-        for item in l:
-            if len(item) > 1:
-                num_list += range(item[0], item[1] + 1)
-            else:
-                num_list += item
+        num_list = utils.shrink_ids(ids_avail)
 
         num_list.sort()
 
         seg_id = num_list.pop(0)
 
-        l2 = [':'.join([str(t[0][1]), str(t[-1][1])]) if t[0][1] - t[-1][1] != 0 else str(t[0][1]) for t in
-              (tuple(g[1]) for g in itertools.groupby(enumerate(num_list), lambda (i, x): i - x))]
-
-        segment.ids_available = ','.join(l2)
+        segment.ids_available = utils.stretch_ids(num_list)
 
         return seg_id
 
@@ -499,24 +509,12 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         ids_avail = segment.ids_available
 
-        # [(123, 130), (1000, 2000)]
-        l = [[int(ids.split(':')[0]), int(ids.split(':')[1])]
-             if len(ids.split(':')) > 1 else [int(ids)] for ids in ids_avail.split(',')]
-
-        num_list = list()
-        for item in l:
-            if len(item) > 1:
-                num_list += range(item[0], item[1] + 1)
-            else:
-                num_list += item
+        num_list = utils.shrink_ids(ids_avail)
 
         num_list.append(int(id_to_set))
         num_list.sort()
 
-        l2 = [':'.join([str(t[0][1]), str(t[-1][1])]) if t[0][1] - t[-1][1] != 0 else str(t[0][1]) for t in
-              (tuple(g[1]) for g in itertools.groupby(enumerate(num_list), lambda (i, x): i - x))]
-
-        segment.ids_available = ','.join(l2)
+        segment.ids_available = utils.stretch_ids(num_list)
 
         return const.OK
 

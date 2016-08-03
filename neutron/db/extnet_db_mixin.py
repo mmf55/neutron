@@ -200,7 +200,9 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         node = context.session.query(models.ExtNode) \
             .filter_by(id=id) \
             .first()
-        return self._make_extnode_dict(node, fields=fields)
+        if node:
+            return self._make_extnode_dict(node, fields=fields)
+        return None
 
     def get_extnode_by_name(self, context, name, fields=None):
         self._admin_check(context, 'GET')
@@ -268,7 +270,19 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         interface = context.session.query(models.ExtInterface)\
             .filter_by(id=id)\
             .first()
-        return self._make_extinterface_dict(interface, fields=fields)
+        if interface:
+            return self._make_extinterface_dict(interface, fields=fields)
+        return None
+
+    def get_extinterface_by_name(self, context, name, node_id, fields=None):
+        self._admin_check(context, 'GET')
+        interface = context.session.query(models.ExtInterface) \
+            .filter_by(name=name) \
+            .filter_by(extnode_id=node_id) \
+            .first()
+        if interface:
+            return self._make_extinterface_dict(interface, fields=fields)
+        return None
 
     def delete_extinterface(self, context, id):
         self._admin_check(context, 'DELETE')
