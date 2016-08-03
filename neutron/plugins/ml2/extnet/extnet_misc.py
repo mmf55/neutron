@@ -259,7 +259,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             LOG.debug(first_node.id)
             LOG.debug(node.get('id'))
             path = self.build_virtual_network_path(graph=net_graph,
-                                                   first=first_node.id,
+                                                   start=first_node.id,
                                                    end=node.get('id'))
             LOG.debug(path)
         #     if not path:
