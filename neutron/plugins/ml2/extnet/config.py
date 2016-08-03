@@ -9,6 +9,11 @@ netctrl_opts = [
                required=False,
                help='Network controller node name.'),
 
+    cfg.StrOpt('next_hop_ip',
+               default='192.168.2.1',
+               required=False,
+               help='Network controller next hop device.'),
+
     cfg.DictOpt('device_controllers',
                 default="q-agent-notifier: OVS,extnet_agent: ESW1;ESW2",
                 required=False,
