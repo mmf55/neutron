@@ -256,6 +256,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             LOG.debug(net_graph)
             # Apply links to the best path found.
             first_node = self.get_extnode_by_name(context, cfg.CONF.EXTNET_CONTROLLER.net_ctrl_node_name)
+            LOG.debug(first_node.id)
+            LOG.debug(node.get('id'))
             path = self.build_virtual_network_path(graph=net_graph,
                                                    first=first_node.id,
                                                    end=node.get('id'))
