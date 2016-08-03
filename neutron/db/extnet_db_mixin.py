@@ -343,6 +343,8 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
                 extinterface2_id=link['extinterface2_id'],
                 network_id=link['network_id'],
             )
+            if link.get('extport'):
+                link_db.extports.append(link.get('extport'))
             context.session.add(link_db)
         return self._make_extlink_dict(link_db)
 
@@ -363,6 +365,8 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
             link_in_db.extinterface1_id = link['extinterface1_id']
             link_in_db.extinterface2_id = link['extinterface2_id']
             link_in_db.network_id = link['network_id']
+            if link.get('extport'):
+                link_in_db.extports.append(link.get('extport'))
         return self._make_extlink_dict(link_in_db)
 
     def get_extlinks(self, context, filters=None, fields=None):

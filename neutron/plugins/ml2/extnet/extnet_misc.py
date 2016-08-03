@@ -320,6 +320,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                        extinterface1_id=extsegment.extinterfaces[0].id,
                                        extinterface2_id=extsegment.extinterfaces[1].id,
                                        network_id=network_id,
+                                       extport=port_id
                                        )
                         extlink = {'extlink': extlink}
                         LOG.debug(extlink)
