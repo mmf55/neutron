@@ -332,7 +332,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             for interface in node.extinterfaces:
                 if interface.extsegment:
                     neigh_interface = next((x for x in interface.extsegment.extinterfaces if x != interface), None)
-                    nodes_conn_list.append(neigh_interface.extnode.id)
+                    if neigh_interface:
+                        nodes_conn_list.append(neigh_interface.extnode.id)
             graph[node.id] = nodes_conn_list
         return graph
 
