@@ -322,6 +322,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                        network_id=network_id,
                                        )
                         extlink = {'extlink': extlink}
+                        LOG.debug(extlink)
                         self.create_extlink(context, extlink)
             i += 1
         return const.OK
