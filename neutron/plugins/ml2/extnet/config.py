@@ -4,10 +4,10 @@ netctrl_group = cfg.OptGroup(name='EXTNET_CONTROLLER',
                              title='Network controller default options.')
 
 netctrl_opts = [
-    cfg.StrOpt('net_ctrl_node_name',
-               default='OVS',
-               required=False,
-               help='Network controller node name.'),
+    cfg.DictOpt('network_controller_info',
+                default='name: OVS,ip_address: 192.168.2.2,netmask: 255.255.255.0,nexthop: 192.168.2.1',
+                required=False,
+                help='Network controller node name.'),
 
     cfg.StrOpt('nexthop_ip',
                default='192.168.2.1',
@@ -28,4 +28,3 @@ netctrl_opts = [
 
 cfg.CONF.register_group(netctrl_group)
 cfg.CONF.register_opts(netctrl_opts, netctrl_group)
-
