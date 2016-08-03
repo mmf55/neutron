@@ -253,6 +253,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             # Build network graph
             net_graph = self._build_net_graph(context)
 
+            LOG.debug(net_graph)
             # Apply links to the best path found.
             path = self.build_virtual_network_path(graph=net_graph,
                                                    first=cfg.CONF.EXTNET_CONTROLLER.net_ctrl_node_name,
