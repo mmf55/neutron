@@ -180,10 +180,11 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             if interface.get('type') == 'l2':
                 node_interfaces = self._get_extnode_interfaces_with_interface(context, interface.get('id'), 'l2')
                 node_interfaces = [x.id for x in node_interfaces]
-                LOG.debug(node_interfaces)
+
                 segmentation_id = next((x.segmentation_id for x in links
                                         if (x.extinterface1_id in node_interfaces or
                                             x.extinterface2_id in node_interfaces) and x.segmentation_id), None)
+                LOG.debug(segmentation_id)
                 if not segmentation_id:
                     raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
                 else:
