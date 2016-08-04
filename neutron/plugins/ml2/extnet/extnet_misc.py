@@ -205,7 +205,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             if self._apply_virtual_network_path(context, port, path) != const.OK:
                 raise extnet_exceptions.ExtNodeHasNoLinks()
 
-            LOG.debug(len(interface_extports))
             if len(interface_extports) == 0:
                 LOG.debug(interface)
                 if self.deploy_port(interface,
