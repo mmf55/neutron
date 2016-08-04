@@ -205,14 +205,14 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             if self._apply_virtual_network_path(context, port, path) != const.OK:
                 raise extnet_exceptions.ExtNodeHasNoLinks()
 
-            if len(interface_extports) == 0:
-                LOG.debug(interface)
-                if self.deploy_port(interface,
-                                    node,
-                                    segmentation_id,
-                                    vnetwork=port.get('network_id'),
-                                    context=context) != const.OK:
-                    raise extnet_exceptions.ExtPortErrorApplyingConfigs()
+        if len(interface_extports) == 0:
+            LOG.debug(interface)
+            if self.deploy_port(interface,
+                                node,
+                                segmentation_id,
+                                vnetwork=port.get('network_id'),
+                                context=context) != const.OK:
+                raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
         self.update_extport_extinterface(context, port.get('id'), interface.get('id'))
 
