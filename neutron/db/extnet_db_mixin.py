@@ -398,3 +398,9 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
         LOG.debug("External link '%s' was deleted.", id)
 
 # -------------------------------------------------------------------------------------------------------------------
+
+    def update_extport_extinterface(self, context, id, extinterface_id):
+        with context.session.begin(subtransactions=True):
+            extport = context.session.query(models.ExtPort).filter_by(id=id).first()
+            extport.extinterface_id = extinterface_id
+
