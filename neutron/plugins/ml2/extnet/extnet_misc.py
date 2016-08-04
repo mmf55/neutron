@@ -183,7 +183,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 LOG.debug(node_interfaces)
                 segmentation_id = next((x.segmentation_id for x in links
                                         if (x.extinterface1_id in node_interfaces or
-                                            x.extinterface2_id in node_interfaces)), None)
+                                            x.extinterface2_id in node_interfaces) and x.segmentation_id), None)
                 if not segmentation_id:
                     raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
                 else:
