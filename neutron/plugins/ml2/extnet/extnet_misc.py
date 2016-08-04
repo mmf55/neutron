@@ -226,7 +226,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 node = self.get_extnode(context, interface.get('extnode_id'))
 
                 interface_extports = self._extinterface_has_extports(context, interface.get('id'))
-                extport_db = context.session.query(models.ExtPort).filter_by(id=port_id)
+                extport_db = context.session.query(models.ExtPort).filter_by(id=port_id).first()
                 for link in extport_db.extlinks:
                     if len(link.extports) == 1:
                         self.delete_extlink(context, link.id)
