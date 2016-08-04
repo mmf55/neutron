@@ -128,6 +128,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         node = self.get_extnode_by_name(context, port.get('extnode_name'))
 
         if not node:
+            LOG.debug("Node not found. Searching network topology...")
             self.discover_topology(context)
 
         node = self.get_extnode_by_name(context, port.get('extnode_name'))
@@ -141,6 +142,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                                       node.get('id'))
 
             if not interface:
+                LOG.debug("Interface not found. Searching network topology...")
                 self.discover_topology(context)
 
             interface = self.get_extinterface_by_name(context,
@@ -154,6 +156,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
         else:
+            LOG.debug("Getting a port on the external device...")
             interface = None
             interfaces = self._get_extnode_interfaces(context, node.get('id'))
             if interfaces:
@@ -185,7 +188,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 else:
                     self.set_seg_id_extport(context, port.get('id'), segmentation_id)
         else:
-
+            LOG.debug("Creating links for the new port...")
             # Build network graph
             net_graph = self._build_net_graph(context)
 
