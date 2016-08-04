@@ -45,6 +45,7 @@ class ExtPortDBMixin(object):
                 # extinterface_name=data[extport_dict_ext.EXT_INTERFACE_NAME],
                 # extnode_name=data[extport_dict_ext.EXT_NODE_NAME]
             )
+            LOG.debug('NOWWWW')
             context.session.add(extport_db)
         result[extport_dict_ext.EXT_INTERFACE_NAME] = data[extport_dict_ext.EXT_INTERFACE_NAME]
         result[extport_dict_ext.EXT_NODE_NAME] = data[extport_dict_ext.EXT_NODE_NAME]
