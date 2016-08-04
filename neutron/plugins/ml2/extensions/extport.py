@@ -28,12 +28,11 @@ class ExtPortExtensionDriver(api.ExtensionDriver,
             result[extport_dict_ext.EXT_NODE_NAME] = data[extport_dict_ext.EXT_NODE_NAME]
         if data[extport.EXT_INTERFACE_NAME]:
             result[extport_dict_ext.EXT_INTERFACE_NAME] = data[extport_dict_ext.EXT_INTERFACE_NAME]
-            self._process_create_port(plugin_context, data, result)
+        self._process_create_port(plugin_context, data, result)
 
     def process_update_port(self, plugin_context, data, result):
         if extport.EXT_NODE_NAME in data:
-           self._process_update_port(plugin_context, data, result)
-        pass
+            self._process_update_port(plugin_context, data, result)
 
     def extend_port_dict(self, session, base_model, result):
         if result.get(extport.EXT_NODE_NAME) is None:
