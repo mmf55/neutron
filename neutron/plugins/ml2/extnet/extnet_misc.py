@@ -187,7 +187,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 if not segmentation_id:
                     raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
                 else:
-                    LOG.debug(port.get('id'))
                     self.set_seg_id_extport(context, port.get('id'), segmentation_id)
         else:
             LOG.debug("Creating links for the new port...")
