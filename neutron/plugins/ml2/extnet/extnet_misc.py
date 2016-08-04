@@ -157,7 +157,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             interface = None
             interfaces = self._get_extnode_interfaces(context, node.get('id'))
             if interfaces:
-                interface = next((x for x in interfaces if not self._extinterface_has_extlinks(context, x.get('id'))),
+                interface = next((x for x in interfaces if not x.get('extsegment_id')),
                                  None)
             if not interface:
                 raise extnet_exceptions.NoExtInterfacesAvailable()
