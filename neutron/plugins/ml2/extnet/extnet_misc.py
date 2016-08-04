@@ -126,7 +126,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         self.setup_controller_host(context)
 
         node = self.get_extnode_by_name(context, port.get('extnode_name'))
-        LOG.debug(port)
+
         if not node:
             LOG.debug("Node not found. Searching network topology...")
             self.discover_topology(context)
@@ -136,34 +136,32 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         if not node:
             raise extnet_exceptions.ExtNodeNotFound()
 
-        if port.get('extinterface_name'):
-            interface = self.get_extinterface_by_name(context,
-                                                      port.get('extinterface_name'),
-                                                      node.get('id'))
+        interface = self.get_extinterface_by_name(context,
+                                                  port.get('extinterface_name'),
+                                                  node.get('id'))
 
-            if not interface:
-                LOG.debug("Interface not found. Searching network topology...")
-                self.discover_topology(context)
+        if not interface:
+            LOG.debug("Interface not found. Searching network topology...")
+            self.discover_topology(context)
 
-            interface = self.get_extinterface_by_name(context,
-                                                      port.get('extinterface_name'),
-                                                      node.get('id'))
+        interface = self.get_extinterface_by_name(context,
+                                                  port.get('extinterface_name'),
+                                                  node.get('id'))
 
-            if not interface:
-                raise extnet_exceptions.ExtInterfaceNotFound()
+        if not interface:
+            raise extnet_exceptions.ExtInterfaceNotFound()
 
-            if self._extinterface_has_extlinks(context, interface.get('id')):
-                raise extnet_exceptions.ExtPortErrorApplyingConfigs()
+        if self._extinterface_has_extlinks(context, interface.get('id')):
+            raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
-        else:
-            LOG.debug("Getting a port on the external device...")
-            interface = None
-            interfaces = self._get_extnode_interfaces(context, node.get('id'))
-            if interfaces:
-                interface = next((x for x in interfaces if not x.get('extsegment_id')),
-                                 None)
-            if not interface:
-                raise extnet_exceptions.NoExtInterfacesAvailable()
+            # LOG.debug("Getting a port on the external device...")
+            # interface = None
+            # interfaces = self._get_extnode_interfaces(context, node.get('id'))
+            # if interfaces:
+            #     interface = next((x for x in interfaces if not x.get('extsegment_id')),
+            #                      None)
+            # if not interface:
+            #     raise extnet_exceptions.NoExtInterfacesAvailable()
 
         segmentation_id = None
 
