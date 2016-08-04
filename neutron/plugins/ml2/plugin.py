@@ -1125,10 +1125,10 @@ class Ml2Plugin(db_base_plugin_v2.NeutronDbPluginV2,
         kwargs = {'context': context, 'port': result}
         registry.notify(resources.PORT, events.AFTER_CREATE, self, **kwargs)
 
-        extinterface_id = port['port'].get('extinterface_id')
-        # Called if the port contains the attribute "extinterface_id" which means that this port is associated with
+        extnode_name = port['port'].get('extnode_name')
+        # Called if the port contains the attribute "extnode_name" which means that this port is associated with
         # an external interface.
-        if extinterface_id:
+        if extnode_name:
             try:
                 self.create_extport(context, result)
             except Exception:
