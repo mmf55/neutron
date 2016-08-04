@@ -126,7 +126,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         self.setup_controller_host(context)
 
         node = self.get_extnode_by_name(context, port.get('extnode_name'))
-        LOG.debug(port.get('extnode_name'))
+        LOG.debug(port)
         if not node:
             LOG.debug("Node not found. Searching network topology...")
             self.discover_topology(context)
