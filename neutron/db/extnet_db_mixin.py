@@ -357,8 +357,9 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
                 extinterface2_id=link['extinterface2_id'],
                 network_id=link['network_id'],
             )
-            if link.get('extport'):
-                link_db.extports.append(link.get('extport'))
+            if link.get('extport_id'):
+                extport = context.session.query(models.ExtPort).filter_by(id=link.get('extport_id')).first()
+                link_db.extports.append(extport)
             context.session.add(link_db)
         return self._make_extlink_dict(link_db)
 
