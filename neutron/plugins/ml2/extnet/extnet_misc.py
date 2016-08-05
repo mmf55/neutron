@@ -207,10 +207,10 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 raise extnet_exceptions.ExtNodeHasNoLinks()
 
         if len(interface_extports) == 0:
-            LOG.debug(interface)
+            LOG.debug(port.get('segmentation_id'))
             if self.deploy_port(interface,
                                 node,
-                                segmentation_id,
+                                port.get('segmentation_id'),
                                 vnetwork=port.get('network_id'),
                                 context=context) != const.OK:
                 raise extnet_exceptions.ExtPortErrorApplyingConfigs()
