@@ -338,7 +338,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         port_id = port.get('id')
         network_id = port.get('network_id')
         i = 0
-        extlink_created = None
+        segmentation_id = None
         extsegments = context.session.query(models.ExtSegment).all()
         while i + 1 != len(path):
             node1 = context.session.query(models.ExtNode).filter_by(id=path[i]).first()
