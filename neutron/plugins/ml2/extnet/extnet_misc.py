@@ -171,21 +171,22 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             if port_on_db.get('network_id') != port.get('network_id'):
                 raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
-        links = self._get_all_links_on_extnode(context,
-                                               node.get('id'),
-                                               port.get('network_id'))
-        if links:
+        extports_on_extnode = self._get_all_extports_on_extnode(context,
+                                                                node.get('id'),
+                                                                port.get('network_id'))
+        if extports_on_extnode:
             if interface.get('type') == 'l2':
-                node_interfaces = self._get_extnode_interfaces_with_interface(context, interface.get('id'), 'l2')
-                node_interfaces = [x.id for x in node_interfaces]
 
-                segmentation_id = next((x.segmentation_id for x in links
-                                        if (x.extinterface1_id in node_interfaces or
-                                            x.extinterface2_id in node_interfaces) and x.segmentation_id), None)
+                segmentation_id = next((x.segmentation_id for x in extports_on_extnode if x.segmentation_id), None)
+
                 if not segmentation_id:
                     raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
                 else:
-                    self.set_seg_id_extport(context, port.get('id'), segmentation_id)
+                    port['segmentation_id'] = segmentation_id
+                    # self.set_seg_id_extport(context, port.get('id'), segmentation_id)
+            extlinks_to_extnode = extports_on_extnode[0].extlinks
+            for extlink in extlinks_to_extnode:
+                extlink.extports.append(context.session.query(models.ExtPort).filter_by(id=port.get('id')).first())
         else:
             LOG.debug("Creating links for the new port...")
             # Build network graph
@@ -214,7 +215,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                 context=context) != const.OK:
                 raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
-        self.update_extport_extinterface(context, port.get('id'), interface.get('id'))
+        port['extinterface_id'] = interface.get('id')
+        self.update_extport_extinterface(context, port)
 
     def delete_extport(self, context, port):
         port_id = port.get('id')
@@ -336,6 +338,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         port_id = port.get('id')
         network_id = port.get('network_id')
         i = 0
+        extlink_created = None
         extsegments = context.session.query(models.ExtSegment).all()
         while i + 1 != len(path):
             node1 = context.session.query(models.ExtNode).filter_by(id=path[i]).first()
@@ -356,8 +359,10 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                        )
                         extlink = {'extlink': extlink}
                         LOG.debug(extlink)
-                        self.create_extlink(context, extlink)
+                        extlink_created = self.create_extlink(context, extlink)
             i += 1
+            if i == len(path):
+                port['segmentation_id'] = extlink_created.get('segmentation_id')
         return const.OK
 
     def _build_net_graph(self, context):
@@ -467,17 +472,16 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         interface = context.session.query(models.ExtInterface).filter_by(id=interface_id).first()
         return interface.extports
 
-    def _get_all_links_on_extnode(self, context, extnode_id, network_id):
-        node = context.session.query(models.ExtNode).filter_by(id=extnode_id).first()
-        links = []
-        for interface in node.extinterfaces:
-            links += context.session.query(models.ExtLink) \
-                .filter(or_(models.ExtLink.extinterface1_id == interface.id,
-                            models.ExtLink.extinterface2_id == interface.id)) \
-                .filter(models.ExtLink.network_id == network_id) \
+    def _get_all_extports_on_extnode(self, context, extnode_id, network_id):
+        extinterfaces = context.session.query(models.ExtNode).filter_by(id=extnode_id).first().extinterfaces
+        extports = []
+        for interface in extinterfaces:
+            extports += context.session.query(models.ExtPort) \
+                .filter(models.ExtPort.extinterface_id == interface.id) \
                 .all()
-            links = list(set(links))
-        return links
+            extports = list(set(extports))
+        extports = filter(lambda x: x.port.network_id == network_id, extports)
+        return extports
 
     def _get_all_links_on_extsegment(self, context, segment_id, network_id):
         interfaces = context.session.query(models.ExtInterface).filter_by(extsegment_id=segment_id).all()
