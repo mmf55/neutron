@@ -349,6 +349,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                     links_on_db = self._get_all_links_on_extsegment(context, extsegment.id, network_id)
                     if links_on_db:
                         link_on_db = links_on_db[0]
+                        segmentation_id = link_on_db.segmentation_id
                         link_on_db.extports.append(context.session.query(models.ExtPort).filter_by(id=port_id).first())
                     else:
                         extlink = dict(name='link' + node1.name + node2.name,
@@ -360,9 +361,10 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                         extlink = {'extlink': extlink}
                         LOG.debug(extlink)
                         extlink_created = self.create_extlink(context, extlink)
+                        segmentation_id = extlink_created.get('segmentation_id')
             i += 1
             if i == len(path):
-                port['segmentation_id'] = extlink_created.get('segmentation_id')
+                port['segmentation_id'] = segmentation_id
         return const.OK
 
     def _build_net_graph(self, context):
