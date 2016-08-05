@@ -229,6 +229,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
                 interface_extports = self._extinterface_has_extports(context, interface.get('id'))
 
+                LOG.debug(len(interface_extports))
+
                 if len(interface_extports) == 1:
                     if self.undeploy_port(interface,
                                           node,
@@ -239,7 +241,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
                 extport_db = context.session.query(models.ExtPort).filter_by(id=port_id).first()
 
-                LOG.debug(extport_db)
+                LOG.debug(len(extport_db.extlinks))
 
                 for link in extport_db.extlinks:
                     if len(link.extports) == 1:
