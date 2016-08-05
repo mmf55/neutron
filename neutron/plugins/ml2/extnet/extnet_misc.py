@@ -220,16 +220,14 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         port_id = port.get('id')
         ext_port = self.get_extport(context, port_id)
 
+        LOG.debug(ext_port)
+
         if ext_port:
             interface = self.get_extinterface(context, ext_port.get('extinterface_id'))
             if interface:
                 node = self.get_extnode(context, interface.get('extnode_id'))
 
                 interface_extports = self._extinterface_has_extports(context, interface.get('id'))
-                extport_db = context.session.query(models.ExtPort).filter_by(id=port_id).first()
-                for link in extport_db.extlinks:
-                    if len(link.extports) == 1:
-                        self.delete_extlink(context, link.id)
 
                 if len(interface_extports) == 1:
                     if self.undeploy_port(interface,
@@ -238,6 +236,14 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                           vnetwork=port.get('network_id'),
                                           context=context) != const.OK:
                         raise extnet_exceptions.ExtPortErrorApplyingConfigs()
+
+                extport_db = context.session.query(models.ExtPort).filter_by(id=port_id).first()
+
+                LOG.debug(extport_db)
+
+                for link in extport_db.extlinks:
+                    if len(link.extports) == 1:
+                        self.delete_extlink(context, link.id)
 
     # ------------------------------------ Auxiliary functions ---------------------------------------
 
