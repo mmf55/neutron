@@ -363,9 +363,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                         extlink_created = self.create_extlink(context, extlink)
                         segmentation_id = extlink_created.get('segmentation_id')
             i += 1
-            if i == len(path):
-                LOG.debug(segmentation_id)
-                port['segmentation_id'] = segmentation_id
+        port['segmentation_id'] = segmentation_id
         return const.OK
 
     def _build_net_graph(self, context):
