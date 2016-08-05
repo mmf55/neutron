@@ -154,17 +154,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         if self._extinterface_has_extlinks(context, interface.get('id')):
             raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
-            # LOG.debug("Getting a port on the external device...")
-            # interface = None
-            # interfaces = self._get_extnode_interfaces(context, node.get('id'))
-            # if interfaces:
-            #     interface = next((x for x in interfaces if not x.get('extsegment_id')),
-            #                      None)
-            # if not interface:
-            #     raise extnet_exceptions.NoExtInterfacesAvailable()
-
-        segmentation_id = None
-
         interface_extports = self._extinterface_has_extports(context, interface.get('id'))
         if interface_extports:
             port_on_db = self.get_port(context, interface_extports[0].id)
@@ -183,7 +172,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                     raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable()
                 else:
                     port['segmentation_id'] = segmentation_id
-                    # self.set_seg_id_extport(context, port.get('id'), segmentation_id)
+
             extlinks_to_extnode = extports_on_extnode[0].extlinks
             for extlink in extlinks_to_extnode:
                 extlink.extports.append(context.session.query(models.ExtPort).filter_by(id=port.get('id')).first())
@@ -207,7 +196,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 raise extnet_exceptions.ExtNodeHasNoLinks()
 
         if len(interface_extports) == 0:
-            LOG.debug(port.get('segmentation_id'))
             if self.deploy_port(interface,
                                 node,
                                 port.get('segmentation_id'),
@@ -216,7 +204,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 raise extnet_exceptions.ExtPortErrorApplyingConfigs()
 
         port['extinterface_id'] = interface.get('id')
-        self.update_extport_extinterface(context, port)
+        self.update_extport(context, port)
 
     def delete_extport(self, context, port):
         port_id = port.get('id')

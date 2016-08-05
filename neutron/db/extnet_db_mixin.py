@@ -400,7 +400,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
 
 # -------------------------------------------------------------------------------------------------------------------
 
-    def update_extport_extinterface(self, context, port):
+    def update_extport(self, context, port):
         with context.session.begin(subtransactions=True):
             extport = context.session.query(models.ExtPort).filter_by(id=port.get('id')).first()
             extport.extinterface_id = port.get('extinterface_id')
