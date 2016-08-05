@@ -349,6 +349,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                     links_on_db = self._get_all_links_on_extsegment(context, extsegment.id, network_id)
                     if links_on_db:
                         link_on_db = links_on_db[0]
+                        LOG.debug(link_on_db.segmentation_id)
                         segmentation_id = link_on_db.segmentation_id
                         link_on_db.extports.append(context.session.query(models.ExtPort).filter_by(id=port_id).first())
                     else:
