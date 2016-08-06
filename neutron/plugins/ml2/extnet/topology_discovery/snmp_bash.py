@@ -111,6 +111,8 @@ class SnmpCisco(topology_discovery_api.TopoDiscMechanismApi):
 
     def _get_trunk_ids_available(self, trunks_map_bin, vlan_ints_list):
 
+        trunks_map_bin = trunks_map_bin.encode("utf-8")
+
         bin_list = ["{0:04b}".format(int(x, 16)) for x in binascii.b2a_hex(trunks_map_bin)]
         bin_str = ''.join(bin_list)
         vlan_ints_name_list = [x.value for x in vlan_ints_list]
@@ -121,5 +123,5 @@ class SnmpCisco(topology_discovery_api.TopoDiscMechanismApi):
 
 if __name__ == '__main__':
     obj = SnmpCisco()
-    obj.connect('192.168.2.1', community='public', version=2)
+    obj.connect('10.0.2.2', community='public', version=2)
     print obj.get_node_info_dict()
