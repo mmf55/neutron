@@ -33,11 +33,11 @@ LOG = logging.getLogger(__name__)
 class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                             net_ctrl.ExtNetController):
     def initialize_extnetcontroller(self):
-        network_ctrl_info_dict = cfg.CONF.EXTNET_CONTROLLER.network_controller_info
-        self.net_ctrl_name = network_ctrl_info_dict.get('name')
-        self.net_ctrl_nexthop_ip = network_ctrl_info_dict.get('nexthop')
-        self.net_ctrl_netmask = network_ctrl_info_dict.get('netmask')
-        self.net_ctrl_ip_address = network_ctrl_info_dict.get('ip_address')
+        self.net_ctrl_name = cfg.CONF.EXTNET_CONTROLLER.name
+        self.net_ctrl_nexthop_ip = cfg.CONF.EXTNET_CONTROLLER.nexthop_ip
+        self.net_ctrl_netmask = cfg.CONF.EXTNET_CONTROLLER.netmask
+        self.net_ctrl_ip_address = cfg.CONF.EXTNET_CONTROLLER.ip_address
+        self.net_ctrl_ids_available = cfg.CONF.EXTNET_CONTROLLER.ids_available
 
         config_dict = {device_ctrl: dev_name_list.split(';')
                        for device_ctrl, dev_name_list in cfg.CONF.EXTNET_CONTROLLER.device_controllers.items()}
@@ -303,7 +303,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                  ip_address=self.net_ctrl_ip_address,
                                  netmask=self.net_ctrl_netmask,
                                  dev_connected=None,
-                                 ids_available=None
+                                 ids_available=self.net_ctrl_ids_available
                                  )
 
             extsegment_id = self._handle_extsegment(context,
