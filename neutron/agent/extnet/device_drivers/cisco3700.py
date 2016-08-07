@@ -11,6 +11,10 @@ COMMAND_PROMPT = '[#$>]'
 
 class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
+    def _get_digits_int_name(self, interface_name):
+        l = [x for x in interface_name if x.isdigit()]
+        return ''.join(l)
+
     def _get_node_id(self, available_list):
         # [(123, 130), (1000, 2000)]
         l = [[int(ids.split(':')[0]), int(ids.split(':')[1])]
@@ -178,7 +182,9 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
         if link_type == const.GRE:
 
-            self._send_command('no interface Tunnel%s' % segmentation_id)
+            int_tun = self._get_digits_int_name(interface_name) + segmentation_id
+
+            self._send_command('no interface Tunnel%s' % int_tun)
 
         elif link_type == const.VLAN:
 
@@ -220,7 +226,9 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
         if link_type == const.GRE:
 
-            self._send_command('interface Tunnel%s' % segmentation_id)
+            int_tun = self._get_digits_int_name(interface_name) + segmentation_id
+
+            self._send_command('interface Tunnel%s' % int_tun)
 
             self._send_command('tunnel key %s' % segmentation_id)
 
