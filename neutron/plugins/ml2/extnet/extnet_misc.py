@@ -630,7 +630,7 @@ class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
         if network_id not in self.local_vlan_map:
             self.provision_local_vlan(network_id, 'local', None, None)
 
-        lvm = self.local_vlan_map.get(network_id).vlan
+        lvm = self.local_vlan_map.get(network_id)
         lvid = lvm.vlan
 
         if network_type == const.VLAN:
