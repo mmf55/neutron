@@ -608,6 +608,7 @@ class OVSNeutronAgent(sg_rpc.SecurityGroupAgentRpcCallbackMixin,
 
     def _local_vlan_for_vlan(self, lvid, physical_network, segmentation_id):
         distributed = self.enable_distributed_routing
+        LOG.debug(self.phys_brs)
         phys_br = self.phys_brs[physical_network]
         phys_port = self.phys_ofports[physical_network]
         int_br = self.int_br
