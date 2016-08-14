@@ -19,16 +19,26 @@ netctrl_opts = [
                required=False,
                help='Network controller IP address.'),
 
+    cfg.StrOpt('ids_available',
+               default='11:20',
+               required=False,
+               help='Network controller next hop device.'),
+
     cfg.StrOpt('nexthop_ip',
                # default='192.168.2.1',
                default='10.0.4.1',
                required=False,
                help='Network controller next hop device.'),
 
-    cfg.StrOpt('ids_available',
-               default='11:20',
+    cfg.StrOpt('nexthop_name',
+               default='ESW2',
                required=False,
                help='Network controller next hop device.'),
+
+    cfg.DictOpt('nexthop_interface',
+                default='name: FastEthernet1/1,ip_address: None',
+                required=False,
+                help='Network controller next hop device.'),
 
     cfg.DictOpt('device_controllers',
                 default="q-agent-notifier: OVS,extnet_agent: ESW1;ESW2;ESW4",

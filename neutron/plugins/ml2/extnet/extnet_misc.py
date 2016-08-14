@@ -38,6 +38,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         self.net_ctrl_netmask = cfg.CONF.EXTNET_CONTROLLER.netmask
         self.net_ctrl_ip_address = cfg.CONF.EXTNET_CONTROLLER.ip_address
         self.net_ctrl_ids_available = cfg.CONF.EXTNET_CONTROLLER.ids_available
+        self.nexthop_name = cfg.CONF.EXTNET_CONTROLLER.nexthop_name
+        self.nexthop_interface = cfg.CONF.EXTNET_CONTROLLER.nexthop_interface
 
         config_dict = {device_ctrl: dev_name_list.split(';')
                        for device_ctrl, dev_name_list in cfg.CONF.EXTNET_CONTROLLER.device_controllers.items()}
@@ -321,8 +323,23 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                   )
             interface_dict = {'extinterface': interface_dict}
 
-            ovs_interface = super(ExtNetControllerMixin, self).create_extinterface(context,
-                                                                                   interface_dict)
+            super(ExtNetControllerMixin, self).create_extinterface(context,
+                                                                   interface_dict)
+
+            node_dict = dict(name=self.nexthop_name)
+            node_dict = {'extnode': node_dict}
+            ovs_node = super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
+
+            interface_dict = dict(name=self.nexthop_interface.get('name'),
+                                  ip_address=self.nexthop_interface.get('ip_address'),
+                                  type=const.L3 if self.nexthop_interface.get('ip_address') else const.L2,
+                                  extnode_id=ovs_node.get('id'),
+                                  extsegment_id=extsegment_id
+                                  )
+            interface_dict = {'extinterface': interface_dict}
+
+            super(ExtNetControllerMixin, self).create_extinterface(context,
+                                                                   interface_dict)
 
     def _apply_virtual_network_path(self, context, port, path):
         port_id = port.get('id')
@@ -432,7 +449,16 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
                 return extsegment_db_dict['id']
             else:
-                return None
+                extsegment_dict = dict(name='first_hop',
+                                       type_supported=const.GRE if self.nexthop_interface.get('ip_address')
+                                       else const.VLAN,
+                                       ids_available=self.net_ctrl_ids_available
+                                       )
+
+                extsegment_dict = {'extsegment': extsegment_dict}
+                extsegment_db_dict = super(ExtNetControllerMixin, self).create_extsegment(context,
+                                                                                          extsegment_dict)
+                return extsegment_db_dict['id']
 
     def _get_extnet_subnet(self, ip_address, netmask):
         l_netmask = [int(x) for x in netmask.split('.')]
