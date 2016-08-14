@@ -10,18 +10,18 @@ netctrl_opts = [
                help='Network controller name.'),
 
     cfg.StrOpt('ip_address',
-               # default='192.168.2.2',
+               default='10.0.4.2',
                required=False,
                help='Network controller IP address.'),
 
     cfg.StrOpt('netmask',
-               # default='255.255.255.0',
+               default='255.255.255.0',
                required=False,
                help='Network controller IP address.'),
 
     cfg.StrOpt('nexthop_ip',
                # default='192.168.2.1',
-               default='10.0.0.1',
+               default='10.0.4.1',
                required=False,
                help='Network controller next hop device.'),
 
