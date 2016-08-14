@@ -630,11 +630,12 @@ class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
         if network_id not in self.local_vlan_map:
             self.provision_local_vlan(network_id, 'local', None, None)
 
-        lvid = self.local_vlan_map.get(network_id).vlan
+        lvm = self.local_vlan_map.get(network_id).vlan
+        lvid = lvm.vlan
 
         if network_type == const.VLAN:
             # if not self.enable_tunneling:
-            self._local_vlan_for_vlan(lvid, const.VLAN, segmentation_id)
+            self._local_vlan_for_vlan(lvid, lvm.physical_network, segmentation_id)
             # else:
             #    return "ERROR - Tunneling enabled."
 
