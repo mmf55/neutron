@@ -633,10 +633,10 @@ class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
         lvid = self.local_vlan_map.get(network_id).vlan
 
         if network_type == const.VLAN:
-            if not self.enable_tunneling:
-                self._local_vlan_for_vlan(lvid, const.VLAN, segmentation_id)
-            else:
-                return "ERROR - Tunneling enabled."
+            # if not self.enable_tunneling:
+            self._local_vlan_for_vlan(lvid, const.VLAN, segmentation_id)
+            # else:
+            #    return "ERROR - Tunneling enabled."
 
         elif network_type == const.GRE:
             remote_ip = kwargs.get('remote_ip')
