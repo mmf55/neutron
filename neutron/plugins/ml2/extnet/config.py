@@ -10,12 +10,12 @@ netctrl_opts = [
                help='Network controller name.'),
 
     cfg.StrOpt('ip_address',
-               default='10.0.4.2',
+               # default='10.0.4.2',
                required=False,
                help='Network controller IP address.'),
 
     cfg.StrOpt('netmask',
-               default='255.255.255.0',
+               # default='255.255.255.0',
                required=False,
                help='Network controller IP address.'),
 
