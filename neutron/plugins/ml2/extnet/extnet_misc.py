@@ -78,14 +78,16 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                                             link.get('network_id'))
 
         # Call create link to make the changes on the network.
-        if self.deploy_link(link,
-                            segment.get('type_supported'),
-                            interface1,
-                            interface2,
-                            node1,
-                            node2,
-                            vnetwork=link.get('network_id'),
-                            context=context) != const.OK:
+        res = self.deploy_link(link,
+                               segment.get('type_supported'),
+                               interface1,
+                               interface2,
+                               node1,
+                               node2,
+                               vnetwork=link.get('network_id'),
+                               context=context)
+        LOG.debug(res)
+        if res != const.OK:
             raise extnet_exceptions.ExtLinkErrorApplyingConfigs()
 
         # Save new link on the database

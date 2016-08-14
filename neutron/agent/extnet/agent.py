@@ -62,9 +62,6 @@ class ExtNetDeviceControllerMixin(object):
 
         mod = imp.load_source(name.lower(), module_path)
         Class = getattr(mod, name)
-        LOG.debug(node_name)
-        LOG.debug(node_ip_address)
-        LOG.debug(self.config_dict.get('device_configs_path'))
         return Class(node_name, node_ip_address, self.config_dict.get('device_configs_path'))
 
         # def load_driver2(self, device_name, device_driver):
