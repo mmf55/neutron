@@ -330,7 +330,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             node_dict = {'extnode': node_dict}
             ovs_node = super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
 
-
             interface_dict = dict(name=self.nexthop_interface.get('name'),
                                   ip_address=self.nexthop_interface.get('ip_address'),
                                   type=const.L3 if self.nexthop_interface.get('ip_address') else const.L2,
