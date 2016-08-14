@@ -326,7 +326,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             super(ExtNetControllerMixin, self).create_extinterface(context,
                                                                    interface_dict)
 
-            node_dict = dict(name=self.nexthop_name)
+            node_dict = dict(name=self.nexthop_name, ip_address=self.net_ctrl_nexthop_ip)
             node_dict = {'extnode': node_dict}
             ovs_node = super(ExtNetControllerMixin, self).create_extnode(context, node_dict)
 
