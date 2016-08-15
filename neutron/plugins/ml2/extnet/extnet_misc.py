@@ -448,7 +448,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                     return extsegment_in_db.get('id')
 
                 return extsegment_db_dict['id']
-            else:
+            elif node_name == 'OVS':
                 extsegment_dict = dict(name='first_hop',
                                        type_supported=const.GRE if self.nexthop_interface.get('ip_address')
                                        else const.VLAN,
@@ -459,6 +459,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 extsegment_db_dict = super(ExtNetControllerMixin, self).create_extsegment(context,
                                                                                           extsegment_dict)
                 return extsegment_db_dict['id']
+            else:
+                return None
 
     def _get_extnet_subnet(self, ip_address, netmask):
         l_netmask = [int(x) for x in netmask.split('.')]
