@@ -37,6 +37,7 @@ def upgrade():
     sa.Column('name', sa.String(length=36), nullable=True),
     sa.Column('type_supported', sa.String(length=36), nullable=True),
     sa.Column('ids_available', sa.String(length=36), nullable=True),
+    sa.Column('first_hop_seg', sa.String(length=36), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     mysql_engine='InnoDB'
     )

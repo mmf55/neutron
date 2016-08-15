@@ -452,7 +452,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             elif node_name == 'OVS':
                 extsegment_dict = dict(name='l2' + node_name + nexthop_name,
                                        type_supported=const.VLAN,
-                                       ids_available=self.net_ctrl_ids_available
+                                       ids_available=self.net_ctrl_ids_available,
+                                       first_hop_seg=True
                                        )
 
                 extsegment_dict = {'extsegment': extsegment_dict}
@@ -517,7 +518,12 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
     def _get_segmentation_id(self, context, segment_id, conn_type, network_id):
         segment = context.session.query(models.ExtSegment).filter_by(id=segment_id).first()
 
-        if conn_type == const.VLAN:
+        if conn_type == const.VLAN and segment.get('first_hop_seg'):
+            network = self.get_network(network_id)
+            if network.get('provider:segmentation_id'):
+                return network.get('provider:segmentation_id')
+
+        elif conn_type == const.VLAN:
             links = self._get_all_links_on_extsegment(context, segment_id, network_id)
             if links:
                 return links[0].segmentation_id
@@ -663,9 +669,10 @@ class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
 
         if network_type == const.VLAN:
             # if not self.enable_tunneling:
-            self._local_vlan_for_vlan(lvid, lvm.physical_network, segmentation_id)
+            # self._local_vlan_for_vlan(lvid, lvm.physical_network, segmentation_id)
             # else:
             #    return "ERROR - Tunneling enabled."
+            pass
 
         elif network_type == const.GRE:
             remote_ip = kwargs.get('remote_ip')
@@ -687,7 +694,8 @@ class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
         lvid = self.local_vlan_map.get(network_id).vlan
 
         if network_type == const.VLAN:
-            self.reclaim_local_vlan(network_id)
+            # self.reclaim_local_vlan(network_id)
+            pass
 
         elif network_type == const.GRE:
             remote_ip = kwargs.get('remote_ip')

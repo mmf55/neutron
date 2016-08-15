@@ -302,7 +302,8 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
                 id=uuidutils.generate_uuid(),
                 name=segment.get('name'),
                 type_supported=segment.get('type_supported'),
-                ids_available=segment.get('ids_available'))
+                ids_available=segment.get('ids_available'),
+                first_hop_seg=segment.get('first_hop_seg') if segment.get('first_hop_seg') else False)
             context.session.add(segment_db)
         return self._make_extsegment_dict(segment_db)
 

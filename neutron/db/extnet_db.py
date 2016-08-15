@@ -74,6 +74,7 @@ class ExtSegment(model_base.BASEV2, models_v2.HasId):
     name = sa.Column(sa.String(36))
     type_supported = sa.Column(sa.String(36))
     ids_available = sa.Column(sa.String(36))
+    first_hop_seg = sa.Column(sa.Boolean)
 
     extinterfaces = orm.relationship("ExtInterface",
                                      back_populates='extsegment')
