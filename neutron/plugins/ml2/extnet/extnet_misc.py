@@ -449,9 +449,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
                 return extsegment_db_dict['id']
             elif node_name == 'OVS':
-                extsegment_dict = dict(name='first_hop',
-                                       type_supported=const.GRE if self.nexthop_interface.get('ip_address')
-                                       else const.VLAN,
+                extsegment_dict = dict(name='l2' + node_name,
+                                       type_supported=const.VLAN,
                                        ids_available=self.net_ctrl_ids_available
                                        )
 
