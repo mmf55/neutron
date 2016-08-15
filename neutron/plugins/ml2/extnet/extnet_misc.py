@@ -313,6 +313,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             extsegment_id = self._handle_extsegment(context,
                                                     ovs_node.get('name'),
                                                     ovs_interface,
+                                                    nexthop_name=self.nexthop_name
                                                     )
 
             interface_dict = dict(name=ovs_interface.get('name'),
@@ -386,7 +387,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             graph[node.id] = nodes_conn_list
         return graph
 
-    def _handle_extsegment(self, context, node_name, interface, topo_dict=None):
+    def _handle_extsegment(self, context, node_name, interface, topo_dict=None, nexthop_name=None):
 
         ip_address = interface.get('ip_address')
         if ip_address:
@@ -449,7 +450,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
                 return extsegment_db_dict['id']
             elif node_name == 'OVS':
-                extsegment_dict = dict(name='l2' + node_name,
+                extsegment_dict = dict(name='l2' + node_name + nexthop_name,
                                        type_supported=const.VLAN,
                                        ids_available=self.net_ctrl_ids_available
                                        )
