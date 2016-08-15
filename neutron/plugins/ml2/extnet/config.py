@@ -26,7 +26,7 @@ netctrl_opts = [
 
     cfg.StrOpt('nexthop_ip',
                # default='192.168.2.1',
-               default='10.0.4.1',
+               default='10.0.2.1',
                required=False,
                help='Next hop device IP address for access by the network controller.'),
 
