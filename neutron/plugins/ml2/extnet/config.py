@@ -20,7 +20,7 @@ netctrl_opts = [
                help='Network mask of the network controller.'),
 
     cfg.StrOpt('ids_available',
-               default='11:20',
+               # default='0:10',
                required=False,
                help='Networks IDs available on the first hop segment.'),
 

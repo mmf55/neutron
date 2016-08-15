@@ -80,20 +80,23 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                                             link.get('network_id'))
 
         # Call create link to make the changes on the network.
-        res = self.deploy_link(link,
-                               segment.get('type_supported'),
-                               interface1,
-                               interface2,
-                               node1,
-                               node2,
-                               vnetwork=link.get('network_id'),
-                               context=context)
-        LOG.debug(res)
-        if res != const.OK:
-            raise extnet_exceptions.ExtLinkErrorApplyingConfigs()
+        if link['segmentation_id']:
+            res = self.deploy_link(link,
+                                   segment.get('type_supported'),
+                                   interface1,
+                                   interface2,
+                                   node1,
+                                   node2,
+                                   vnetwork=link.get('network_id'),
+                                   context=context)
+            LOG.debug(res)
+            if res != const.OK:
+                raise extnet_exceptions.ExtLinkErrorApplyingConfigs()
 
-        # Save new link on the database
-        return super(ExtNetControllerMixin, self).create_extlink(context, extlink)
+            # Save new link on the database
+            return super(ExtNetControllerMixin, self).create_extlink(context, extlink)
+        else:
+            raise extnet_exceptions.ExtLinkSegmentationIdNotAvailable
 
     def delete_extlink(self, context, id):
         link = self.get_extlink(context, id)
@@ -452,7 +455,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             elif node_name == 'OVS':
                 extsegment_dict = dict(name='l2' + node_name + nexthop_name,
                                        type_supported=const.VLAN,
-                                       ids_available=self.net_ctrl_ids_available,
                                        first_hop_seg=True
                                        )
 
@@ -522,6 +524,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             network = self.get_network(context, network_id)
             if network.get('provider:segmentation_id'):
                 return network.get('provider:segmentation_id')
+            else:
+                return None
 
         elif conn_type == const.VLAN:
             links = self._get_all_links_on_extsegment(context, segment_id, network_id)
