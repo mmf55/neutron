@@ -519,7 +519,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         segment = context.session.query(models.ExtSegment).filter_by(id=segment_id).first()
 
         if conn_type == const.VLAN and segment.get('first_hop_seg'):
-            network = self.get_network(network_id)
+            network = self.get_network(context, network_id)
             if network.get('provider:segmentation_id'):
                 return network.get('provider:segmentation_id')
 
