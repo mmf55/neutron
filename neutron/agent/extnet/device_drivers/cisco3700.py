@@ -188,19 +188,30 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
         elif link_type == const.VLAN:
 
-            self._send_command('interface %s' % interface_name)
+            if kwargs.get('first_hop_seg'):
 
-            self._send_command('switchport trunk allowed vlan remove %s' % segmentation_id)
+                bridge_group = self.dev_config_dict.get('bridge_groups_attributed').get(kwargs.get('vnetwork'))
+                if bridge_group:
 
-            self._send_command('no interface vlan %s' % segmentation_id)
+                    self._send_command('interface vlan %s' % segmentation_id)
 
-            self._exit_config_mode()
+                    self._send_command('no bridge-group %s' % bridge_group)
 
-            self._send_command('vlan database')
+            else:
 
-            self._send_command('no vlan %s' % segmentation_id)
+                self._send_command('interface %s' % interface_name)
 
-            self._send_command('exit')
+                self._send_command('switchport trunk allowed vlan remove %s' % segmentation_id)
+
+                self._send_command('no interface vlan %s' % segmentation_id)
+
+                self._exit_config_mode()
+
+                self._send_command('vlan database')
+
+                self._send_command('no vlan %s' % segmentation_id)
+
+                self._send_command('exit')
 
         else:
             return "ERROR - Link type not supported by the driver %s" % self.driver_name()
@@ -247,33 +258,40 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
         elif link_type == const.VLAN:
 
-            vlans_allowed = self._get_allowed_vlans_on_interface(interface_name)
-            if vlans_allowed == '1-4094' or vlans_allowed == '1-4095':
-                vlans_allowed = str(segmentation_id) + ',1,1002-1005'
-            elif str(segmentation_id) not in vlans_allowed.split(','):
-                vlans_allowed = str(segmentation_id) + ',' + vlans_allowed
+            if kwargs.get('first_hop_seg'):
+                self._send_command('interface vlan %s' % segmentation_id)
 
-            self._exit_config_mode()
+                self._send_command('bridge-group %s' % bridge_group)
 
-            self._send_command('vlan database')
+            else:
 
-            self._send_command('vlan %s' % segmentation_id)
+                vlans_allowed = self._get_allowed_vlans_on_interface(interface_name)
+                if vlans_allowed == '1-4094' or vlans_allowed == '1-4095':
+                    vlans_allowed = str(segmentation_id) + ',1,1002-1005'
+                elif str(segmentation_id) not in vlans_allowed.split(','):
+                    vlans_allowed = str(segmentation_id) + ',' + vlans_allowed
 
-            self._send_command('exit')
+                self._exit_config_mode()
 
-            self._enter_config_mode()
+                self._send_command('vlan database')
 
-            self._send_command('interface vlan %s' % segmentation_id)
+                self._send_command('vlan %s' % segmentation_id)
 
-            self._send_command('bridge-group %s' % bridge_group)
+                self._send_command('exit')
 
-            self._send_command('interface %s' % interface_name)
+                self._enter_config_mode()
 
-            self._send_command('no ip address')
+                self._send_command('interface vlan %s' % segmentation_id)
 
-            self._send_command('switchport mode trunk')
+                self._send_command('bridge-group %s' % bridge_group)
 
-            self._send_command('switchport trunk allowed vlan ' + vlans_allowed)
+                self._send_command('interface %s' % interface_name)
+
+                self._send_command('no ip address')
+
+                self._send_command('switchport mode trunk')
+
+                self._send_command('switchport trunk allowed vlan ' + vlans_allowed)
 
         else:
             return "ERROR - Link type not supported by the driver %s" % self.driver_name()

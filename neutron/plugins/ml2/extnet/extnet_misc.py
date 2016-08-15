@@ -88,7 +88,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                    node1,
                                    node2,
                                    vnetwork=link.get('network_id'),
-                                   context=context)
+                                   context=context,
+                                   first_hop_seg=segment.get('first_hop_seg'))
             LOG.debug(res)
             if res != const.OK:
                 raise extnet_exceptions.ExtLinkErrorApplyingConfigs()
@@ -116,7 +117,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                               node1,
                               node2,
                               vnetwork=link.get('network_id'),
-                              context=context) != const.OK:
+                              context=context,
+                              first_hop_seg=segment.get('first_hop_seg')) != const.OK:
             raise extnet_exceptions.ExtLinkErrorApplyingConfigs()
 
         if self._set_segmentation_id(context,
@@ -367,7 +369,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                        extinterface1_id=extsegment.extinterfaces[0].id,
                                        extinterface2_id=extsegment.extinterfaces[1].id,
                                        network_id=network_id,
-                                       extport_id=port_id
+                                       extport_id=port_id,
                                        )
                         extlink = {'extlink': extlink}
                         LOG.debug(extlink)
