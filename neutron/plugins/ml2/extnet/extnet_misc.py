@@ -78,9 +78,8 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                                             segment.get('id'),
                                                             segment.get('type_supported'),
                                                             link.get('network_id'))
-        LOG.debug(link['segmentation_id'])
-        LOG.debug(segment.get('id'))
-        LOG.debug(segment.get('type_supported'))
+        LOG.debug(interface1.get('ip_address'))
+        LOG.debug(interface2.get('ip_address'))
         # Call create link to make the changes on the network.
         if link['segmentation_id']:
             LOG.debug(segment.get('first_hop_seg'))
