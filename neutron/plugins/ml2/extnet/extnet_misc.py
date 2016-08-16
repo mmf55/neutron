@@ -697,13 +697,12 @@ class ExtNetOVSAgentMixin(dev_ctrl.ExtNetDeviceController):
         LOG.debug("Undeploy_link on %s" % interface.get('name'))
         network_id = kwargs.get('vnetwork')
 
-        lvid = self.local_vlan_map.get(network_id).vlan
-
         if network_type == const.VLAN:
             # self.reclaim_local_vlan(network_id)
             pass
 
         elif network_type == const.GRE:
+            lvid = self.local_vlan_map.get(network_id).vlan
             remote_ip = kwargs.get('remote_ip')
             td = network_type + network_id[:4]
             port_name = self.get_tunnel_name(
