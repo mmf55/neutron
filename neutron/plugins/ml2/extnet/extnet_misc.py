@@ -600,14 +600,13 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
         kwargs['interface'] = interface
         return cctxt.call(context,
                           'deploy_link',
-                          **kwargs)
-#                          node=node,
-#                          segmentation_id=segmentation_id,
-#                          network_type=network_type,
-#                          interface=interface,
-#                          remote_ip=kwargs.get('remote_ip'),
-#                          vnetwork=kwargs.get('vnetwork'),
-#                          first_hop_seg=kwargs.get('first_hop_seg'))
+                          node=node,
+                          segmentation_id=segmentation_id,
+                          network_type=network_type,
+                          interface=interface,
+                          remote_ip=kwargs.get('remote_ip'),
+                          vnetwork=kwargs.get('vnetwork'),
+                          first_hop_seg=kwargs.get('first_hop_seg'))
 
     def undeploy_link_on_node(self, interface, node, network_type, segmentation_id, **kwargs):
         context = kwargs.get('context')
