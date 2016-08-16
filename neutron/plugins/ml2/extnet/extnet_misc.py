@@ -598,8 +598,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
                           segmentation_id=segmentation_id,
                           network_type=network_type,
                           interface=interface,
-                          vnetwork=kwargs.get('vnetwork'),
-                          remote_ip=kwargs.get('remote_ip'))
+                          **kwargs)
 
     def undeploy_link_on_node(self, interface, node, network_type, segmentation_id, **kwargs):
         context = kwargs.get('context')
@@ -620,8 +619,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
                           segmentation_id=segmentation_id,
                           interface=interface,
                           network_type=network_type,
-                          vnetwork=kwargs.get('vnetwork'),
-                          remote_ip=kwargs.get('remote_ip'))
+                          **kwargs)
 
     def deploy_port_on_node(self, interface, node, segmentation_id, **kwargs):
         context = kwargs.get('context')
@@ -641,7 +639,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
                           segmentation_id=segmentation_id,
                           node=node,
                           interface=interface,
-                          vnetwork=kwargs.get('vnetwork'))
+                          **kwargs)
 
     def undeploy_port_on_node(self, interface, node, segmentation_id, **kwargs):
         context = kwargs.get('context')
@@ -661,7 +659,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
                           segmentation_id=segmentation_id,
                           node=node,
                           interface=interface,
-                          vnetwork=kwargs.get('vnetwork'))
+                          **kwargs)
 
 
 # This turns the OVS agent to a device controller.
