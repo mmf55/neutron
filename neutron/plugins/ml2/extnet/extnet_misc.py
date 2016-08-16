@@ -81,7 +81,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         # Call create link to make the changes on the network.
         LOG.debug(link)
-        if link['segmentation_id']:
+        if link.get('segmentation_id'):
             res = self.deploy_link(link,
                                    segment.get('type_supported'),
                                    interface1,
