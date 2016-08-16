@@ -600,6 +600,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
                           segmentation_id=segmentation_id,
                           network_type=network_type,
                           interface=interface,
+                          vnetwork=kwargs.get('vnetwork'),
                           first_hop_seg=kwargs.get('first_hop_seg'))
 
     def undeploy_link_on_node(self, interface, node, network_type, segmentation_id, **kwargs):
@@ -621,6 +622,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
                           segmentation_id=segmentation_id,
                           interface=interface,
                           network_type=network_type,
+                          vnetwork=kwargs.get('vnetwork'),
                           first_hop_seg=kwargs.get('first_hop_seg'))
 
     def deploy_port_on_node(self, interface, node, segmentation_id, **kwargs):
