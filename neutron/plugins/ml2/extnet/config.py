@@ -35,7 +35,7 @@ netctrl_opts = [
                help='Next hop device name connected to network controller.'),
 
     cfg.DictOpt('nexthop_interface',
-                default='name: FastEthernet1/1,ip_address: 192.168.2.1',
+                default='name: FastEthernet0/0,ip_address: 192.168.2.1',
                 required=False,
                 help='Next hop device interface connected to network controller.'),
 
