@@ -88,6 +88,7 @@ class ExtNetworkDBMixin(extsegment.ExtSegmentPluginInterface,
             'type_supported': extsegment.type_supported,
             'name': extsegment.name,
             'ids_available': extsegment.ids_available,
+            'first_hop_seg': extsegment.first_hop_seg,
         }
         return self._fields(extsegment_dict, fields)
 
