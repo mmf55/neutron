@@ -10,23 +10,22 @@ netctrl_opts = [
                help='Network controller name.'),
 
     cfg.StrOpt('ip_address',
-               # default='10.0.4.2',
+               default='192.168.2.2',
                required=False,
                help='Network controller IP address.'),
 
     cfg.StrOpt('netmask',
-               # default='255.255.255.0',
+               default='255.255.255.0',
                required=False,
                help='Network mask of the network controller.'),
 
     cfg.StrOpt('ids_available',
-               # default='0:10',
+               default='0:10',
                required=False,
                help='Networks IDs available on the first hop segment.'),
 
     cfg.StrOpt('nexthop_ip',
-               # default='192.168.2.1',
-               default='10.0.2.1',
+               default='192.168.2.1',
                required=False,
                help='Next hop device IP address for access by the network controller.'),
 
@@ -36,7 +35,7 @@ netctrl_opts = [
                help='Next hop device name connected to network controller.'),
 
     cfg.DictOpt('nexthop_interface',
-                default='name: FastEthernet1/1,ip_address: ''',
+                default='name: FastEthernet1/1,ip_address: 192.168.2.1',
                 required=False,
                 help='Next hop device interface connected to network controller.'),
 
