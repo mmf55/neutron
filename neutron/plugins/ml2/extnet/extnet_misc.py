@@ -553,7 +553,10 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         segment = context.session.query(models.ExtSegment).filter_by(id=segment_id).first()
 
-        if conn_type == const.VLAN:
+        if conn_type == const.VLAN and segment.get('first_hop_seg'):
+            return const.OK
+
+        elif conn_type == const.VLAN:
             links = self._get_all_links_on_extsegment(context, segment_id, network_id)
             links = {x for x in links if x['segmentation_id'] != id_to_set}
             if links:
