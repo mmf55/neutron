@@ -511,7 +511,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
     def _get_segmentation_id(self, context, segment_id, conn_type, network_id):
         segment = context.session.query(models.ExtSegment).filter_by(id=segment_id).first()
-        LOG.debug(segment.id)
+
         if conn_type == const.VLAN and segment.get('first_hop_seg'):
             network = self.get_network(context, network_id)
             if network.get('provider:segmentation_id'):
@@ -525,7 +525,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 return links[0].segmentation_id
 
         ids_avail = segment.ids_available
-
+        LOG.debug(ids_avail)
         if not ids_avail:
             raise extnet_exceptions.ExtLinkErrorObtainingSegmentationID()
 
