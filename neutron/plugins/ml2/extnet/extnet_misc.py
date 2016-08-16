@@ -81,6 +81,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
         # Call create link to make the changes on the network.
         if link['segmentation_id']:
+            LOG.debug(segment.get('first_hop_seg'))
             res = self.deploy_link(link,
                                    segment.get('type_supported'),
                                    interface1,
@@ -592,6 +593,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
         cctxt = client.prepare(topic=topic_create_extlink,
                                fanout=False,
                                timeout=30)
+        LOG.debug(kwargs.get('first_hop_seg'))
         return cctxt.call(context,
                           'deploy_link',
                           node=node,
