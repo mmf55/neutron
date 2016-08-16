@@ -78,11 +78,9 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                                             segment.get('id'),
                                                             segment.get('type_supported'),
                                                             link.get('network_id'))
-        LOG.debug(interface1.get('ip_address'))
-        LOG.debug(interface2.get('ip_address'))
+
         # Call create link to make the changes on the network.
         if link['segmentation_id']:
-            LOG.debug(segment.get('first_hop_seg'))
             res = self.deploy_link(link,
                                    segment.get('type_supported'),
                                    interface1,
@@ -92,7 +90,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                    vnetwork=link.get('network_id'),
                                    context=context,
                                    first_hop_seg=segment.get('first_hop_seg'))
-            LOG.debug(res)
+
             if res != const.OK:
                 raise extnet_exceptions.ExtLinkErrorApplyingConfigs()
 
@@ -192,14 +190,13 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
             # Build network graph
             net_graph = self._build_net_graph(context)
 
-            LOG.debug(net_graph)
             # Apply links to the best path found.
             first_node = self.get_extnode_by_name(context, self.net_ctrl_name)
 
             path = self.build_virtual_network_path(graph=net_graph,
                                                    start=first_node.id,
                                                    end=node.get('id'))
-            LOG.debug(path)
+
             if not path:
                 raise extnet_exceptions.ExtNodeHasNoLinks()
 
@@ -221,16 +218,12 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         port_id = port.get('id')
         ext_port = self.get_extport(context, port_id)
 
-        LOG.debug(ext_port)
-
         if ext_port:
             interface = self.get_extinterface(context, ext_port.get('extinterface_id'))
             if interface:
                 node = self.get_extnode(context, interface.get('extnode_id'))
 
                 interface_extports = self._extinterface_has_extports(context, interface.get('id'))
-
-                LOG.debug(len(interface_extports))
 
                 if len(interface_extports) == 1:
                     if self.undeploy_port(interface,
@@ -242,8 +235,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
 
                 extport_db = context.session.query(models.ExtPort).filter_by(id=port_id).first()
 
-                LOG.debug(len(extport_db.extlinks))
-
                 for link in extport_db.extlinks:
                     if len(link.extports) == 1:
                         self.delete_extlink(context, link.id)
@@ -253,8 +244,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
     def discover_topology(self, context):
         td = topo_discovery.TopologyDiscovery(snmp_bash.SnmpCisco())
         topo_dict = td.get_devices_info(self.net_ctrl_nexthop_ip)
-
-        LOG.debug(topo_dict)
 
         if not topo_dict:
             raise extnet_exceptions.ExtNodeErrorOnTopologyDiscover()
@@ -374,7 +363,6 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                                        extport_id=port_id,
                                        )
                         extlink = {'extlink': extlink}
-                        LOG.debug(extlink)
                         extlink_created = self.create_extlink(context, extlink)
                         segmentation_id = extlink_created.get('segmentation_id')
             i += 1
