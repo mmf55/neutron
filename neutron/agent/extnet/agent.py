@@ -26,13 +26,13 @@ class ExtNetDeviceControllerMixin(object):
         return self.load_driver(node).deploy_port(interface.get('type'),
                                                   interface.get('name'),
                                                   segmentation_id,
-                                                  vnetwork=kwargs.get('vnetwork'))
+                                                  **kwargs)
 
     def undeploy_port(self, ctxt, interface, node, segmentation_id, **kwargs):
         return self.load_driver(node).undeploy_port(interface.get('type'),
                                                     interface.get('name'),
                                                     segmentation_id,
-                                                    vnetwork=kwargs.get('vnetwork'))
+                                                    **kwargs)
 
     def deploy_link(self, ctxt, interface, node, segmentation_id, network_type, **kwargs):
         LOG.debug("Deploy_link on %s" % interface.get('name'))
@@ -40,14 +40,14 @@ class ExtNetDeviceControllerMixin(object):
                                                   interface.get('name'),
                                                   kwargs.get('remote_ip'),
                                                   segmentation_id,
-                                                  vnetwork=kwargs.get('vnetwork'))
+                                                  **kwargs)
 
     def undeploy_link(self, ctxt, interface, node, segmentation_id, network_type, **kwargs):
         LOG.debug("Undeploy_link on %s" % interface.get('name'))
         return self.load_driver(node).undeploy_link(network_type,
                                                     interface.get('name'),
                                                     segmentation_id,
-                                                    vnetwork=kwargs.get('vnetwork'))
+                                                    **kwargs)
 
     def device_controller_name(self):
         return topics.EXTNET_AGENT
