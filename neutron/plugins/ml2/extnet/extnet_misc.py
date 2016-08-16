@@ -601,6 +601,7 @@ class ExtNetDeviceCtrlManager(dev_ctrl_mgr.ExtNetDeviceControllerManager):
                           segmentation_id=segmentation_id,
                           network_type=network_type,
                           interface=interface,
+                          remote_ip=kwargs.get('remote_ip'),
                           vnetwork=kwargs.get('vnetwork'),
                           first_hop_seg=kwargs.get('first_hop_seg'))
 
