@@ -525,7 +525,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
                 return links[0].segmentation_id
 
         ids_avail = segment.ids_available
-        LOG.debug(ids_avail)
+
         if not ids_avail:
             raise extnet_exceptions.ExtLinkErrorObtainingSegmentationID()
 
@@ -536,7 +536,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
         seg_id = num_list.pop(0)
 
         segment.ids_available = utils.stretch_ids(num_list)
-
+        LOG.debug(seg_id)
         return seg_id
 
     def _set_segmentation_id(self, context, id_to_set, segment_id, conn_type, network_id):
