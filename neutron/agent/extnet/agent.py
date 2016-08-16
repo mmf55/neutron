@@ -36,6 +36,7 @@ class ExtNetDeviceControllerMixin(object):
 
     def deploy_link(self, ctxt, interface, node, segmentation_id, network_type, **kwargs):
         LOG.debug("Deploy_link on %s" % interface.get('name'))
+        LOG.debug(kwargs.get('remote_ip'))
         return self.load_driver(node).deploy_link(network_type,
                                                   interface.get('name'),
                                                   kwargs.get('remote_ip'),
