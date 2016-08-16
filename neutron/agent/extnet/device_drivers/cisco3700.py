@@ -237,7 +237,7 @@ class Cisco3700(driver_api.ExtNetDeviceDriverBase):
 
         if link_type == const.GRE:
 
-            int_tun = self._get_digits_int_name(interface_name) + segmentation_id
+            int_tun = self._get_digits_int_name(interface_name) + str(segmentation_id)
 
             self._send_command('interface Tunnel%s' % int_tun)
 
