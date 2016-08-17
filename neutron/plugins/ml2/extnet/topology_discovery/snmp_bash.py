@@ -23,11 +23,16 @@ PASSWORD = 'pass'
 
 
 class SnmpCisco(topology_discovery_api.TopoDiscMechanismApi):
+
+    def __init__(self, community, version):
+        self.community = community
+        self.version = version
+
     def connect(self, hostname, **kwargs):
         self.hostname = hostname
         self.session = Session(hostname=hostname,
-                               community=kwargs['community'],
-                               version=kwargs['version'])
+                               community=self.community,
+                               version=self.version)
 
     def get_node_name(self):
         try:

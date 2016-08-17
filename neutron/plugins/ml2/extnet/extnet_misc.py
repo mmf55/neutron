@@ -243,7 +243,7 @@ class ExtNetControllerMixin(extnet_db_mixin.ExtNetworkDBMixin,
     # ------------------------------------ Auxiliary functions ---------------------------------------
 
     def discover_topology(self, context):
-        td = topo_discovery.TopologyDiscovery(snmp_bash.SnmpCisco())
+        td = topo_discovery.TopologyDiscovery(snmp_bash.SnmpCisco('public', 2))
         topo_dict = td.get_devices_info(self.net_ctrl_nexthop_ip)
 
         if not topo_dict:
