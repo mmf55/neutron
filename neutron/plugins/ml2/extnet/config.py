@@ -40,7 +40,7 @@ netctrl_opts = [
                 help='Next hop device interface connected to network controller.'),
 
     cfg.DictOpt('device_controllers',
-                default="q-agent-notifier: OVS,extnet_agent: ESW1;ESW2;ESW4",
+                default="q-agent-notifier: OVS,extnet_agent: ESW1;ESW2;ESW3;ESW4",
                 required=False,
                 help='Device controller available on the network controller.'),
 ]
